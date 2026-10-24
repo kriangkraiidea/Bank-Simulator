@@ -41,13 +41,13 @@
     }
     .bottom-nav {
       backdrop-filter: blur(16px);
-      background-color: rgba(15, 23, 42, 0.92);
+      background-color: rgba(15, 23, 42, 0.94);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
     .nav-item.active { color: #34d399; }
     .nav-item.active .nav-icon { transform: translateY(-2px); }
     .modal-backdrop {
-      background: rgba(3, 7, 18, 0.82);
+      background: rgba(3, 7, 18, 0.84);
       backdrop-filter: blur(8px);
     }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -59,26 +59,119 @@
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none; margin: 0;
     }
+    .calc-btn {
+      transition: all 0.1s ease;
+    }
+    .calc-btn:active {
+      transform: scale(0.95);
+      background-color: #334155;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between max-w-md mx-auto relative antialiased pb-20">
+
+<!-- SVG ICON SYSTEM -->
+<svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+  <defs>
+    <!-- Bank Building -->
+    <g id="icon-bank">
+      <polygon points="12 2 2 7 22 7 12 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <rect x="4" y="10" width="3" height="8" stroke="currentColor" stroke-width="2" fill="none"/>
+      <rect x="10.5" y="10" width="3" height="8" stroke="currentColor" stroke-width="2" fill="none"/>
+      <rect x="17" y="10" width="3" height="8" stroke="currentColor" stroke-width="2" fill="none"/>
+      <rect x="2" y="18" width="20" height="4" stroke="currentColor" stroke-width="2" fill="none"/>
+    </g>
+    <!-- Transfer / Send -->
+    <g id="icon-transfer">
+      <line x1="7" y1="17" x2="17" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <polyline points="7 7 17 7 17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+    <!-- Receive Money -->
+    <g id="icon-receive">
+      <line x1="17" y1="7" x2="7" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <polyline points="17 17 7 17 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+    <!-- Home -->
+    <g id="icon-home">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+    </g>
+    <!-- Calculator -->
+    <g id="icon-calc">
+      <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+      <line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="8" y1="10" x2="8.01" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="12" y1="10" x2="12.01" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="16" y1="10" x2="16.01" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="8" y1="14" x2="8.01" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="12" y1="14" x2="12.01" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="16" y1="14" x2="16.01" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="8" y1="18" x2="8.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="12" y1="18" x2="12.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="16" y1="18" x2="16.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <!-- Statement / Document -->
+    <g id="icon-statement">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <polyline points="10 9 9 9 8 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <!-- Users -->
+    <g id="icon-users">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <!-- Camera -->
+    <g id="icon-camera">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+    </g>
+    <!-- Lock -->
+    <g id="icon-lock">
+      <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" fill="none"/>
+    </g>
+    <!-- Eye -->
+    <g id="icon-eye">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none"/>
+      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+    </g>
+    <!-- Refresh -->
+    <g id="icon-refresh">
+      <polyline points="23 4 23 10 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="1 20 1 14 7 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <!-- Exit -->
+    <g id="icon-exit">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </defs>
+</svg>
 
 <!-- ========================= SCREEN: HOME (ENTRY & LOBBY) ========================= -->
 <div id="screen-welcome" class="flex-1 flex flex-col justify-between p-5 min-h-screen">
   <div>
     <!-- Brand Header -->
     <div class="pt-6 pb-4 text-center">
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-xl shadow-emerald-900/40 mb-3">
-        <span class="text-4xl">🏦</span>
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-xl shadow-emerald-900/40 mb-3 text-slate-950">
+        <svg class="w-10 h-10" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
       </div>
       <h1 class="text-2xl font-bold tracking-tight text-white">MONO BANK</h1>
       <p class="text-emerald-400 font-medium text-xs mt-0.5">เศรษฐี Mobile Banking</p>
     </div>
 
-    <!-- Create Room Button (Full Width) -->
+    <!-- Create Room Button (Single Big Button) -->
     <div class="mb-5">
-      <button onclick="openSetupScreen()" class="w-full py-4 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/25 transition active:scale-[0.98] flex items-center justify-center gap-2">
-        <span>🎲</span> สร้างห้องเกมใหม่
+      <button onclick="openSetupScreen()" class="w-full py-4 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/25 transition active:scale-[0.98] flex items-center justify-center gap-2.5">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span>สร้างห้องเกมใหม่</span>
       </button>
     </div>
 
@@ -87,16 +180,17 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></span>
-          <h3 class="font-bold text-sm text-slate-200">ห้องเกมทั้งหมด (เรียงตามล่าสุด)</h3>
+          <h3 class="font-bold text-sm text-slate-200">ห้องเกมทั้งหมด (ล่าสุดอยู่บนสุด)</h3>
         </div>
-        <button onclick="loadActiveLobbyGames()" class="text-xs text-emerald-400 font-medium flex items-center gap-1 active:scale-95 transition">
-          <span id="lobby-refresh-icon">🔄</span> รีเฟรช
+        <button onclick="loadActiveLobbyGames()" class="text-xs text-emerald-400 font-medium flex items-center gap-1.5 active:scale-95 transition">
+          <svg id="lobby-refresh-icon" class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-refresh"/></svg>
+          <span>รีเฟรช</span>
         </button>
       </div>
 
       <div id="lobby-games-list" class="space-y-2.5 max-h-[52vh] overflow-y-auto hide-scrollbar pb-2">
         <div class="p-6 text-center text-xs text-slate-500 bg-slate-900/60 rounded-2xl border border-slate-800">
-          ⏳ กำลังค้นหาห้องเกม...
+          กำลังค้นหาห้องเกม...
         </div>
       </div>
     </div>
@@ -113,7 +207,9 @@
 <!-- ========================= SCREEN: SETUP GAME ========================= -->
 <div id="screen-setup" class="hidden flex-1 p-5 min-h-screen">
   <div class="flex items-center justify-between mb-4">
-    <button onclick="navScreen('screen-welcome')" class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-sm">←</button>
+    <button onclick="navScreen('screen-welcome')" class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300">
+      <svg class="w-4 h-4" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </button>
     <h2 class="font-bold text-base text-white">สร้างห้องเกมใหม่</h2>
     <div class="w-9"></div>
   </div>
@@ -126,7 +222,7 @@
       <input id="setup-room-name" type="text" maxlength="20" placeholder="เช่น แก๊งเพื่อนรัก, เศรษฐีห้อง 1" oninput="handleRoomNameInput(this)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-medium focus:border-emerald-500 focus:outline-none"/>
     </div>
 
-    <!-- Player Rows with Color Picker & 12-char Limit -->
+    <!-- Player Rows with Color Picker & 12-char Limit (No number counter) -->
     <div>
       <div class="flex items-center justify-between mb-2">
         <label class="text-xs text-slate-300 font-semibold">รายชื่อผู้เล่น (2 - 8 คน / ไม่เกิน 12 ตัวอักษร)</label>
@@ -157,7 +253,7 @@
     <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-3">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-xs font-semibold text-white">🙈 ซ่อนยอดเงินผู้เล่นอื่น</p>
+          <p class="text-xs font-semibold text-white">ซ่อนยอดเงินผู้เล่นอื่น</p>
           <p class="text-[10px] text-slate-400">ผู้เล่นจะเห็นเฉพาะยอดเงินของตัวเองเท่านั้น</p>
         </div>
         <input id="setup-hide-balance" type="checkbox" checked class="w-5 h-5 accent-emerald-500 cursor-pointer"/>
@@ -165,7 +261,7 @@
 
       <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between">
         <div>
-          <p class="text-xs font-semibold text-white">👁️ อนุญาตให้มีผู้ชม (Spectator)</p>
+          <p class="text-xs font-semibold text-white">อนุญาตให้มีผู้ชม (Spectator)</p>
           <p class="text-[10px] text-slate-400">ให้ผู้อื่นสามารถกดเข้ามาดูเกมได้</p>
         </div>
         <input id="setup-allow-spectator" type="checkbox" checked class="w-5 h-5 accent-emerald-500 cursor-pointer"/>
@@ -175,7 +271,7 @@
       <div class="pt-2 border-t border-slate-700/60">
         <div class="flex items-center justify-between mb-2">
           <div>
-            <p class="text-xs font-semibold text-white">🔒 ล็อครหัสผ่านเข้าห้อง</p>
+            <p class="text-xs font-semibold text-white">ล็อครหัสผ่านเข้าห้อง</p>
             <p class="text-[10px] text-slate-400">ต้องกรอกรหัสผ่านก่อนเข้าห้อง</p>
           </div>
           <input id="setup-has-password" type="checkbox" onchange="togglePasswordInput(this.checked)" class="w-5 h-5 accent-emerald-500 cursor-pointer"/>
@@ -189,7 +285,7 @@
     <div id="setup-error" class="hidden p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-400 text-xs text-center"></div>
 
     <button id="btn-create-game" onclick="handleCreateGame()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 transition active:scale-[0.98]">
-      🚀 บันทึกและสร้างห้องเกม
+      บันทึกและสร้างห้องเกม
     </button>
   </div>
 </div>
@@ -197,7 +293,9 @@
 <!-- ========================= SCREEN: SELECT MY IDENTITY ========================= -->
 <div id="screen-select-user" class="hidden flex-1 p-5 min-h-screen">
   <div class="text-center pt-3 mb-5">
-    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-xl mb-2">👤</div>
+    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-xl mb-2">
+      <svg class="w-6 h-6" viewBox="0 0 24 24"><use href="#icon-users"/></svg>
+    </div>
     <h2 class="text-lg font-bold text-white">เลือกบัญชีผู้เล่นของคุณ</h2>
     <p class="text-xs text-slate-400 mt-0.5">ตัวละครที่มีผู้อื่นเลือกแล้ว จะไม่สามารถเลือกซ้ำได้</p>
     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-emerald-400 mt-2">
@@ -208,7 +306,7 @@
   <div id="select-user-list" class="space-y-2.5 max-w-sm mx-auto"></div>
 
   <div id="select-spectator-box" class="mt-4 text-center">
-    <button onclick="enterAsSpectator()" class="text-xs text-slate-400 hover:text-white underline">เข้าดูในฐานะผู้ชม (Spectator 👁️)</button>
+    <button onclick="enterAsSpectator()" class="text-xs text-slate-400 hover:text-white underline">เข้าดูในฐานะผู้ชม (Spectator)</button>
   </div>
 </div>
 
@@ -218,8 +316,8 @@
   <!-- Top App Bar -->
   <header class="px-5 pt-3 pb-2 flex items-center justify-between sticky top-0 z-30 bg-[#0b1120]/95 backdrop-blur-md border-b border-slate-800/80">
     <div class="flex items-center gap-2.5 min-w-0 pr-2">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-lg shadow-md shadow-emerald-900/30 shrink-0">
-        🏦
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 shadow-md shadow-emerald-900/30 shrink-0">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
       </div>
       <div class="min-w-0">
         <div class="flex items-center gap-1.5">
@@ -234,13 +332,13 @@
 
     <div class="flex items-center gap-2 shrink-0">
       <button onclick="refreshGameState(true)" id="btn-sync" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs active:scale-95 transition" title="ซิงค์ข้อมูล">
-        🔄
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-refresh"/></svg>
       </button>
       <button onclick="switchUserPrompt()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs" title="สลับตัวละคร">
-        👤
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-users"/></svg>
       </button>
       <button onclick="confirmExitGame()" class="w-8 h-8 rounded-full bg-red-950/60 border border-red-800 flex items-center justify-center text-red-400 text-xs" title="ออกจากห้อง (คืนตัวละครให้ผู้อื่นเล่นได้)">
-        🚪
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-exit"/></svg>
       </button>
     </div>
   </header>
@@ -254,10 +352,10 @@
         <div class="flex items-center gap-3">
           <div class="relative group cursor-pointer" onclick="triggerAvatarUpload()">
             <div id="my-card-avatar-container" class="w-12 h-12 rounded-2xl bg-black/20 border-2 border-white/20 overflow-hidden flex items-center justify-center text-2xl shadow-inner">
-              <span id="my-card-emoji">👤</span>
+              <span id="my-card-emoji"></span>
             </div>
-            <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-900 border border-white/40 flex items-center justify-center text-[10px]" title="แตะเพื่อเปลี่ยนรูป">
-              📷
+            <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-900 border border-white/40 flex items-center justify-center text-slate-300" title="แตะเพื่อเปลี่ยนรูป">
+              <svg class="w-3 h-3" viewBox="0 0 24 24"><use href="#icon-camera"/></svg>
             </div>
           </div>
           <div>
@@ -273,7 +371,9 @@
       <div class="my-3">
         <p class="text-[11px] text-emerald-100/80 mb-0.5 flex items-center gap-1.5">
           <span>ยอดเงินคงเหลือ</span>
-          <button onclick="toggleBalanceVisibility()" class="text-xs opacity-75 hover:opacity-100" id="btn-toggle-eye">👁️</button>
+          <button onclick="toggleBalanceVisibility()" class="opacity-75 hover:opacity-100" id="btn-toggle-eye">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-eye"/></svg>
+          </button>
         </p>
         <div class="flex items-baseline gap-1">
           <span class="text-lg font-semibold text-emerald-200">฿</span>
@@ -287,32 +387,32 @@
       </div>
     </div>
 
-    <!-- Quick Action Grid -->
+    <!-- Quick Action Grid (Bank App Style) -->
     <div class="grid grid-cols-4 gap-2.5">
       <button onclick="handleTransferButtonClick()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
-        <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-xl shadow-inner">
-          💸
+        <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
         </div>
         <span class="text-[11px] font-medium text-slate-200">โอนเงิน</span>
       </button>
 
-      <button onclick="openBankModalWithTab('receive')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
-        <div class="w-11 h-11 rounded-2xl bg-teal-500/15 text-teal-400 flex items-center justify-center text-xl shadow-inner">
-          📥
+      <button onclick="switchTab('calc')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
+        <div class="w-11 h-11 rounded-2xl bg-blue-500/15 text-blue-400 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-calc"/></svg>
         </div>
-        <span class="text-[11px] font-medium text-slate-200">เบิกธนาคาร</span>
+        <span class="text-[11px] font-medium text-slate-200">คิดเลข</span>
       </button>
 
-      <button onclick="openBankModalWithTab('pay')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
-        <div class="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-xl shadow-inner">
-          📤
+      <button onclick="openBankModalWithTab('receive')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
+        <div class="w-11 h-11 rounded-2xl bg-teal-500/15 text-teal-400 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
         </div>
-        <span class="text-[11px] font-medium text-slate-200">จ่ายธนาคาร</span>
+        <span class="text-[11px] font-medium text-slate-200">ธนาคาร</span>
       </button>
 
       <button onclick="switchTab('statement')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
-        <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center text-xl shadow-inner">
-          📜
+        <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-statement"/></svg>
         </div>
         <span class="text-[11px] font-medium text-slate-200">สเตทเม้นต์</span>
       </button>
@@ -322,7 +422,7 @@
     <div class="bank-central-card rounded-2xl p-4 text-white flex items-center justify-between border border-indigo-400/20">
       <div>
         <div class="flex items-center gap-1.5">
-          <span class="text-base">🏦</span>
+          <svg class="w-4 h-4 text-indigo-300" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
           <span class="text-xs text-indigo-200 font-medium">คลังเงินธนาคารกลาง (Game Vault)</span>
         </div>
         <div class="text-xl font-bold mt-1 text-white flex items-baseline gap-1">
@@ -335,11 +435,11 @@
       </button>
     </div>
 
-    <!-- Quick Payee Transfer Carousel -->
+    <!-- Quick Payees Carousel -->
     <div>
       <div class="flex items-center justify-between mb-2">
         <h4 class="text-xs font-semibold text-slate-300">เพื่อนในห้อง (แตะเพื่อโอนเงิน)</h4>
-        <span id="privacy-indicator-badge" class="text-[10px] text-slate-400">🙈 ซ่อนยอดเงินผู้อื่น</span>
+        <span id="privacy-indicator-badge" class="text-[10px] text-slate-400">ซ่อนยอดเงินผู้อื่น</span>
       </div>
       <div id="quick-payees-carousel" class="flex gap-3 overflow-x-auto hide-scrollbar pb-1"></div>
     </div>
@@ -365,7 +465,7 @@
     <!-- From Card Info -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div id="transfer-from-avatar-box" class="w-10 h-10 rounded-xl bg-slate-800 overflow-hidden flex items-center justify-center text-xl">👤</div>
+        <div id="transfer-from-avatar-box" class="w-10 h-10 rounded-xl bg-slate-800 overflow-hidden flex items-center justify-center text-xl"></div>
         <div>
           <p class="text-[10px] text-slate-400">จากบัญชีผู้โอน</p>
           <p id="transfer-from-name" class="font-bold text-sm text-white">คุณ</p>
@@ -383,7 +483,7 @@
       <div id="transfer-recipients-grid" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto hide-scrollbar"></div>
     </div>
 
-    <!-- Amount Input with +10 Quick Pill -->
+    <!-- Amount Input with Quick Pills (+10, etc.) -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
       <label class="text-xs text-slate-400 block font-medium">ระบุจำนวนเงินที่ต้องการโอน (บาท)</label>
       <div class="relative flex items-center">
@@ -392,7 +492,7 @@
         <button onclick="clearTransferAmount()" class="text-slate-500 hover:text-slate-300 text-sm px-2">✕</button>
       </div>
 
-      <!-- Quick Amount Buttons with +10 -->
+      <!-- Quick Amount Buttons -->
       <div class="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800/80">
         <button onclick="addTransferAmount(10)" class="py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition active:scale-95">+10</button>
         <button onclick="addTransferAmount(100)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+100</button>
@@ -407,7 +507,7 @@
 
     <!-- Reason / Memo -->
     <div class="space-y-2">
-      <label class="text-xs text-slate-300 font-medium block">บันทึกช่วยจำ / เหตุผล</label>
+      <label class="text-xs text-slate-300 font-medium block">บันทึกช่วยจำ / หมายเหตุ</label>
       <input id="input-transfer-reason" type="text" placeholder="ระบุเหตุผล เช่น ค่าเช่าที่ดิน" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-emerald-500 focus:outline-none"/>
 
       <div class="flex flex-wrap gap-1.5 pt-1">
@@ -415,7 +515,8 @@
         <button onclick="setQuickReason('🚀 ผ่านจุดเริ่มต้น GO')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🚀 ผ่าน GO</button>
         <button onclick="setQuickReason('🏘️ ซื้อที่ดินต่อ')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🏘️ ซื้อที่ดินต่อ</button>
         <button onclick="setQuickReason('🏨 ค้างแรมโรงแรม')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🏨 ค่าโรงแรม</button>
-        <button onclick="setQuickReason('🤝 ยืมเงิน')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🤝 ยืมเงิน</button>
+        <button onclick="setQuickReason('💎 การ์ดสมบัติ')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">💎 การ์ดสมบัติ</button>
+        <button onclick="setQuickReason('🃏 การ์ดโอกาส')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🃏 การ์ดโอกาส</button>
       </div>
     </div>
 
@@ -425,11 +526,68 @@
     </button>
   </main>
 
-  <!-- TAB CONTENT 3: CENTRAL BANK OPERATIONS -->
+  <!-- TAB CONTENT 3: CALCULATOR (เครื่องคิดเลขส่งยอดได้) -->
+  <main id="tab-content-calc" class="hidden p-5 space-y-4 flex-1">
+    <div class="text-center pb-1">
+      <h3 class="text-base font-bold text-white flex items-center justify-center gap-1.5">
+        <svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24"><use href="#icon-calc"/></svg>
+        <span>เครื่องคิดเลขการเงิน</span>
+      </h3>
+      <p class="text-xs text-slate-400">คำนวณยอดเงิน แล้วกดส่งยอดไปโอนเงินหรือธนาคารได้ทันที</p>
+    </div>
+
+    <!-- Calculator Display Screen -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-right shadow-inner">
+      <div id="calc-expression" class="text-xs font-mono text-slate-400 h-5 overflow-x-auto hide-scrollbar">0</div>
+      <div id="calc-display" class="text-3xl font-extrabold text-emerald-400 font-mono tracking-tight overflow-x-auto hide-scrollbar pt-1">0</div>
+    </div>
+
+    <!-- Calculator Keypad -->
+    <div class="grid grid-cols-4 gap-2 text-sm font-semibold">
+      <button onclick="calcClear()" class="calc-btn py-3.5 rounded-xl bg-slate-800/80 text-amber-400 border border-slate-700">C</button>
+      <button onclick="calcBackspace()" class="calc-btn py-3.5 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700">⌫</button>
+      <button onclick="calcOp('%')" class="calc-btn py-3.5 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700">%</button>
+      <button onclick="calcOp('/')" class="calc-btn py-3.5 rounded-xl bg-emerald-600 text-white">÷</button>
+
+      <button onclick="calcNum('7')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">7</button>
+      <button onclick="calcNum('8')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">8</button>
+      <button onclick="calcNum('9')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">9</button>
+      <button onclick="calcOp('*')" class="calc-btn py-3.5 rounded-xl bg-emerald-600 text-white">×</button>
+
+      <button onclick="calcNum('4')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">4</button>
+      <button onclick="calcNum('5')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">5</button>
+      <button onclick="calcNum('6')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">6</button>
+      <button onclick="calcOp('-')" class="calc-btn py-3.5 rounded-xl bg-emerald-600 text-white">−</button>
+
+      <button onclick="calcNum('1')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">1</button>
+      <button onclick="calcNum('2')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">2</button>
+      <button onclick="calcNum('3')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">3</button>
+      <button onclick="calcOp('+')" class="calc-btn py-3.5 rounded-xl bg-emerald-600 text-white">+</button>
+
+      <button onclick="calcNum('0')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">0</button>
+      <button onclick="calcNum('00')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">00</button>
+      <button onclick="calcNum('.')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">.</button>
+      <button onclick="calcEquals()" class="calc-btn py-3.5 rounded-xl bg-emerald-500 text-slate-950 font-bold">=</button>
+    </div>
+
+    <!-- Apply Amount Buttons -->
+    <div class="grid grid-cols-2 gap-2.5 pt-2">
+      <button onclick="applyCalcToTransfer()" class="py-3 px-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow transition active:scale-95 flex items-center justify-center gap-1.5">
+        <svg class="w-4 h-4" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
+        <span>โอนให้ผู้เล่น (ใช้ยอดนี้)</span>
+      </button>
+      <button onclick="applyCalcToBank()" class="py-3 px-3 rounded-2xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs shadow transition active:scale-95 flex items-center justify-center gap-1.5">
+        <svg class="w-4 h-4" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
+        <span>จ่าย/รับธนาคาร (ใช้ยอดนี้)</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- TAB CONTENT 4: CENTRAL BANK OPERATIONS -->
   <main id="tab-content-bank" class="hidden p-5 space-y-4 flex-1">
     <div class="text-center pb-1">
       <h3 class="text-base font-bold text-white flex items-center justify-center gap-1.5">
-        <span>🏛️</span>
+        <svg class="w-5 h-5 text-teal-400" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
         <span id="bank-tab-heading">ธุรกรรมธนาคารกลาง</span>
       </h3>
       <p id="bank-tab-subheading" class="text-xs text-slate-400">เบิกเงินรางวัล หรือชำระเงินให้กับธนาคารเกม</p>
@@ -438,63 +596,75 @@
     <!-- Direction Tabs -->
     <div class="grid grid-cols-2 p-1 rounded-2xl bg-slate-900 border border-slate-800">
       <button onclick="setBankTabMode('receive')" id="bank-tab-btn-receive" class="py-2.5 rounded-xl font-semibold text-xs transition bg-emerald-500 text-slate-950 shadow-md">
-        📥 รับเงินจากธนาคาร
+        รับเงินจากธนาคาร
       </button>
       <button onclick="setBankTabMode('pay')" id="bank-tab-btn-pay" class="py-2.5 rounded-xl font-semibold text-xs transition text-slate-400">
-        📤 จ่ายเงินให้ธนาคาร
+        จ่ายเงินให้ธนาคาร
       </button>
     </div>
 
-    <!-- Selected Target Player -->
+    <!-- Selected Target Player (Excludes Bankrupt & Hides Balance of Others) -->
     <div>
       <label class="text-xs text-slate-400 block mb-1">ผู้เล่นเป้าหมาย</label>
       <select id="bank-player-select" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"></select>
     </div>
 
-    <!-- Presets -->
+    <!-- Presets for Monopoly -->
     <div id="bank-preset-section">
       <label class="text-xs text-slate-300 font-semibold mb-2 block">รายการด่วนเกมเศรษฐี:</label>
       <div id="bank-presets-container" class="grid grid-cols-2 gap-2"></div>
     </div>
 
-    <!-- Custom Bank Amount with +10 -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
-      <label class="text-xs text-slate-400 font-medium">ระบุจำนวนเงิน (บาท)</label>
+    <!-- Custom Bank Amount with Full Quick Buttons and Clear Button -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <label class="text-xs text-slate-400 block font-medium">ระบุจำนวนเงิน (บาท)</label>
       <div class="relative flex items-center">
         <span class="text-2xl font-bold text-emerald-400 mr-2">฿</span>
         <input id="input-bank-amount" type="number" min="1" placeholder="0" class="w-full bg-transparent text-2xl font-bold text-white focus:outline-none placeholder:text-slate-600"/>
+        <button onclick="clearBankAmount()" class="text-slate-500 hover:text-slate-300 text-sm px-2">✕</button>
       </div>
+
+      <!-- Bank Quick Amount Grid -->
       <div class="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800/80">
-        <button onclick="addBankAmount(10)" class="py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition">+10</button>
-        <button onclick="addBankAmount(100)" class="py-1 rounded-lg bg-slate-800 text-xs text-slate-300 transition">+100</button>
-        <button onclick="addBankAmount(500)" class="py-1 rounded-lg bg-slate-800 text-xs text-slate-300 transition">+500</button>
-        <button onclick="addBankAmount(2000)" class="py-1 rounded-lg bg-slate-800 text-xs text-slate-300 transition">+2,000</button>
+        <button onclick="addBankAmount(10)" class="py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition active:scale-95">+10</button>
+        <button onclick="addBankAmount(100)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+100</button>
+        <button onclick="addBankAmount(500)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+500</button>
+        <button onclick="addBankAmount(1000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+1,000</button>
+        <button onclick="addBankAmount(2000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+2,000</button>
+        <button onclick="addBankAmount(5000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+5,000</button>
+        <button onclick="addBankAmount(10000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+10,000</button>
+        <button onclick="clearBankAmount()" class="py-1.5 rounded-lg bg-red-950/60 text-red-300 border border-red-800 text-xs font-medium transition">เคลียร์ 0</button>
       </div>
     </div>
 
-    <!-- Bank Reason -->
-    <div class="space-y-1.5">
+    <!-- Bank Reason / Memo Tags -->
+    <div class="space-y-2">
       <label class="text-xs text-slate-300 font-medium flex items-center justify-between">
-        <span>เหตุผลประกอบรายการ</span>
+        <span>หมายเหตุ / บันทึกช่วยจำ</span>
         <span class="text-red-400 text-[10px]">*บังคับ</span>
       </label>
       <input id="input-bank-reason" type="text" placeholder="ระบุเหตุผล เช่น ผ่านจุดเริ่มต้น" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-emerald-500 focus:outline-none"/>
+
+      <!-- Bank Quick Reason Tags -->
+      <div id="bank-quick-tags-container" class="flex flex-wrap gap-1.5 pt-1"></div>
     </div>
 
-    <button onclick="handleExecuteBankTransfer()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition">
-      ✅ ยืนยันทำรายการธนาคาร
+    <!-- Confirm Review Button -->
+    <button onclick="prepareBankReview()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition mt-2">
+      ตรวจสอบและยืนยันทำรายการ →
     </button>
   </main>
 
-  <!-- TAB CONTENT 4: STATEMENT -->
+  <!-- TAB CONTENT 5: STATEMENT (DD/MM/YYYY HH:MM) -->
   <main id="tab-content-statement" class="hidden p-5 space-y-4 flex-1">
     <div class="flex items-center justify-between">
       <div>
         <h3 class="font-bold text-base text-white">Statement ประวัติการเงิน</h3>
-        <p class="text-xs text-slate-400">บันทึกทุกธุรกรรมแบบ Real-time</p>
+        <p class="text-xs text-slate-400">บันทึกทุกธุรกรรม (DD/MM/YYYY HH:MM)</p>
       </div>
-      <button onclick="handleExportCsvStatement()" class="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-emerald-400 font-medium flex items-center gap-1 active:scale-95 transition">
-        <span>📥</span> CSV
+      <button onclick="handleExportCsvStatement()" class="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-emerald-400 font-medium flex items-center gap-1.5 active:scale-95 transition">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-statement"/></svg>
+        <span>CSV</span>
       </button>
     </div>
 
@@ -510,7 +680,7 @@
     <div id="statement-list-container" class="space-y-2.5 pb-4 max-h-[60vh] overflow-y-auto hide-scrollbar"></div>
   </main>
 
-  <!-- TAB CONTENT 5: PLAYERS -->
+  <!-- TAB CONTENT 6: PLAYERS -->
   <main id="tab-content-players" class="hidden p-5 space-y-4 flex-1">
     <div class="flex items-center justify-between">
       <div>
@@ -525,31 +695,36 @@
     <div id="full-players-rank-list" class="space-y-3"></div>
   </main>
 
-  <!-- Bottom Navigation Bar -->
-  <nav class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 flex items-center justify-around py-2 px-1">
-    <button onclick="switchTab('home')" id="nav-btn-home" class="nav-item active flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
-      <span class="nav-icon text-xl">🏠</span>
-      <span class="text-[10px] font-medium">หน้าหลัก</span>
+  <!-- Bottom Navigation Bar (6 Sleek Items) -->
+  <nav class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 grid grid-cols-6 py-2 px-1 text-center">
+    <button onclick="switchTab('home')" id="nav-btn-home" class="nav-item active flex flex-col items-center gap-1 py-1 text-slate-400 transition">
+      <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-home"/></svg>
+      <span class="text-[9px] font-medium">หน้าหลัก</span>
     </button>
 
-    <button onclick="handleTransferButtonClick()" id="nav-btn-transfer" class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
-      <span class="nav-icon text-xl">💸</span>
-      <span class="text-[10px] font-medium">โอนเงิน</span>
+    <button onclick="handleTransferButtonClick()" id="nav-btn-transfer" class="nav-item flex flex-col items-center gap-1 py-1 text-slate-400 transition">
+      <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
+      <span class="text-[9px] font-medium">โอนเงิน</span>
     </button>
 
-    <button onclick="switchTab('bank')" id="nav-btn-bank" class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
-      <span class="nav-icon text-xl">🏦</span>
-      <span class="text-[10px] font-medium">ธนาคาร</span>
+    <button onclick="switchTab('calc')" id="nav-btn-calc" class="nav-item flex flex-col items-center gap-1 py-1 text-slate-400 transition">
+      <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-calc"/></svg>
+      <span class="text-[9px] font-medium">คิดเลข</span>
     </button>
 
-    <button onclick="switchTab('statement')" id="nav-btn-statement" class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
-      <span class="nav-icon text-xl">📜</span>
-      <span class="text-[10px] font-medium">สเตทเม้นต์</span>
+    <button onclick="switchTab('bank')" id="nav-btn-bank" class="nav-item flex flex-col items-center gap-1 py-1 text-slate-400 transition">
+      <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
+      <span class="text-[9px] font-medium">ธนาคาร</span>
     </button>
 
-    <button onclick="switchTab('players')" id="nav-btn-players" class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
-      <span class="nav-icon text-xl">👥</span>
-      <span class="text-[10px] font-medium">ผู้เล่น</span>
+    <button onclick="switchTab('statement')" id="nav-btn-statement" class="nav-item flex flex-col items-center gap-1 py-1 text-slate-400 transition">
+      <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-statement"/></svg>
+      <span class="text-[9px] font-medium">สเตทเม้นต์</span>
+    </button>
+
+    <button onclick="switchTab('players')" id="nav-btn-players" class="nav-item flex flex-col items-center gap-1 py-1 text-slate-400 transition">
+      <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-users"/></svg>
+      <span class="text-[9px] font-medium">ผู้เล่น</span>
     </button>
   </nav>
 
@@ -575,7 +750,9 @@
 <div id="modal-transfer-review" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end sm:items-center justify-center p-4">
   <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
     <div class="text-center pb-1">
-      <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl mb-2">💸</div>
+      <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-2">
+        <svg class="w-6 h-6" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
+      </div>
       <h3 class="font-bold text-lg">ตรวจสอบข้อมูลการโอน</h3>
       <p class="text-xs text-slate-400">กรุณาตรวจสอบยอดและผู้รับก่อนยืนยัน</p>
     </div>
@@ -604,7 +781,7 @@
         บันทึก: <span id="review-reason-text" class="text-slate-200">—</span>
       </div>
       <div id="review-insufficient-warning" class="hidden p-2 rounded-lg bg-orange-950/60 border border-orange-700 text-orange-400 text-[11px]">
-        ⚠️ ยอดเงินในบัญชีคุณไม่พอ ยอดคงเหลือจะติดลบหลังทำรายการ
+        ยอดเงินในบัญชีคุณไม่พอ ยอดคงเหลือจะติดลบหลังทำรายการ
       </div>
     </div>
 
@@ -619,23 +796,68 @@
   </div>
 </div>
 
+<!-- ========================= MODAL: BANK REVIEW ========================= -->
+<div id="modal-bank-review" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end sm:items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+    <div class="text-center pb-1">
+      <div class="w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center mx-auto mb-2">
+        <svg class="w-6 h-6" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
+      </div>
+      <h3 class="font-bold text-lg">ตรวจสอบธุรกรรมธนาคาร</h3>
+      <p class="text-xs text-slate-400">กรุณาตรวจสอบข้อมูลก่อนยืนยันทำรายการ</p>
+    </div>
+
+    <div class="bg-slate-800/80 rounded-2xl p-4 space-y-3 border border-slate-700/60 text-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-slate-400">ประเภทรายการ</span>
+        <span id="bank-review-dir" class="font-bold text-emerald-400">—</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-400">ผู้เล่น</span>
+        <span id="bank-review-player" class="font-bold text-white text-sm">—</span>
+      </div>
+      <div class="pt-2 border-t border-slate-700 flex items-baseline justify-between">
+        <span class="text-xs text-slate-300 font-medium">จำนวนเงิน</span>
+        <div class="text-right">
+          <span class="text-2xl font-extrabold text-white">฿</span>
+          <span id="bank-review-amount" class="text-2xl font-extrabold text-white">0</span>
+        </div>
+      </div>
+      <div class="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-lg">
+        เหตุผล: <span id="bank-review-reason" class="text-slate-200">—</span>
+      </div>
+    </div>
+
+    <div class="flex gap-2.5 pt-1">
+      <button onclick="closeBankReviewModal()" class="flex-1 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition">
+        ยกเลิก
+      </button>
+      <button onclick="confirmAndExecuteBankTransfer()" id="btn-bank-review-confirm" class="flex-1 py-3.5 rounded-2xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-teal-500/25 transition">
+        ยืนยันทำรายการ
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================= MODAL: ELECTRONIC SLIP ========================= -->
-<div id="modal-slip" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+<div id="modal-slip" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4" onclick="if(event.target === this) closeSlipModal();">
   <div class="slip-card rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
     <div class="text-center pb-4 border-b border-dashed border-slate-300">
-      <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-2xl mb-1.5">✓</div>
-      <h3 class="font-bold text-base text-slate-900">โอนเงินสำเร็จ</h3>
-      <p class="text-[11px] text-slate-500" id="slip-timestamp">24 ต.ค. 2569 - 22:10 น.</p>
+      <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-1.5">
+        <svg class="w-6 h-6" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3 class="font-bold text-base text-slate-900">ทำรายการสำเร็จ</h3>
+      <p class="text-[11px] text-slate-500 font-mono" id="slip-timestamp">25/10/2026 00:15</p>
       <p class="text-[10px] font-mono text-slate-400 mt-0.5">รหัสอ้างอิง: <span id="slip-ref-no">TX9823412</span></p>
     </div>
 
     <div class="py-4 space-y-3.5 border-b border-dashed border-slate-300 text-xs">
       <div class="flex items-center justify-between">
-        <span class="text-slate-500">จาก (ผู้โอน)</span>
+        <span class="text-slate-500">จาก</span>
         <span id="slip-from-name" class="font-bold text-slate-900">—</span>
       </div>
       <div class="flex items-center justify-between">
-        <span class="text-slate-500">ไปยัง (ผู้รับ)</span>
+        <span class="text-slate-500">ไปยัง</span>
         <span id="slip-to-name" class="font-bold text-emerald-700 text-sm">—</span>
       </div>
       <div class="flex items-center justify-between">
@@ -654,10 +876,10 @@
 
     <div class="pt-4 text-center">
       <div class="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 mb-4">
-        <span>🏛️ MONO BANK DIGITAL SYSTEM</span>
+        <span>MONO BANK DIGITAL SYSTEM</span>
       </div>
       <button onclick="closeSlipModal()" class="w-full py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm shadow hover:bg-slate-800 transition active:scale-95">
-        เสร็จสิ้น
+        เสร็จสิ้น (กลับหน้าหลัก)
       </button>
     </div>
   </div>
@@ -667,7 +889,9 @@
 <div id="modal-password" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
   <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-xs shadow-2xl text-white space-y-4">
     <div class="text-center">
-      <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-xl mb-2">🔒</div>
+      <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-2">
+        <svg class="w-6 h-6" viewBox="0 0 24 24"><use href="#icon-lock"/></svg>
+      </div>
       <h3 class="font-bold text-base">ห้องนี้มีรหัสผ่าน</h3>
       <p class="text-xs text-slate-400 mt-1">กรุณากรอกรหัสผ่านเพื่อเข้าห้อง <span id="pwd-modal-room-name" class="text-emerald-400 font-bold"></span></p>
     </div>
@@ -690,14 +914,14 @@
 // STATE MANAGEMENT & PALETTE
 // ==========================================
 const PLAYER_PALETTE = [
-  { emoji: '🔴', name: 'แดง', hex: '#ef4444' },
-  { emoji: '🔵', name: 'น้ำเงิน', hex: '#3b82f6' },
-  { emoji: '🟢', name: 'เขียว', hex: '#10b981' },
-  { emoji: '🟡', name: 'เหลือง', hex: '#f59e0b' },
-  { emoji: '🟣', name: 'ม่วง', hex: '#a855f7' },
-  { emoji: '🟠', name: 'ส้ม', hex: '#f97316' },
-  { emoji: '🩷', name: 'ชมพู', hex: '#ec4899' },
-  { emoji: '🩵', name: 'ฟ้า', hex: '#06b6d4' },
+  { name: 'แดง', hex: '#ef4444' },
+  { name: 'น้ำเงิน', hex: '#3b82f6' },
+  { name: 'เขียว', hex: '#10b981' },
+  { name: 'เหลือง', hex: '#f59e0b' },
+  { name: 'ม่วง', hex: '#a855f7' },
+  { name: 'ส้ม', hex: '#f97316' },
+  { name: 'ชมพู', hex: '#ec4899' },
+  { name: 'ฟ้า', hex: '#06b6d4' },
 ];
 
 let appState = {
@@ -714,9 +938,15 @@ let appState = {
   bankTabMode: 'receive',
   statementFilter: 'all',
   pendingTransfer: null,
+  pendingBank: null,
   targetJoinCode: '',
   targetJoinIsSpectator: false,
   targetEditingRow: null,
+  // Calculator state
+  calcCurrent: '0',
+  calcPrev: '',
+  calcOp: null,
+  calcNewNumber: true,
 };
 
 function getOrCreateSessionId() {
@@ -813,7 +1043,7 @@ function navScreen(screenId) {
 
 function switchTab(tabId) {
   appState.currentTab = tabId;
-  ['home', 'transfer', 'bank', 'statement', 'players'].forEach(t => {
+  ['home', 'transfer', 'calc', 'bank', 'statement', 'players'].forEach(t => {
     const content = document.getElementById(`tab-content-${t}`);
     const navBtn = document.getElementById(`nav-btn-${t}`);
     if (content) content.classList.add('hidden');
@@ -859,7 +1089,7 @@ async function loadActiveLobbyGames() {
       const card = document.createElement('div');
       card.className = 'p-3.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-between transition shadow-sm';
       
-      const badgePwd = g.has_password ? '<span class="text-[10px] text-amber-400 font-bold ml-1">🔒 มีรหัส</span>' : '';
+      const badgePwd = g.has_password ? `<span class="inline-flex items-center gap-0.5 text-[10px] text-amber-400 font-bold ml-1"><svg class="w-3 h-3" viewBox="0 0 24 24"><use href="#icon-lock"/></svg> มีรหัส</span>` : '';
       const roomTitle = g.room_name || g.room_code;
 
       card.innerHTML = `
@@ -869,14 +1099,14 @@ async function loadActiveLobbyGames() {
             ${badgePwd}
           </div>
           <p class="text-[11px] text-slate-400 mt-0.5">
-            👥 ผู้เล่น: <span class="font-semibold text-slate-200">${g.active_players || 0}/${g.max_players || 0} คน</span>
-            ${g.hide_others_balance ? ' · 🙈 ซ่อนยอด' : ''}
+            ผู้เล่น: <span class="font-semibold text-slate-200">${g.active_players || 0}/${g.max_players || 0} คน</span>
+            ${g.hide_others_balance ? ' · ซ่อนยอด' : ''}
           </p>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
           ${g.allow_spectator ? `
             <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, true)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium" title="เข้าเป็นผู้ชม">
-              👁️ ดู
+              ดู
             </button>
           ` : ''}
           <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, false)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
@@ -986,7 +1216,7 @@ function openSetupScreen() {
     } catch(e) {}
   }
 
-  // Default setup with 3 distinct unrepeated colors
+  // Default setup
   document.getElementById('setup-room-name').value = 'ห้องเกมเศรษฐี 1';
   addPlayerSetupRow('ผู้เล่น 1', 0);
   addPlayerSetupRow('ผู้เล่น 2', 1);
@@ -1005,7 +1235,6 @@ function togglePasswordInput(checked) {
   else container.classList.add('hidden');
 }
 
-// Get array of color indices already in use by player rows
 function getUsedColorIndices(excludeRow = null) {
   const rows = document.querySelectorAll('.setup-player-row');
   const used = new Set();
@@ -1018,7 +1247,6 @@ function getUsedColorIndices(excludeRow = null) {
   return used;
 }
 
-// Find first available unpicked color
 function getNextAvailableColorIndex() {
   const used = getUsedColorIndices();
   for (let i = 0; i < PLAYER_PALETTE.length; i++) {
@@ -1041,16 +1269,14 @@ function addPlayerSetupRow(defaultName = '', colorIdx = -1) {
   const pal = PLAYER_PALETTE[finalColorIdx];
 
   const row = document.createElement('div');
-  row.className = 'setup-player-row flex items-center gap-2 bg-slate-800/80 p-2 rounded-xl border border-slate-700/60 relative';
+  row.className = 'setup-player-row flex items-center gap-2.5 bg-slate-800/80 p-2 rounded-xl border border-slate-700/60 relative';
   row.dataset.colorIndex = finalColorIdx;
 
   row.innerHTML = `
-    <!-- Color picker button (opens unique color modal) -->
-    <button type="button" onclick="openColorPickerModal(this)" class="color-btn w-9 h-9 rounded-xl flex items-center justify-center text-xl bg-slate-900 border border-slate-700 shrink-0 shadow-inner" title="แตะเพื่อเลือกสี">
-      ${pal.emoji}
-    </button>
+    <!-- Color circle button -->
+    <button type="button" onclick="openColorPickerModal(this)" class="color-btn w-8 h-8 rounded-full shrink-0 shadow-inner border-2 border-white/30 transition hover:scale-105" style="background-color: ${pal.hex};" title="แตะเพื่อเลือกสี"></button>
     <input type="text" maxlength="12" placeholder="ชื่อผู้เล่น ${count + 1}" value="${escapeHtml(defaultName)}" oninput="handlePlayerNameInput(this)" class="player-name-input flex-1 bg-transparent text-sm text-white focus:outline-none placeholder:text-slate-500 font-medium"/>
-    ${count >= 2 ? `<button type="button" onclick="this.parentElement.remove()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-red-400 text-lg leading-none">×</button>` : ''}
+    ${count >= 2 ? `<button type="button" onclick="this.parentElement.remove()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-red-400 text-lg leading-none">✕</button>` : ''}
   `;
 
   container.appendChild(row);
@@ -1062,7 +1288,7 @@ function handlePlayerNameInput(inp) {
   }
 }
 
-// Color Picker Modal Logic (Disallows duplicate color selection)
+// Color Picker Modal (Unique non-duplicate colors)
 function openColorPickerModal(btn) {
   const row = btn.closest('.setup-player-row');
   appState.targetEditingRow = row;
@@ -1078,9 +1304,9 @@ function openColorPickerModal(btn) {
 
     const optBtn = document.createElement('button');
     optBtn.type = 'button';
-    optBtn.className = `p-3 rounded-2xl border text-center flex flex-col items-center gap-1 transition ${
+    optBtn.className = `p-3 rounded-2xl border text-center flex flex-col items-center gap-1.5 transition ${
       isCurrent
-        ? 'bg-emerald-950/60 border-emerald-500 shadow-md ring-2 ring-emerald-500/40'
+        ? 'bg-emerald-950/60 border-emerald-500 ring-2 ring-emerald-500/40 shadow-lg'
         : isUsed
         ? 'bg-slate-900/40 border-slate-800/50 opacity-30 cursor-not-allowed'
         : 'bg-slate-800 border-slate-700 hover:border-emerald-500/60 active:scale-95'
@@ -1091,9 +1317,9 @@ function openColorPickerModal(btn) {
     }
 
     optBtn.innerHTML = `
-      <span class="text-3xl">${pal.emoji}</span>
+      <div class="w-8 h-8 rounded-full border-2 border-white/20 shadow-inner" style="background-color: ${pal.hex};"></div>
       <span class="text-[10px] ${isUsed ? 'text-slate-500' : 'text-slate-300'} font-medium">
-        ${isUsed ? '🔒 ซ้ำ' : pal.name}
+        ${isUsed ? 'ซ้ำ' : pal.name}
       </span>
     `;
     container.appendChild(optBtn);
@@ -1106,7 +1332,7 @@ function selectColorForPlayer(colorIdx) {
   if (appState.targetEditingRow) {
     appState.targetEditingRow.dataset.colorIndex = colorIdx;
     const btn = appState.targetEditingRow.querySelector('.color-btn');
-    if (btn) btn.textContent = PLAYER_PALETTE[colorIdx].emoji;
+    if (btn) btn.style.backgroundColor = PLAYER_PALETTE[colorIdx].hex;
   }
   closeColorPickerModal();
 }
@@ -1182,7 +1408,7 @@ async function handleCreateGame() {
   } catch(e) {}
 
   btn.disabled = true;
-  btn.textContent = '⏳ กำลังสร้างห้องเกม...';
+  btn.textContent = 'กำลังสร้างห้องเกม...';
 
   try {
     const data = await apiRequest('/api/game', {
@@ -1208,7 +1434,7 @@ async function handleCreateGame() {
     errBox.classList.remove('hidden');
   } finally {
     btn.disabled = false;
-    btn.textContent = '🚀 บันทึกและสร้างห้องเกม';
+    btn.textContent = 'บันทึกและสร้างห้องเกม';
   }
 }
 
@@ -1251,7 +1477,7 @@ function renderUserSelectionList() {
 
     const avatarHtml = p.avatar_url
       ? `<img src="${p.avatar_url}" class="w-10 h-10 rounded-xl object-cover border border-white/20"/>`
-      : `<span class="text-3xl">${pal.emoji}</span>`;
+      : `<div class="w-10 h-10 rounded-xl border border-white/20 flex items-center justify-center text-white font-bold text-sm" style="background-color: ${pal.hex};">${escapeHtml(p.name.slice(0, 1))}</div>`;
 
     btn.innerHTML = `
       <div class="flex items-center gap-3">
@@ -1261,12 +1487,12 @@ function renderUserSelectionList() {
             <p class="font-bold text-base text-white leading-tight">${escapeHtml(p.name)}</p>
             ${isClaimedByMe ? `<span class="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 font-bold">เครื่องคุณ</span>` : ''}
           </div>
-          <p class="text-[11px] text-slate-400">บัญชีหมายเลข: 089-${p.id}</p>
+          <p class="text-[11px] text-slate-400">บัญชี: 089-${p.id}</p>
         </div>
       </div>
       <div class="text-right">
         ${isClaimedByOther 
-          ? `<span class="px-2 py-1 rounded-lg bg-red-950/60 border border-red-800 text-[10px] text-red-300 font-semibold">🔒 มีผู้เล่นใช้งาน</span>`
+          ? `<span class="px-2 py-1 rounded-lg bg-red-950/60 border border-red-800 text-[10px] text-red-300 font-semibold">มีผู้เล่นใช้งาน</span>`
           : `<span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs">เลือกเล่น →</span>`
         }
       </div>
@@ -1345,7 +1571,7 @@ function renderMainAppUI() {
     if (myPlayer.avatar_url) {
       avatarContainer.innerHTML = `<img src="${myPlayer.avatar_url}" class="w-full h-full object-cover"/>`;
     } else {
-      avatarContainer.innerHTML = `<span id="my-card-emoji">${pal.emoji}</span>`;
+      avatarContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white font-bold text-lg" style="background-color: ${pal.hex};">${escapeHtml(myPlayer.name.slice(0, 1))}</div>`;
     }
 
     cardBal.textContent = appState.balanceVisible ? fmt(myPlayer.balance) : '••••••';
@@ -1353,17 +1579,17 @@ function renderMainAppUI() {
 
     if (myPlayer.bankrupt) {
       cardStatus.className = 'px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-sans font-semibold text-[10px]';
-      cardStatus.textContent = '💀 ล้มละลาย (นายธนาคาร)';
+      cardStatus.textContent = 'ล้มละลาย (นายธนาคาร)';
     } else if (myPlayer.balance < 2000) {
       cardStatus.className = 'px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 font-sans font-semibold text-[10px]';
-      cardStatus.textContent = '⚠️ เงินใกล้หมด';
+      cardStatus.textContent = 'เงินใกล้หมด';
     } else {
       cardStatus.className = 'px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 font-sans font-semibold text-[10px]';
       cardStatus.textContent = '● ปกติ';
     }
   } else {
     cardName.textContent = 'โหมดผู้ชม (Spectator)';
-    avatarContainer.innerHTML = '<span>👁️</span>';
+    avatarContainer.innerHTML = '<span class="text-xs">ดู</span>';
     cardBal.textContent = '—';
     cardAcc.textContent = 'ผู้ชมทั่วไป';
     cardStatus.textContent = '● อ่านอย่างเดียว';
@@ -1375,8 +1601,8 @@ function renderMainAppUI() {
 
   // Privacy Indicator
   const privBadge = document.getElementById('privacy-indicator-badge');
-  if (game.hideOthersBalance) privBadge.textContent = '🙈 ซ่อนยอดเงินผู้อื่น';
-  else privBadge.textContent = '🌐 แสดงยอดเงินทุกคน';
+  if (game.hideOthersBalance) privBadge.textContent = 'ซ่อนยอดเงินผู้อื่น';
+  else privBadge.textContent = 'แสดงยอดเงินทุกคน';
 
   // Quick Payees Carousel
   const payeesCarousel = document.getElementById('quick-payees-carousel');
@@ -1387,7 +1613,7 @@ function renderMainAppUI() {
     btn.className = 'flex flex-col items-center gap-1 shrink-0 p-2.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/60 active:scale-95 transition w-20';
     btn.onclick = () => {
       if (myPlayer?.bankrupt) {
-        showToast('💀 คุณล้มละลายแล้ว ไม่สามารถโอนเงินส่วนตัวได้ (ให้เล่นเป็นธนาคารแทน)', 'warning');
+        showToast('คุณล้มละลายแล้ว ไม่สามารถโอนเงินส่วนตัวได้ (ให้เล่นเป็นธนาคารแทน)', 'warning');
         return;
       }
       appState.selectedRecipientId = p.id;
@@ -1396,7 +1622,7 @@ function renderMainAppUI() {
 
     const avatarHtml = p.avatar_url
       ? `<img src="${p.avatar_url}" class="w-10 h-10 rounded-full object-cover border border-slate-700"/>`
-      : `<div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xl shadow-inner">${pal.emoji}</div>`;
+      : `<div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-inner" style="background-color: ${pal.hex};">${escapeHtml(p.name.slice(0, 1))}</div>`;
 
     const displayBalance = game.hideOthersBalance ? '฿••••••' : `฿${fmt(p.balance)}`;
 
@@ -1420,7 +1646,7 @@ function renderMainAppUI() {
 
   // Adjust Bank Tab Heading for Bankrupt users
   if (myPlayer?.bankrupt) {
-    document.getElementById('bank-tab-heading').textContent = '🏛️ ผู้จัดการธนาคาร (Banker Mode)';
+    document.getElementById('bank-tab-heading').textContent = 'ผู้จัดการธนาคาร (Banker Mode)';
     document.getElementById('bank-tab-subheading').textContent = 'คุณล้มละลายแล้ว ได้รับสิทธิ์บริหารจัดการเงินของธนาคารกลาง';
   } else {
     document.getElementById('bank-tab-heading').textContent = 'ธุรกรรมธนาคารกลาง';
@@ -1436,7 +1662,7 @@ function renderMainAppUI() {
 function handleTransferButtonClick() {
   const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
   if (me?.bankrupt) {
-    showToast('💀 คุณล้มละลายแล้ว ไม่สามารถโอนเงินส่วนตัวได้ ให้เข้าแท็บ "ธนาคาร" เพื่อเล่นเป็นผู้จัดการธนาคาร', 'warning');
+    showToast('คุณล้มละลายแล้ว ไม่สามารถโอนเงินส่วนตัวได้ ให้เข้าแท็บ "ธนาคาร" เพื่อเล่นเป็นผู้จัดการธนาคาร', 'warning');
     switchTab('bank');
     return;
   }
@@ -1448,7 +1674,7 @@ function buildTxCard(tx) {
   div.className = 'p-3 rounded-2xl bg-slate-900/90 border border-slate-800/80 flex items-center justify-between text-xs';
 
   let title = '';
-  let sub = tx.reason ? `📌 ${tx.reason}` : '';
+  let sub = tx.reason ? `${tx.reason}` : '';
   let amountClass = 'text-slate-300';
   let amountSign = '';
 
@@ -1475,15 +1701,18 @@ function buildTxCard(tx) {
     sub = '';
   }
 
-  const timeStr = formatTxTime(tx.created_at);
+  // DD/MM/YYYY HH:MM format
+  const timeStr = formatStatementTime(tx.created_at);
 
   div.innerHTML = `
     <div class="flex items-center gap-2.5 min-w-0 pr-2">
-      <div class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center text-base shrink-0">${tx.icon || '💸'}</div>
+      <div class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center text-slate-300 shrink-0">
+        ${tx.type === 'bank' ? '<svg class="w-4 h-4" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>' : '<svg class="w-4 h-4" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>'}
+      </div>
       <div class="min-w-0">
         <p class="font-semibold text-slate-200 truncate leading-snug">${title}</p>
         ${sub ? `<p class="text-[10px] text-slate-400 truncate">${escapeHtml(sub)}</p>` : ''}
-        <p class="text-[9px] text-slate-500">${timeStr}</p>
+        <p class="text-[9px] text-slate-500 font-mono">${timeStr}</p>
       </div>
     </div>
     ${tx.amount ? `<div class="shrink-0 text-sm font-extrabold ${amountClass}">${amountSign}฿${fmt(tx.amount)}</div>` : ''}
@@ -1491,13 +1720,22 @@ function buildTxCard(tx) {
   return div;
 }
 
-function formatTxTime(dateStr) {
+// Format exactly as DD/MM/YYYY HH:MM (Mobile & Safari compatible)
+function formatStatementTime(dateStr) {
   if (!dateStr) return '';
   try {
-    const d = new Date(dateStr.endsWith('Z') ? dateStr : dateStr + 'Z');
-    return d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    let s = String(dateStr).trim().replace(' ', 'T');
+    if (!s.endsWith('Z')) s += 'Z';
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
   } catch(e) {
-    return dateStr.slice(11, 19);
+    return dateStr;
   }
 }
 
@@ -1537,7 +1775,7 @@ function handleAvatarFileSelected(event) {
 
 async function uploadAvatarDataUrl(dataUrl) {
   try {
-    showToast('⏳ กำลังอัปเดตรูปโปรไฟล์...', 'info');
+    showToast('กำลังอัปเดตรูปโปรไฟล์...', 'info');
     await apiRequest(`/api/game/${appState.currentRoomCode}/profile`, {
       method: 'POST',
       body: JSON.stringify({
@@ -1545,7 +1783,7 @@ async function uploadAvatarDataUrl(dataUrl) {
         avatarUrl: dataUrl
       })
     });
-    showToast('📷 อัปเดตรูปโปรไฟล์สำเร็จแล้ว!', 'success');
+    showToast('อัปเดตรูปโปรไฟล์สำเร็จแล้ว', 'success');
     await refreshGameState(false);
   } catch(e) {
     showToast('อัปโหลดรูปไม่สำเร็จ: ' + e.message, 'error');
@@ -1557,13 +1795,13 @@ async function uploadAvatarDataUrl(dataUrl) {
 // ==========================================
 function renderTransferTab() {
   const myPlayer = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
-  const pal = myPlayer ? (PLAYER_PALETTE[myPlayer.color_index] || PLAYER_PALETTE[0]) : { emoji: '👤' };
+  const pal = myPlayer ? (PLAYER_PALETTE[myPlayer.color_index] || PLAYER_PALETTE[0]) : { hex: '#64748b' };
 
   const avatarBox = document.getElementById('transfer-from-avatar-box');
   if (myPlayer?.avatar_url) {
     avatarBox.innerHTML = `<img src="${myPlayer.avatar_url}" class="w-full h-full object-cover rounded-xl"/>`;
   } else {
-    avatarBox.innerHTML = `<span class="text-xl">${pal.emoji}</span>`;
+    avatarBox.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white font-bold text-sm rounded-xl" style="background-color: ${pal.hex};">${escapeHtml((myPlayer?.name || '').slice(0, 1))}</div>`;
   }
 
   document.getElementById('transfer-from-name').textContent = myPlayer ? myPlayer.name : 'ไม่ได้เลือกบัญชี';
@@ -1600,7 +1838,7 @@ function renderTransferTab() {
 
     const avatarHtml = p.avatar_url
       ? `<img src="${p.avatar_url}" class="w-8 h-8 rounded-lg object-cover shrink-0"/>`
-      : `<span class="text-2xl">${pPal.emoji}</span>`;
+      : `<div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0" style="background-color: ${pPal.hex};">${escapeHtml(p.name.slice(0, 1))}</div>`;
 
     const displayBal = hideOthers ? '฿••••••' : `฿${fmt(p.balance)}`;
 
@@ -1679,7 +1917,7 @@ async function confirmAndExecuteTransfer() {
   const { fromId, toId, fromName, toName, amount, reason } = appState.pendingTransfer;
   const btn = document.getElementById('btn-review-confirm');
   btn.disabled = true;
-  btn.textContent = '⏳ กำลังประมวลผล...';
+  btn.textContent = 'กำลังประมวลผล...';
 
   try {
     const result = await apiRequest(`/api/game/${appState.currentRoomCode}/transfer`, {
@@ -1699,7 +1937,7 @@ async function confirmAndExecuteTransfer() {
       toName: result.toName || toName,
       amount: result.amount || amount,
       reason: result.reason || reason,
-      timestamp: result.timestamp ? formatSlipTime(result.timestamp) : getNowThaiString()
+      timestamp: result.timestamp ? formatStatementTime(result.timestamp) : getNowFormattedTime()
     });
 
     await refreshGameState(false);
@@ -1715,7 +1953,100 @@ async function confirmAndExecuteTransfer() {
 }
 
 // ==========================================
-// TAB: BANK OPERATIONS
+// TAB: CALCULATOR (เครื่องคิดเลข)
+// ==========================================
+function updateCalcDisplay() {
+  document.getElementById('calc-display').textContent = appState.calcCurrent;
+  const expr = appState.calcPrev && appState.calcOp ? `${appState.calcPrev} ${appState.calcOp}` : '';
+  document.getElementById('calc-expression').textContent = expr || ' ';
+}
+
+function calcNum(n) {
+  if (appState.calcNewNumber) {
+    appState.calcCurrent = n === '.' ? '0.' : n;
+    appState.calcNewNumber = false;
+  } else {
+    if (n === '.' && appState.calcCurrent.includes('.')) return;
+    if (appState.calcCurrent === '0' && n !== '.') appState.calcCurrent = n;
+    else appState.calcCurrent += n;
+  }
+  updateCalcDisplay();
+}
+
+function calcOp(op) {
+  if (appState.calcOp && !appState.calcNewNumber) {
+    calcEquals();
+  }
+  appState.calcPrev = appState.calcCurrent;
+  appState.calcOp = op;
+  appState.calcNewNumber = true;
+  updateCalcDisplay();
+}
+
+function calcEquals() {
+  if (!appState.calcOp || !appState.calcPrev) return;
+  const a = parseFloat(appState.calcPrev);
+  const b = parseFloat(appState.calcCurrent);
+  let res = 0;
+
+  switch(appState.calcOp) {
+    case '+': res = a + b; break;
+    case '-': res = a - b; break;
+    case '*': res = a * b; break;
+    case '/': res = b !== 0 ? a / b : 0; break;
+    case '%': res = a % b; break;
+  }
+
+  // Round neatly
+  res = Math.round(res * 100) / 100;
+  appState.calcCurrent = String(res);
+  appState.calcPrev = '';
+  appState.calcOp = null;
+  appState.calcNewNumber = true;
+  updateCalcDisplay();
+}
+
+function calcClear() {
+  appState.calcCurrent = '0';
+  appState.calcPrev = '';
+  appState.calcOp = null;
+  appState.calcNewNumber = true;
+  updateCalcDisplay();
+}
+
+function calcBackspace() {
+  if (appState.calcCurrent.length > 1) {
+    appState.calcCurrent = appState.calcCurrent.slice(0, -1);
+  } else {
+    appState.calcCurrent = '0';
+  }
+  updateCalcDisplay();
+}
+
+function getCalcAmountValue() {
+  calcEquals();
+  const val = Math.floor(parseFloat(appState.calcCurrent) || 0);
+  return val > 0 ? val : 0;
+}
+
+function applyCalcToTransfer() {
+  const amt = getCalcAmountValue();
+  if (amt <= 0) { showToast('กรุณาคำนวณจำนวนเงินที่มากกว่า 0', 'warning'); return; }
+  document.getElementById('input-transfer-amount').value = amt;
+  handleTransferButtonClick();
+  showToast(`นำยอด ฿${fmt(amt)} ไปยังหน้าโอนเงินแล้ว`, 'info');
+}
+
+function applyCalcToBank() {
+  const amt = getCalcAmountValue();
+  if (amt <= 0) { showToast('กรุณาคำนวณจำนวนเงินที่มากกว่า 0', 'warning'); return; }
+  document.getElementById('input-bank-amount').value = amt;
+  switchTab('bank');
+  showToast(`นำยอด ฿${fmt(amt)} ไปยังหน้าธนาคารแล้ว`, 'info');
+}
+
+// ==========================================
+// TAB: BANK OPERATIONS (UPDATED RULES & REVIEW)
 // ==========================================
 function openBankModalWithTab(mode) {
   setBankTabMode(mode);
@@ -1734,50 +2065,105 @@ function setBankTabMode(mode) {
     btnP.className = 'py-2.5 rounded-xl font-semibold text-xs transition bg-amber-500 text-slate-950 shadow-md';
     btnR.className = 'py-2.5 rounded-xl font-semibold text-xs transition text-slate-400';
   }
-  renderBankPresets();
+  renderBankPresetsAndTags();
 }
 
+// Helper to check bankrupt state safely
+function isPlayerBankrupt(p) {
+  if (!p) return false;
+  return p.bankrupt === 1 || p.bankrupt === '1' || p.bankrupt === true;
+}
+
+// Target Player Dropdown: Filters out Bankrupt players and NEVER displays balance of others
 function renderBankTab() {
   const sel = document.getElementById('bank-player-select');
   sel.innerHTML = '';
-  (appState.gameState?.players || []).forEach(p => {
-    const pal = PLAYER_PALETTE[p.color_index] || PLAYER_PALETTE[0];
+
+  // Exclude bankrupt players from target player select
+  const activePlayers = (appState.gameState?.players || []).filter(p => !isPlayerBankrupt(p));
+
+  if (activePlayers.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'ไม่มีผู้เล่นที่ยังไม่ล้มละลาย';
+    sel.appendChild(opt);
+    return;
+  }
+
+  activePlayers.forEach(p => {
+    const isMe = p.id === appState.myPlayerId;
     const opt = document.createElement('option');
     opt.value = p.id;
-    opt.textContent = `${pal.emoji} ${p.name} (คงเหลือ ฿${fmt(p.balance)})`;
-    if (p.id === appState.myPlayerId) opt.selected = true;
+
+    // Never show other players' balances in this dropdown!
+    if (isMe) {
+      opt.textContent = `${p.name} (คุณ - ฿${fmt(p.balance)})`;
+    } else {
+      opt.textContent = `${p.name}`;
+    }
+
+    if (isMe) opt.selected = true;
     sel.appendChild(opt);
   });
-  renderBankPresets();
+
+  renderBankPresetsAndTags();
 }
 
-function renderBankPresets() {
-  const container = document.getElementById('bank-presets-container');
-  container.innerHTML = '';
+// Updated Presets and Reason tags per user request
+function renderBankPresetsAndTags() {
+  const presetsContainer = document.getElementById('bank-presets-container');
+  const tagsContainer = document.getElementById('bank-quick-tags-container');
+  presetsContainer.innerHTML = '';
+  tagsContainer.innerHTML = '';
 
   const isReceive = appState.bankTabMode === 'receive';
+
+  // Presets (Removed Luck Card and Mortgaged land from receive presets, removed buy land and build house from pay presets)
   const presets = isReceive ? [
-    { label: '🚀 ผ่านจุด GO +฿2,000', amount: 2000, reason: 'ผ่านจุดเริ่มต้น (GO)' },
-    { label: '🏆 เงินปันผล/รางวัล +฿1,000', amount: 1000, reason: 'รับเงินรางวัล/ปันผล' },
-    { label: '🃏 ไพ่โชคดี +฿500', amount: 500, reason: 'เปิดได้ไพ่โชคดี' },
-    { label: '🏦 จำนองที่ดิน +฿1,500', amount: 1500, reason: 'จำนองที่ดินกับธนาคาร' },
+    { label: '🚀 ผ่านจุด GO +฿2,000', amount: 2000, reason: '🚀 ผ่านจุดเริ่มต้น (GO)' },
+    { label: '🏆 เงินปันผล/รางวัล +฿1,000', amount: 1000, reason: '🏆 เงินปันผล/รางวัล' },
   ] : [
-    { label: '💼 เสียภาษี -฿2,000', amount: 2000, reason: 'ชำระภาษีเงินได้' },
-    { label: '⛓️ ประกันตัวจากคุก -฿500', amount: 500, reason: 'ค่าประกันตัวออกจากคุก' },
-    { label: '🏘️ ซื้อที่ดินธนาคาร -฿1,000', amount: 1000, reason: 'ซื้อที่ดินว่างเปล่า' },
-    { label: '🏨 สร้างบ้าน/โรงแรม -฿3,000', amount: 3000, reason: 'สร้างบ้านและโรงแรม' },
+    { label: '💼 เสียภาษี -฿2,000', amount: 2000, reason: '💼 เสียภาษี' },
+    { label: '⛓️ ประกันตัวจากคุก -฿500', amount: 500, reason: '⛓️ ประกันตัวจากคุก' },
   ];
 
   presets.forEach(pr => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/70 text-left text-xs font-medium text-slate-200 transition active:scale-95';
+    btn.className = 'p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/70 text-left text-xs font-semibold text-slate-200 transition active:scale-95';
     btn.onclick = () => {
       document.getElementById('input-bank-amount').value = pr.amount;
       document.getElementById('input-bank-reason').value = pr.reason;
     };
     btn.textContent = pr.label;
-    container.appendChild(btn);
+    presetsContainer.appendChild(btn);
+  });
+
+  // Reason Tags per user request
+  const tags = isReceive ? [
+    '🚀 ผ่านจุดเริ่มต้น (GO)',
+    '🏆 เงินปันผล/รางวัล',
+    '🏦 จำนองที่ดิน',
+    '💎 การ์ดสมบัติ',
+    '🃏 การ์ดโอกาส'
+  ] : [
+    '💼 เสียภาษี',
+    '⛓️ ประกันตัวจากคุก',
+    '🏘️ ซื้อที่ดิน',
+    '🏨 สร้างบ้าน',
+    '💎 การ์ดสมบัติ',
+    '🃏 การ์ดโอกาส'
+  ];
+
+  tags.forEach(t => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60';
+    btn.onclick = () => {
+      document.getElementById('input-bank-reason').value = t;
+    };
+    btn.textContent = t;
+    tagsContainer.appendChild(btn);
   });
 }
 
@@ -1787,36 +2173,73 @@ function addBankAmount(n) {
   inp.value = cur + n;
 }
 
-async function handleExecuteBankTransfer() {
+function clearBankAmount() {
+  document.getElementById('input-bank-amount').value = '';
+}
+
+// Bank Review Modal before executing
+function prepareBankReview() {
   const pid = parseInt(document.getElementById('bank-player-select').value);
   const amount = parseInt(document.getElementById('input-bank-amount').value);
   const reason = document.getElementById('input-bank-reason').value.trim();
   const dir = appState.bankTabMode;
 
-  if (!pid) { showToast('กรุณาเลือกผู้เล่น', 'error'); return; }
+  if (!pid) { showToast('กรุณาเลือกผู้เล่นเป้าหมาย', 'error'); return; }
   if (!amount || amount <= 0) { showToast('กรุณาระบุจำนวนเงินที่ถูกต้อง', 'error'); return; }
-  if (!reason) { showToast('กรุณาระบุเหตุผลการเบิก/จ่ายธนาคาร', 'error'); return; }
+  if (!reason) { showToast('กรุณาระบุหมายเหตุ/เหตุผลการทำรายการ', 'error'); return; }
 
   const player = appState.gameState?.players?.find(p => p.id === pid);
+  if (!player) return;
+
+  appState.pendingBank = {
+    playerId: pid,
+    playerName: player.name,
+    direction: dir,
+    amount,
+    reason
+  };
+
+  const isRec = dir === 'receive';
+  document.getElementById('bank-review-dir').textContent = isRec ? 'รับเงินจากธนาคาร' : 'จ่ายเงินให้ธนาคาร';
+  document.getElementById('bank-review-dir').className = isRec ? 'font-bold text-emerald-400' : 'font-bold text-amber-400';
+  document.getElementById('bank-review-player').textContent = player.name;
+  document.getElementById('bank-review-amount').textContent = fmt(amount);
+  document.getElementById('bank-review-reason').textContent = reason;
+
+  document.getElementById('modal-bank-review').classList.remove('hidden');
+}
+
+function closeBankReviewModal() {
+  document.getElementById('modal-bank-review').classList.add('hidden');
+}
+
+async function confirmAndExecuteBankTransfer() {
+  if (!appState.pendingBank) return;
+  const { playerId, playerName, direction, amount, reason } = appState.pendingBank;
+  const btn = document.getElementById('btn-bank-review-confirm');
+  btn.disabled = true;
+  btn.textContent = 'กำลังประมวลผล...';
 
   try {
     const res = await apiRequest(`/api/game/${appState.currentRoomCode}/bank`, {
       method: 'POST',
-      body: JSON.stringify({ playerId: pid, direction: dir, amount, reason })
+      body: JSON.stringify({ playerId, direction, amount, reason })
     });
 
+    closeBankReviewModal();
     playChime(true);
+
     document.getElementById('input-bank-amount').value = '';
     document.getElementById('input-bank-reason').value = '';
 
-    const isRec = dir === 'receive';
+    const isRec = direction === 'receive';
     showSlipModal({
       refNo: res.refNo || ('BK' + Date.now().toString().slice(-8)),
-      fromName: isRec ? '🏦 ธนาคารกลาง (Vault)' : player.name,
-      toName: isRec ? player.name : '🏦 ธนาคารกลาง (Vault)',
+      fromName: isRec ? 'ธนาคารกลาง (Vault)' : playerName,
+      toName: isRec ? playerName : 'ธนาคารกลาง (Vault)',
       amount,
       reason,
-      timestamp: res.timestamp ? formatSlipTime(res.timestamp) : getNowThaiString()
+      timestamp: res.timestamp ? formatStatementTime(res.timestamp) : getNowFormattedTime()
     });
 
     await refreshGameState(false);
@@ -1824,11 +2247,15 @@ async function handleExecuteBankTransfer() {
   } catch(e) {
     showToast(e.message || 'ทำรายการธนาคารไม่สำเร็จ', 'error');
     playChime(false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'ยืนยันทำรายการ';
+    appState.pendingBank = null;
   }
 }
 
 // ==========================================
-// TAB: STATEMENT
+// TAB: STATEMENT (DD/MM/YYYY HH:MM)
 // ==========================================
 function filterStatement(type) {
   appState.statementFilter = type;
@@ -1871,9 +2298,10 @@ async function handleExportCsvStatement() {
   try {
     const data = await apiRequest(`/api/game/${appState.currentRoomCode}/log?limit=500`);
     const logs = data.transactions || [];
-    const rows = ['\uFEFFลำดับ,วันที่เวลา,ประเภท,ไอคอน,จาก,ไปยัง,จำนวนเงิน(บาท),เหตุผล'];
+    const rows = ['\uFEFFลำดับ,วันที่เวลา (DD/MM/YYYY HH:MM),ประเภท,จาก,ไปยัง,จำนวนเงิน(บาท),บันทึก'];
     logs.forEach((e, i) => {
-      rows.push(`${i+1},"${e.created_at||''}","${e.type}","${e.icon}","${e.from_label||''}","${e.to_label||''}",${e.amount||''},"${e.reason||''}"`);
+      const timeFmt = formatStatementTime(e.created_at);
+      rows.push(`${i+1},"${timeFmt}","${e.type}","${e.from_label||''}","${e.to_label||''}",${e.amount||''},"${e.reason||''}"`);
     });
     const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
@@ -1905,12 +2333,12 @@ function renderFullPlayersTab() {
       isMe ? 'bg-slate-900 border-emerald-500/80 shadow-md shadow-emerald-950/40' : 'bg-slate-900/80 border-slate-800'
     } ${p.bankrupt ? 'opacity-40 grayscale' : ''}`;
 
-    const crown = idx === 0 && !p.bankrupt ? '👑 อันดับ 1' : `อันดับ ${idx + 1}`;
+    const crown = idx === 0 && !p.bankrupt ? 'อันดับ 1' : `อันดับ ${idx + 1}`;
     const displayBalance = (isMe || !hideOthers) ? `฿${fmt(p.balance)}` : '฿••••••';
 
     const avatarHtml = p.avatar_url
       ? `<img src="${p.avatar_url}" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-slate-700"/>`
-      : `<span class="text-2xl">${pal.emoji}</span>`;
+      : `<div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xs shrink-0" style="background-color: ${pal.hex};">${escapeHtml(p.name.slice(0, 1))}</div>`;
 
     card.innerHTML = `
       <div class="flex items-center justify-between mb-2">
@@ -1927,16 +2355,17 @@ function renderFullPlayersTab() {
         </div>
         <div class="text-right">
           <div class="text-base font-extrabold text-emerald-400">${displayBalance}</div>
-          ${p.bankrupt ? '<span class="text-xs text-red-500 font-bold">💀 ล้มละลาย</span>' : ''}
+          ${p.bankrupt ? '<span class="text-xs text-red-500 font-bold">ล้มละลาย</span>' : ''}
         </div>
       </div>
       <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800 text-xs">
         ${!isMe && !p.bankrupt ? `
-          <button onclick="appState.selectedRecipientId=${p.id};switchTab('transfer');" class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-medium hover:bg-emerald-500/30">
-            💸 โอนเงินให้
+          <button onclick="appState.selectedRecipientId=${p.id};switchTab('transfer');" class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-medium hover:bg-emerald-500/30 flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
+            <span>โอนเงินให้</span>
           </button>` : ''}
         <button onclick="handleToggleBankrupt(${p.id})" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 font-medium">
-          ${p.bankrupt ? '↩️ กู้สถานะ' : '💀 ล้มละลาย'}
+          ${p.bankrupt ? 'กู้สถานะ' : 'ประกาศล้มละลาย'}
         </button>
       </div>
     `;
@@ -1963,7 +2392,7 @@ async function handleToggleBankrupt(pid) {
 }
 
 // ==========================================
-// MODAL: SLIP & UTILS
+// MODAL: SLIP & NAVIGATE BACK TO HOME
 // ==========================================
 function showSlipModal(data) {
   document.getElementById('slip-ref-no').textContent = data.refNo;
@@ -1975,14 +2404,14 @@ function showSlipModal(data) {
   document.getElementById('modal-slip').classList.remove('hidden');
 }
 
+// When closing slip, navigate back to HOME
 function closeSlipModal() {
   document.getElementById('modal-slip').classList.add('hidden');
+  switchTab('home');
 }
 
 function toggleBalanceVisibility() {
   appState.balanceVisible = !appState.balanceVisible;
-  const eye = document.getElementById('btn-toggle-eye');
-  eye.textContent = appState.balanceVisible ? '👁️' : '🙈';
   renderMainAppUI();
 }
 
@@ -2060,6 +2489,9 @@ async function apiRequest(url, opts = {}) {
   return data;
 }
 
+// ==========================================
+// FORMATTERS & HELPERS
+// ==========================================
 function fmt(num) {
   return Number(Math.abs(num || 0)).toLocaleString('th-TH');
 }
@@ -2074,26 +2506,14 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-function getNowThaiString() {
+function getNowFormattedTime() {
   const now = new Date();
-  const d = now.getDate();
-  const m = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][now.getMonth()];
-  const y = now.getFullYear() + 543;
-  const t = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-  return `${d} ${m} ${y} - ${t} น.`;
-}
-
-function formatSlipTime(iso) {
-  try {
-    const now = new Date(iso);
-    const d = now.getDate();
-    const m = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][now.getMonth()];
-    const y = now.getFullYear() + 543;
-    const t = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-    return `${d} ${m} ${y} - ${t} น.`;
-  } catch(e) {
-    return getNowThaiString();
-  }
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = now.getFullYear();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
 function showToast(msg, type = 'success') {
