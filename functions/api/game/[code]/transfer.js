@@ -45,7 +45,18 @@ export async function onRequestPost({ params, request, env }) {
       `SELECT balance FROM players WHERE id = ?`
     ).bind(fromPlayerId).first();
 
-    return json({ success: true, newFromBalance: updatedFrom.balance });
+    const refNo = 'TX' + Date.now().toString().slice(-8);
+
+    return json({
+      success: true,
+      refNo,
+      fromName: fromPlayer.name,
+      toName: toPlayer.name,
+      amount,
+      reason: reason || 'โอนเงิน',
+      newFromBalance: updatedFrom.balance,
+      timestamp: new Date().toISOString()
+    });
   } catch (e) {
     return json({ error: e.message }, 500);
   }

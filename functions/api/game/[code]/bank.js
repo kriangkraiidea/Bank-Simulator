@@ -54,7 +54,18 @@ export async function onRequestPost({ params, request, env }) {
        VALUES (?, 'bank', ?, ?, ?, ?, ?, ?)`
     ).bind(game.id, icon, fromLabel, toLabel, amount, reason.trim(), game.round).run();
 
-    return json({ success: true, newBankBalance });
+    const refNo = 'BK' + Date.now().toString().slice(-8);
+
+    return json({
+      success: true,
+      refNo,
+      direction,
+      playerName: player.name,
+      amount,
+      reason: reason.trim(),
+      newBankBalance,
+      timestamp: new Date().toISOString()
+    });
   } catch (e) {
     return json({ error: e.message }, 500);
   }
