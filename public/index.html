@@ -41,17 +41,13 @@
     }
     .bottom-nav {
       backdrop-filter: blur(16px);
-      background-color: rgba(15, 23, 42, 0.88);
+      background-color: rgba(15, 23, 42, 0.92);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .nav-item.active {
-      color: #34d399;
-    }
-    .nav-item.active .nav-icon {
-      transform: translateY(-2px);
-    }
+    .nav-item.active { color: #34d399; }
+    .nav-item.active .nav-icon { transform: translateY(-2px); }
     .modal-backdrop {
-      background: rgba(3, 7, 18, 0.78);
+      background: rgba(3, 7, 18, 0.82);
       backdrop-filter: blur(8px);
     }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -67,29 +63,51 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between max-w-md mx-auto relative antialiased pb-20">
 
-<!-- ========================= SCREEN: HOME (ENTRY) ========================= -->
-<div id="screen-welcome" class="flex-1 flex flex-col justify-between p-6 min-h-screen">
-  <div class="pt-10 text-center">
-    <div class="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-xl shadow-emerald-900/40 mb-5">
-      <span class="text-5xl">🏦</span>
+<!-- ========================= SCREEN: HOME (ENTRY & LOBBY) ========================= -->
+<div id="screen-welcome" class="flex-1 flex flex-col justify-between p-5 min-h-screen">
+  <div>
+    <!-- Brand Header -->
+    <div class="pt-6 pb-4 text-center">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-xl shadow-emerald-900/40 mb-3">
+        <span class="text-4xl">🏦</span>
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight text-white">MONO BANK</h1>
+      <p class="text-emerald-400 font-medium text-xs mt-0.5">เศรษฐี Mobile Banking</p>
     </div>
-    <h1 class="text-3xl font-bold tracking-tight text-white">MONO BANK</h1>
-    <p class="text-emerald-400 font-medium text-sm mt-1">เศรษฐี Mobile Banking</p>
-    <p class="text-slate-400 text-xs mt-2 max-w-xs mx-auto">ระบบจัดการเงินเกมเศรษฐีไร้เงินสด โอนเงินทันใจบนมือถือทุกคน</p>
+
+    <!-- Quick Action Buttons -->
+    <div class="grid grid-cols-2 gap-2.5 mb-6">
+      <button onclick="openSetupScreen()" class="py-3.5 px-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 transition active:scale-[0.98] flex items-center justify-center gap-2">
+        <span>🎲</span> สร้างห้องเกมใหม่
+      </button>
+      <button onclick="navScreen('screen-join')" class="py-3.5 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm border border-slate-700/80 transition active:scale-[0.98] flex items-center justify-center gap-2">
+        <span>🔑</span> ใส่ Room Code
+      </button>
+    </div>
+
+    <!-- Active Games Lobby Section -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-dot"></span>
+          <h3 class="font-bold text-sm text-slate-200">ห้องเกมที่เปิดอยู่ (Lobby)</h3>
+        </div>
+        <button onclick="loadActiveLobbyGames()" class="text-xs text-emerald-400 font-medium flex items-center gap-1 active:scale-95 transition">
+          <span id="lobby-refresh-icon">🔄</span> รีเฟรช
+        </button>
+      </div>
+
+      <div id="lobby-games-list" class="space-y-2.5 max-h-[46vh] overflow-y-auto hide-scrollbar pb-2">
+        <div class="p-6 text-center text-xs text-slate-500 bg-slate-900/60 rounded-2xl border border-slate-800">
+          ⏳ กำลังค้นหาห้องเกม...
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="space-y-3.5 my-8">
-    <button onclick="navScreen('screen-setup')" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/25 transition active:scale-[0.98] flex items-center justify-center gap-2">
-      <span>🎲</span> สร้างห้องเกมใหม่
-    </button>
-    <button onclick="navScreen('screen-join')" class="w-full py-4 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white font-semibold text-base border border-slate-700/60 transition active:scale-[0.98] flex items-center justify-center gap-2">
-      <span>🔑</span> เข้าร่วมเกม (มี Room Code)
-    </button>
-  </div>
-
-  <div class="text-center pb-4">
-    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/60 border border-slate-700/40 text-[11px] text-slate-400">
-      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+  <div class="text-center pt-4 pb-2">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/60 border border-slate-700/40 text-[10px] text-slate-400">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
       Cloudflare D1 Real-time Engine
     </div>
   </div>
@@ -97,66 +115,111 @@
 
 <!-- ========================= SCREEN: SETUP GAME ========================= -->
 <div id="screen-setup" class="hidden flex-1 p-5 min-h-screen">
-  <div class="flex items-center justify-between mb-5">
-    <button onclick="navScreen('screen-welcome')" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300">←</button>
-    <h2 class="font-bold text-lg text-white">เปิดบัญชีห้องเกมใหม่</h2>
-    <div class="w-10"></div>
+  <div class="flex items-center justify-between mb-4">
+    <button onclick="navScreen('screen-welcome')" class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-sm">←</button>
+    <h2 class="font-bold text-base text-white">สร้างห้องเกมใหม่</h2>
+    <div class="w-9"></div>
   </div>
 
   <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl">
-    <div>
-      <label class="text-xs text-slate-400 font-medium">เงินเริ่มต้นต่อผู้เล่น (฿)</label>
-      <div class="mt-1 relative">
-        <span class="absolute left-3.5 top-3 text-slate-500 font-bold">฿</span>
-        <input id="setup-start-money" type="number" value="15000" class="w-full bg-slate-800/90 border border-slate-700 rounded-xl pl-8 pr-4 py-3 text-white font-semibold text-base focus:border-emerald-500 focus:outline-none"/>
-      </div>
-    </div>
-
-    <div>
-      <label class="text-xs text-slate-400 font-medium">วงเงินธนาคารกลาง (ใส่ 0 = ไม่จำกัด)</label>
-      <div class="mt-1 relative">
-        <span class="absolute left-3.5 top-3 text-slate-500 font-bold">฿</span>
-        <input id="setup-bank-limit" type="number" value="0" class="w-full bg-slate-800/90 border border-slate-700 rounded-xl pl-8 pr-4 py-3 text-white font-semibold text-base focus:border-emerald-500 focus:outline-none"/>
-      </div>
-    </div>
-
+    
+    <!-- Player Rows with Color Picker & 15-char Limit -->
     <div>
       <div class="flex items-center justify-between mb-2">
-        <label class="text-xs text-slate-400 font-medium">รายชื่อผู้เล่น (2 - 8 คน)</label>
-        <button onclick="addPlayerSetupRow()" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300">+ เพิ่มผู้เล่น</button>
+        <label class="text-xs text-slate-300 font-semibold">รายชื่อผู้เล่น (2 - 8 คน / ไม่เกิน 15 ตัวอักษร)</label>
+        <button type="button" onclick="addPlayerSetupRow('', -1)" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300">+ เพิ่มผู้เล่น</button>
       </div>
-      <div id="setup-player-list" class="space-y-2.5 max-h-[42vh] overflow-y-auto hide-scrollbar pr-0.5"></div>
+      <div id="setup-player-list" class="space-y-2.5 max-h-[35vh] overflow-y-auto hide-scrollbar pr-0.5"></div>
+    </div>
+
+    <!-- Starting & Bank Limit -->
+    <div class="grid grid-cols-2 gap-2.5 pt-1">
+      <div>
+        <label class="text-[11px] text-slate-400 font-medium">เงินเริ่มต้น/คน (฿)</label>
+        <div class="mt-1 relative">
+          <span class="absolute left-3 top-2.5 text-slate-500 font-bold text-xs">฿</span>
+          <input id="setup-start-money" type="number" value="15000" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-7 pr-3 py-2 text-white font-semibold text-sm focus:border-emerald-500 focus:outline-none"/>
+        </div>
+      </div>
+      <div>
+        <label class="text-[11px] text-slate-400 font-medium">วงเงินธนาคาร (0=ไม่จำกัด)</label>
+        <div class="mt-1 relative">
+          <span class="absolute left-3 top-2.5 text-slate-500 font-bold text-xs">฿</span>
+          <input id="setup-bank-limit" type="number" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-7 pr-3 py-2 text-white font-semibold text-sm focus:border-emerald-500 focus:outline-none"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy & Room Security Settings -->
+    <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-white">🌐 แสดงในห้องสาธารณะ (Lobby)</p>
+          <p class="text-[10px] text-slate-400">ให้ผู้เล่นอื่นเห็นห้องนี้ในหน้ารายชื่อห้อง</p>
+        </div>
+        <input id="setup-is-public" type="checkbox" checked class="w-5 h-5 accent-emerald-500 cursor-pointer"/>
+      </div>
+
+      <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-white">🙈 ซ่อนยอดเงินผู้เล่นอื่น</p>
+          <p class="text-[10px] text-slate-400">ผู้เล่นจะเห็นเฉพาะยอดเงินของตัวเองเท่านั้น</p>
+        </div>
+        <input id="setup-hide-balance" type="checkbox" checked class="w-5 h-5 accent-emerald-500 cursor-pointer"/>
+      </div>
+
+      <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-white">👁️ อนุญาตให้มีผู้ชม (Spectator)</p>
+          <p class="text-[10px] text-slate-400">ให้ผู้อื่นสามารถกดเข้ามาดูเกมได้</p>
+        </div>
+        <input id="setup-allow-spectator" type="checkbox" checked class="w-5 h-5 accent-emerald-500 cursor-pointer"/>
+      </div>
+
+      <!-- Password Lock Toggle -->
+      <div class="pt-2 border-t border-slate-700/60">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <p class="text-xs font-semibold text-white">🔒 ล็อครหัสผ่านเข้าห้อง</p>
+            <p class="text-[10px] text-slate-400">ต้องกรอกรหัสผ่านก่อนเข้าห้อง</p>
+          </div>
+          <input id="setup-has-password" type="checkbox" onchange="togglePasswordInput(this.checked)" class="w-5 h-5 accent-emerald-500 cursor-pointer"/>
+        </div>
+        <div id="setup-password-container" class="hidden">
+          <input id="setup-room-password" type="text" maxlength="8" placeholder="ตั้งรหัสผ่าน เช่น 1234" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none"/>
+        </div>
+      </div>
     </div>
 
     <div id="setup-error" class="hidden p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-400 text-xs text-center"></div>
 
-    <button id="btn-create-game" onclick="handleCreateGame()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/25 transition active:scale-[0.98]">
-      🚀 ยืนยันสร้างห้องเกม
+    <button id="btn-create-game" onclick="handleCreateGame()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 transition active:scale-[0.98]">
+      🚀 บันทึกและสร้างห้องเกม
     </button>
   </div>
 </div>
 
-<!-- ========================= SCREEN: JOIN GAME ========================= -->
+<!-- ========================= SCREEN: JOIN GAME BY CODE ========================= -->
 <div id="screen-join" class="hidden flex-1 p-5 min-h-screen flex flex-col justify-between">
   <div>
     <div class="flex items-center justify-between mb-8">
-      <button onclick="navScreen('screen-welcome')" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300">←</button>
-      <h2 class="font-bold text-lg text-white">เข้าร่วมห้องเกม</h2>
-      <div class="w-10"></div>
+      <button onclick="navScreen('screen-welcome')" class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-sm">←</button>
+      <h2 class="font-bold text-base text-white">เข้าร่วมห้องเกม</h2>
+      <div class="w-9"></div>
     </div>
 
     <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 text-center space-y-4 shadow-xl">
-      <div class="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-3xl">🔑</div>
+      <div class="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-2xl">🔑</div>
       <div>
-        <h3 class="font-bold text-lg text-white">ใส่ Room Code</h3>
-        <p class="text-slate-400 text-xs mt-1">ขอรหัส 6 หลักจากเพื่อนที่เป็นคนสร้างห้อง</p>
+        <h3 class="font-bold text-base text-white">ใส่ Room Code</h3>
+        <p class="text-slate-400 text-xs mt-1">ขอรหัส 6 หลักจากผู้สร้างห้อง</p>
       </div>
 
-      <input id="input-join-code" type="text" maxlength="6" placeholder="ABC123" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3.5 text-center text-2xl font-mono font-bold tracking-widest text-emerald-400 uppercase focus:border-emerald-500 focus:outline-none"/>
+      <input id="input-join-code" type="text" maxlength="6" placeholder="ABC123" class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 text-center text-2xl font-mono font-bold tracking-widest text-emerald-400 uppercase focus:border-emerald-500 focus:outline-none"/>
 
       <div id="join-error" class="hidden p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-400 text-xs"></div>
 
-      <button onclick="handleJoinGame()" class="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-base transition active:scale-[0.98]">
+      <button onclick="handleJoinGameDirect()" class="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition active:scale-[0.98]">
         ยืนยันเข้าร่วมห้อง
       </button>
     </div>
@@ -165,10 +228,10 @@
 
 <!-- ========================= SCREEN: SELECT MY IDENTITY ========================= -->
 <div id="screen-select-user" class="hidden flex-1 p-5 min-h-screen">
-  <div class="text-center pt-4 mb-6">
-    <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-2xl mb-2">👤</div>
-    <h2 class="text-xl font-bold text-white">เลือกบัญชีของคุณ</h2>
-    <p class="text-xs text-slate-400 mt-1">แตะชื่อของคุณเพื่อเข้าสู่หน้าจอธนาคารส่วนตัว</p>
+  <div class="text-center pt-3 mb-5">
+    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-xl mb-2">👤</div>
+    <h2 class="text-lg font-bold text-white">เลือกบัญชีผู้เล่นของคุณ</h2>
+    <p class="text-xs text-slate-400 mt-0.5">ตัวละครที่มีผู้อื่นเลือกแล้ว จะไม่สามารถเลือกซ้ำได้</p>
     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-mono text-emerald-400 mt-2">
       ห้อง: <span id="display-room-code-badge">------</span>
     </div>
@@ -176,8 +239,8 @@
 
   <div id="select-user-list" class="space-y-2.5 max-w-sm mx-auto"></div>
 
-  <div class="mt-4 text-center">
-    <button onclick="setUserIdentity(null)" class="text-xs text-slate-500 hover:text-slate-400 underline">เข้าดูในฐานะผู้ชม (Spectator)</button>
+  <div id="select-spectator-box" class="mt-4 text-center">
+    <button onclick="enterAsSpectator()" class="text-xs text-slate-400 hover:text-white underline">เข้าดูในฐานะผู้ชม (Spectator 👁️)</button>
   </div>
 </div>
 
@@ -206,10 +269,10 @@
       <button onclick="refreshGameState(true)" id="btn-sync" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs active:scale-95 transition" title="ซิงค์ข้อมูล">
         🔄
       </button>
-      <button onclick="switchUserPrompt()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs" title="สลับผู้เล่น">
+      <button onclick="switchUserPrompt()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs" title="สลับตัวละคร">
         👤
       </button>
-      <button onclick="confirmExitGame()" class="w-8 h-8 rounded-full bg-red-950/60 border border-red-800 flex items-center justify-center text-red-400 text-xs" title="ออกจากเกม">
+      <button onclick="confirmExitGame()" class="w-8 h-8 rounded-full bg-red-950/60 border border-red-800 flex items-center justify-center text-red-400 text-xs" title="ออกจากห้อง (คืนตัวละครให้ผู้อื่นเล่นได้)">
         🚪
       </button>
     </div>
@@ -218,22 +281,29 @@
   <!-- TAB CONTENT 1: DASHBOARD / CARDS -->
   <main id="tab-content-home" class="p-5 space-y-5 flex-1">
 
-    <!-- Primary Account Debit Card -->
+    <!-- Primary Account Debit Card with Photo Upload -->
     <div id="my-debit-card" class="bank-gradient-card rounded-3xl p-5 text-white relative overflow-hidden transition-all">
-      <!-- Card background decorations -->
-      <div class="absolute -right-8 -bottom-8 w-36 h-36 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
-      <div class="absolute right-4 top-4 opacity-30 text-4xl">🏛️</div>
-
       <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-2">
-          <span id="my-card-emoji" class="text-2xl">👤</span>
+        <div class="flex items-center gap-3">
+          <!-- Avatar with Click to Upload Photo -->
+          <div class="relative group cursor-pointer" onclick="triggerAvatarUpload()">
+            <div id="my-card-avatar-container" class="w-12 h-12 rounded-2xl bg-black/20 border-2 border-white/20 overflow-hidden flex items-center justify-center text-2xl shadow-inner">
+              <span id="my-card-emoji">👤</span>
+            </div>
+            <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-900 border border-white/40 flex items-center justify-center text-[10px]" title="แตะเพื่อเปลี่ยนรูป">
+              📷
+            </div>
+          </div>
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-emerald-200/90 font-medium">บัญชีออมทรัพย์ดิจิทัล</p>
+            <p class="text-[10px] uppercase tracking-wider text-emerald-200/90 font-medium">บัญชีออมทรัพย์ดิจิทัล</p>
             <h3 id="my-card-name" class="font-bold text-base leading-tight">ผู้เล่น</h3>
           </div>
         </div>
         <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-black/20 text-emerald-200 border border-white/10">MonoPay</span>
       </div>
+
+      <!-- Hidden file input for Avatar upload -->
+      <input type="file" id="input-avatar-file" accept="image/*" class="hidden" onchange="handleAvatarFileSelected(event)"/>
 
       <div class="my-3">
         <p class="text-[11px] text-emerald-100/80 mb-0.5 flex items-center gap-1.5">
@@ -254,7 +324,7 @@
 
     <!-- Quick Action Grid (Bank App Style) -->
     <div class="grid grid-cols-4 gap-2.5">
-      <button onclick="switchTab('transfer')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
+      <button onclick="handleTransferButtonClick()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
         <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-xl shadow-inner">
           💸
         </div>
@@ -300,18 +370,18 @@
       </button>
     </div>
 
-    <!-- Quick Payee Transfer Carousel (เพื่อนในเกม แตะเพื่อโอนทันที) -->
+    <!-- Quick Payee Transfer Carousel -->
     <div>
-      <div class="flex items-center justify-between mb-2.5">
-        <h4 class="text-xs font-semibold text-slate-300">โอนด่วนให้เพื่อนในห้อง</h4>
-        <span class="text-[10px] text-slate-500">แตะที่เพื่อนเพื่อโอน</span>
+      <div class="flex items-center justify-between mb-2">
+        <h4 class="text-xs font-semibold text-slate-300">เพื่อนในห้อง (แตะเพื่อโอนเงิน)</h4>
+        <span id="privacy-indicator-badge" class="text-[10px] text-slate-400">🙈 ซ่อนยอดเงินผู้อื่น</span>
       </div>
       <div id="quick-payees-carousel" class="flex gap-3 overflow-x-auto hide-scrollbar pb-1"></div>
     </div>
 
     <!-- Recent Transactions Preview -->
     <div>
-      <div class="flex items-center justify-between mb-2.5">
+      <div class="flex items-center justify-between mb-2">
         <h4 class="text-xs font-semibold text-slate-300">รายการธุรกรรมล่าสุด</h4>
         <button onclick="switchTab('statement')" class="text-xs text-emerald-400 font-medium hover:underline">ดูทั้งหมด →</button>
       </div>
@@ -320,7 +390,7 @@
 
   </main>
 
-  <!-- TAB CONTENT 2: TRANSFER (โอนเงินสไตล์แอพธนาคาร) -->
+  <!-- TAB CONTENT 2: TRANSFER -->
   <main id="tab-content-transfer" class="hidden p-5 space-y-4 flex-1">
     <div class="text-center pb-1">
       <h3 class="text-base font-bold text-white">โอนเงินระหว่างผู้เล่น</h3>
@@ -330,7 +400,7 @@
     <!-- From Card Info -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <span id="transfer-from-emoji" class="text-2xl">👤</span>
+        <div id="transfer-from-avatar-box" class="w-10 h-10 rounded-xl bg-slate-800 overflow-hidden flex items-center justify-center text-xl">👤</div>
         <div>
           <p class="text-[10px] text-slate-400">จากบัญชีผู้โอน</p>
           <p id="transfer-from-name" class="font-bold text-sm text-white">คุณ</p>
@@ -345,10 +415,10 @@
     <!-- Choose Recipient -->
     <div>
       <label class="text-xs text-slate-300 font-semibold mb-2 block">เลือกบัญชีผู้รับเงิน</label>
-      <div id="transfer-recipients-grid" class="grid grid-cols-2 gap-2.5 max-h-40 overflow-y-auto hide-scrollbar"></div>
+      <div id="transfer-recipients-grid" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto hide-scrollbar"></div>
     </div>
 
-    <!-- Amount Input with Quick Pills -->
+    <!-- Amount Input with +10 Quick Pill -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
       <label class="text-xs text-slate-400 block font-medium">ระบุจำนวนเงินที่ต้องการโอน (บาท)</label>
       <div class="relative flex items-center">
@@ -357,15 +427,16 @@
         <button onclick="clearTransferAmount()" class="text-slate-500 hover:text-slate-300 text-sm px-2">✕</button>
       </div>
 
-      <!-- Quick Amount Buttons -->
+      <!-- Quick Amount Buttons with +10 -->
       <div class="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800/80">
+        <button onclick="addTransferAmount(10)" class="py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition active:scale-95">+10</button>
         <button onclick="addTransferAmount(100)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+100</button>
         <button onclick="addTransferAmount(500)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+500</button>
         <button onclick="addTransferAmount(1000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+1,000</button>
         <button onclick="addTransferAmount(2000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+2,000</button>
         <button onclick="addTransferAmount(5000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+5,000</button>
         <button onclick="addTransferAmount(10000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+10,000</button>
-        <button onclick="setAllMyBalance()" class="py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium col-span-2 transition">โอนทั้งหมด</button>
+        <button onclick="setAllMyBalance()" class="py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition">หมดตัว</button>
       </div>
     </div>
 
@@ -393,8 +464,11 @@
   <!-- TAB CONTENT 3: CENTRAL BANK OPERATIONS -->
   <main id="tab-content-bank" class="hidden p-5 space-y-4 flex-1">
     <div class="text-center pb-1">
-      <h3 class="text-base font-bold text-white">ธุรกรรมธนาคารกลาง</h3>
-      <p class="text-xs text-slate-400">เบิกเงินรางวัล หรือชำระเงินให้กับธนาคารเกม</p>
+      <h3 class="text-base font-bold text-white flex items-center justify-center gap-1.5">
+        <span>🏛️</span>
+        <span id="bank-tab-heading">ธุรกรรมธนาคารกลาง</span>
+      </h3>
+      <p id="bank-tab-subheading" class="text-xs text-slate-400">เบิกเงินรางวัล หรือชำระเงินให้กับธนาคารเกม</p>
     </div>
 
     <!-- Direction Tabs -->
@@ -409,26 +483,32 @@
 
     <!-- Selected Target Player -->
     <div>
-      <label class="text-xs text-slate-400 block mb-1">ผู้ทำรายการ</label>
+      <label class="text-xs text-slate-400 block mb-1">ผู้เล่นเป้าหมาย</label>
       <select id="bank-player-select" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"></select>
     </div>
 
-    <!-- Monopoly Presets -->
+    <!-- Presets -->
     <div id="bank-preset-section">
-      <label id="bank-preset-label" class="text-xs text-slate-300 font-semibold mb-2 block">กดรายการสำเร็จรูป (แตะเพื่อใส่ค่าทันที):</label>
+      <label class="text-xs text-slate-300 font-semibold mb-2 block">รายการด่วนเกมเศรษฐี:</label>
       <div id="bank-presets-container" class="grid grid-cols-2 gap-2"></div>
     </div>
 
-    <!-- Custom Bank Amount -->
+    <!-- Custom Bank Amount with +10 -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
-      <label class="text-xs text-slate-400 font-medium">หรือกำหนดจำนวนเงินเอง (บาท)</label>
+      <label class="text-xs text-slate-400 font-medium">ระบุจำนวนเงิน (บาท)</label>
       <div class="relative flex items-center">
         <span class="text-2xl font-bold text-emerald-400 mr-2">฿</span>
         <input id="input-bank-amount" type="number" min="1" placeholder="0" class="w-full bg-transparent text-2xl font-bold text-white focus:outline-none placeholder:text-slate-600"/>
       </div>
+      <div class="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800/80">
+        <button onclick="addBankAmount(10)" class="py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition">+10</button>
+        <button onclick="addBankAmount(100)" class="py-1 rounded-lg bg-slate-800 text-xs text-slate-300 transition">+100</button>
+        <button onclick="addBankAmount(500)" class="py-1 rounded-lg bg-slate-800 text-xs text-slate-300 transition">+500</button>
+        <button onclick="addBankAmount(2000)" class="py-1 rounded-lg bg-slate-800 text-xs text-slate-300 transition">+2,000</button>
+      </div>
     </div>
 
-    <!-- Bank Reason (Required) -->
+    <!-- Bank Reason -->
     <div class="space-y-1.5">
       <label class="text-xs text-slate-300 font-medium flex items-center justify-between">
         <span>เหตุผลประกอบรายการ</span>
@@ -437,13 +517,12 @@
       <input id="input-bank-reason" type="text" placeholder="ระบุเหตุผล เช่น ผ่านจุดเริ่มต้น" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-emerald-500 focus:outline-none"/>
     </div>
 
-    <!-- Confirm Bank Button -->
     <button onclick="handleExecuteBankTransfer()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition">
       ✅ ยืนยันทำรายการธนาคาร
     </button>
   </main>
 
-  <!-- TAB CONTENT 4: STATEMENT / HISTORY -->
+  <!-- TAB CONTENT 4: STATEMENT -->
   <main id="tab-content-statement" class="hidden p-5 space-y-4 flex-1">
     <div class="flex items-center justify-between">
       <div>
@@ -455,7 +534,7 @@
       </button>
     </div>
 
-    <!-- Statement Filter -->
+    <!-- Filter Buttons -->
     <div class="flex gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
       <button onclick="filterStatement('all')" id="stmt-filter-all" class="flex-1 py-1.5 rounded-lg font-medium transition bg-slate-800 text-white">ทั้งหมด</button>
       <button onclick="filterStatement('in')" id="stmt-filter-in" class="flex-1 py-1.5 rounded-lg font-medium transition text-slate-400">เงินเข้า</button>
@@ -467,7 +546,7 @@
     <div id="statement-list-container" class="space-y-2.5 pb-4 max-h-[60vh] overflow-y-auto hide-scrollbar"></div>
   </main>
 
-  <!-- TAB CONTENT 5: PLAYERS / ROOM SETTINGS -->
+  <!-- TAB CONTENT 5: PLAYERS -->
   <main id="tab-content-players" class="hidden p-5 space-y-4 flex-1">
     <div class="flex items-center justify-between">
       <div>
@@ -482,14 +561,14 @@
     <div id="full-players-rank-list" class="space-y-3"></div>
   </main>
 
-  <!-- Bottom Navigation Bar (Mobile App Style) -->
+  <!-- Bottom Navigation Bar -->
   <nav class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 flex items-center justify-around py-2 px-1">
     <button onclick="switchTab('home')" id="nav-btn-home" class="nav-item active flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
       <span class="nav-icon text-xl">🏠</span>
       <span class="text-[10px] font-medium">หน้าหลัก</span>
     </button>
 
-    <button onclick="switchTab('transfer')" id="nav-btn-transfer" class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
+    <button onclick="handleTransferButtonClick()" id="nav-btn-transfer" class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
       <span class="nav-icon text-xl">💸</span>
       <span class="text-[10px] font-medium">โอนเงิน</span>
     </button>
@@ -512,9 +591,9 @@
 
 </div>
 
-<!-- ========================= MODAL: TRANSFER REVIEW (ตรวจสอบก่อนโอน) ========================= -->
+<!-- ========================= MODAL: TRANSFER REVIEW ========================= -->
 <div id="modal-transfer-review" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end sm:items-center justify-center p-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4 animate-in slide-in-from-bottom-5">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
     <div class="text-center pb-1">
       <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl mb-2">💸</div>
       <h3 class="font-bold text-lg">ตรวจสอบข้อมูลการโอน</h3>
@@ -560,10 +639,9 @@
   </div>
 </div>
 
-<!-- ========================= MODAL: ELECTRONIC SLIP (สลิปโอนเงินสำเร็จ) ========================= -->
+<!-- ========================= MODAL: ELECTRONIC SLIP ========================= -->
 <div id="modal-slip" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-  <div class="slip-card rounded-3xl p-6 w-full max-w-sm shadow-2xl relative animate-in zoom-in-95">
-    <!-- Slip Header -->
+  <div class="slip-card rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
     <div class="text-center pb-4 border-b border-dashed border-slate-300">
       <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-2xl mb-1.5">✓</div>
       <h3 class="font-bold text-base text-slate-900">โอนเงินสำเร็จ</h3>
@@ -571,7 +649,6 @@
       <p class="text-[10px] font-mono text-slate-400 mt-0.5">รหัสอ้างอิง: <span id="slip-ref-no">TX9823412</span></p>
     </div>
 
-    <!-- Slip Details -->
     <div class="py-4 space-y-3.5 border-b border-dashed border-slate-300 text-xs">
       <div class="flex items-center justify-between">
         <span class="text-slate-500">จาก (ผู้โอน)</span>
@@ -595,7 +672,6 @@
       </div>
     </div>
 
-    <!-- Slip Footer -->
     <div class="pt-4 text-center">
       <div class="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 mb-4">
         <span>🏛️ MONO BANK DIGITAL SYSTEM</span>
@@ -607,12 +683,31 @@
   </div>
 </div>
 
+<!-- ========================= MODAL: PASSWORD PROMPT ========================= -->
+<div id="modal-password" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-xs shadow-2xl text-white space-y-4">
+    <div class="text-center">
+      <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-xl mb-2">🔒</div>
+      <h3 class="font-bold text-base">ห้องนี้มีรหัสผ่าน</h3>
+      <p class="text-xs text-slate-400 mt-1">กรุณากรอกรหัสผ่านเพื่อเข้าห้อง <span id="pwd-modal-room-code" class="font-mono text-emerald-400 font-bold"></span></p>
+    </div>
+
+    <input id="input-modal-password" type="password" placeholder="รหัสผ่านห้อง" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-center text-sm text-white focus:border-emerald-500 focus:outline-none"/>
+    <div id="pwd-modal-error" class="hidden text-red-400 text-xs text-center"></div>
+
+    <div class="flex gap-2">
+      <button onclick="closePasswordModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs">ยกเลิก</button>
+      <button onclick="submitRoomPassword()" id="btn-pwd-submit" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs">เข้าร่วม</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================= TOAST NOTIFICATION ========================= -->
 <div id="toast" class="hidden fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-white text-xs font-semibold shadow-2xl max-w-[90vw] text-center flex items-center gap-2 transition-all"></div>
 
 <script>
 // ==========================================
-// STATE MANAGEMENT
+// STATE MANAGEMENT & PALETTE
 // ==========================================
 const PLAYER_PALETTE = [
   { emoji: '🔴', name: 'แดง', hex: '#ef4444' },
@@ -628,6 +723,8 @@ const PLAYER_PALETTE = [
 let appState = {
   currentRoomCode: '',
   myPlayerId: null,
+  sessionId: '',
+  isSpectator: false,
   gameState: null,
   pollTimer: null,
   balanceVisible: true,
@@ -636,9 +733,21 @@ let appState = {
   bankTabMode: 'receive',
   statementFilter: 'all',
   pendingTransfer: null,
+  targetJoinCode: '',
+  targetJoinIsSpectator: false,
 };
 
-// Audio Synthesizer for Bank Chime
+// Generate or restore persistent Session ID for this browser device
+function getOrCreateSessionId() {
+  let sid = localStorage.getItem('monobank_device_session_id');
+  if (!sid) {
+    sid = 'sess_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+    localStorage.setItem('monobank_device_session_id', sid);
+  }
+  return sid;
+}
+
+// Audio Synthesizer
 function playChime(success = true) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -648,8 +757,8 @@ function playChime(success = true) {
     gain.connect(ctx.destination);
     const now = ctx.currentTime;
     if (success) {
-      osc.frequency.setValueAtTime(587.33, now); // D5
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+      osc.frequency.setValueAtTime(587.33, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
       gain.gain.setValueAtTime(0.2, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
       osc.start(now);
@@ -669,21 +778,20 @@ function playChime(success = true) {
 // INITIALIZATION
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
-  // Pre-fill setup inputs
-  const setupList = document.getElementById('setup-player-list');
-  setupList.innerHTML = '';
-  addPlayerSetupRow('ผู้เล่น 1');
-  addPlayerSetupRow('ผู้เล่น 2');
-  addPlayerSetupRow('ผู้เล่น 3');
+  appState.sessionId = getOrCreateSessionId();
+
+  // Load Active Lobby Games
+  loadActiveLobbyGames();
 
   // Check saved session
   const saved = localStorage.getItem('monobank_session');
   if (saved) {
     try {
-      const { code, pid } = JSON.parse(saved);
+      const { code, pid, isSpec } = JSON.parse(saved);
       if (code) {
         appState.currentRoomCode = code;
         appState.myPlayerId = pid;
+        appState.isSpectator = !!isSpec;
         resumeSession();
         return;
       }
@@ -720,6 +828,9 @@ function navScreen(screenId) {
   if (screenId !== 'screen-main-app') {
     stopPolling();
   }
+  if (screenId === 'screen-welcome') {
+    loadActiveLobbyGames();
+  }
 }
 
 function switchTab(tabId) {
@@ -736,7 +847,6 @@ function switchTab(tabId) {
   if (activeContent) activeContent.classList.remove('hidden');
   if (activeNavBtn) activeNavBtn.classList.add('active');
 
-  // Trigger tab-specific renders
   if (tabId === 'transfer') renderTransferTab();
   if (tabId === 'bank') renderBankTab();
   if (tabId === 'statement') renderStatementTab();
@@ -745,22 +855,212 @@ function switchTab(tabId) {
 }
 
 // ==========================================
-// SETUP & JOIN FLOW
+// LOBBY (ACTIVE GAMES LIST)
 // ==========================================
-function addPlayerSetupRow(defaultName = '') {
+async function loadActiveLobbyGames() {
+  const container = document.getElementById('lobby-games-list');
+  const icon = document.getElementById('lobby-refresh-icon');
+  if (icon) icon.classList.add('animate-spin');
+
+  try {
+    const data = await apiRequest('/api/game');
+    const games = data.games || [];
+
+    if (games.length === 0) {
+      container.innerHTML = `
+        <div class="p-6 text-center text-xs text-slate-500 bg-slate-900/60 rounded-2xl border border-slate-800">
+          ยังไม่มีห้องเกมที่เปิดอยู่ กดปุ่ม "สร้างห้องเกมใหม่" เพื่อเริ่มเล่น
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = '';
+    games.forEach(g => {
+      const isFull = g.active_players >= g.max_players;
+      const card = document.createElement('div');
+      card.className = 'p-3.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-between transition shadow-sm';
+      
+      const badgePublic = g.is_public ? '<span class="text-[10px] text-emerald-400">🌐 สาธารณะ</span>' : '<span class="text-[10px] text-slate-400">🔒 ส่วนตัว</span>';
+      const badgePwd = g.has_password ? '<span class="text-[10px] text-amber-400 font-bold ml-1">🔒 มีรหัส</span>' : '';
+
+      card.innerHTML = `
+        <div class="min-w-0 pr-2">
+          <div class="flex items-center gap-1.5">
+            <span class="font-mono font-bold text-sm text-white">${escapeHtml(g.room_code)}</span>
+            ${badgePublic}
+            ${badgePwd}
+          </div>
+          <p class="text-[11px] text-slate-400 mt-0.5">
+            👥 ผู้เล่น: <span class="font-semibold text-slate-200">${g.active_players || 0}/${g.max_players || 0} คน</span>
+            ${g.hide_others_balance ? ' · 🙈 ซ่อนยอดเงิน' : ''}
+          </p>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          ${g.allow_spectator ? `
+            <button onclick="requestJoinRoom('${g.room_code}', ${g.has_password}, true)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium" title="เข้าเป็นผู้ชม">
+              👁️ ดู
+            </button>
+          ` : ''}
+          <button onclick="requestJoinRoom('${g.room_code}', ${g.has_password}, false)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
+            ${isFull ? 'ดู/รอว่าง' : 'เข้าร่วม'}
+          </button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+  } catch(e) {
+    container.innerHTML = `
+      <div class="p-4 text-center text-xs text-red-400 bg-red-950/40 rounded-2xl border border-red-900">
+        โหลดห้องเกมไม่สำเร็จ กรุณาลองใหม่
+      </div>
+    `;
+  } finally {
+    if (icon) icon.classList.remove('animate-spin');
+  }
+}
+
+// Request joining a room (handles password check if needed)
+function requestJoinRoom(roomCode, hasPassword, isSpectator = false) {
+  appState.targetJoinCode = roomCode;
+  appState.targetJoinIsSpectator = isSpectator;
+
+  if (hasPassword && !isSpectator) {
+    document.getElementById('pwd-modal-room-code').textContent = roomCode;
+    document.getElementById('input-modal-password').value = '';
+    document.getElementById('pwd-modal-error').classList.add('hidden');
+    document.getElementById('modal-password').classList.remove('hidden');
+  } else {
+    joinRoomDirect(roomCode, '', isSpectator);
+  }
+}
+
+async function submitRoomPassword() {
+  const pwd = document.getElementById('input-modal-password').value;
+  const errBox = document.getElementById('pwd-modal-error');
+  const btn = document.getElementById('btn-pwd-submit');
+  errBox.classList.add('hidden');
+  btn.disabled = true;
+
+  try {
+    const res = await apiRequest(`/api/game/${appState.targetJoinCode}/verify`, {
+      method: 'POST',
+      body: JSON.stringify({ password: pwd })
+    });
+    closePasswordModal();
+    joinRoomDirect(appState.targetJoinCode, pwd, appState.targetJoinIsSpectator);
+  } catch(e) {
+    errBox.textContent = e.message || 'รหัสผ่านไม่ถูกต้อง';
+    errBox.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function closePasswordModal() {
+  document.getElementById('modal-password').classList.add('hidden');
+}
+
+async function joinRoomDirect(roomCode, password = '', isSpectator = false) {
+  try {
+    const data = await apiRequest(`/api/game/${roomCode}`);
+    appState.currentRoomCode = roomCode;
+    appState.gameState = data;
+    appState.isSpectator = isSpectator;
+
+    if (isSpectator) {
+      enterAsSpectator();
+    } else {
+      showUserSelectionScreen();
+    }
+  } catch(e) {
+    showToast(e.message || 'เข้าห้องไม่สำเร็จ', 'error');
+  }
+}
+
+// ==========================================
+// SETUP SCREEN (WITH LOCALSTORAGE AUTO-FILL & COLOR PICKER)
+// ==========================================
+function openSetupScreen() {
+  navScreen('screen-setup');
+  const list = document.getElementById('setup-player-list');
+  list.innerHTML = '';
+
+  // Check LocalStorage for previously saved setup
+  const savedSetup = localStorage.getItem('monobank_last_setup');
+  if (savedSetup) {
+    try {
+      const cfg = JSON.parse(savedSetup);
+      document.getElementById('setup-start-money').value = cfg.startingMoney || 15000;
+      document.getElementById('setup-bank-limit').value = cfg.bankLimit || 0;
+      document.getElementById('setup-is-public').checked = cfg.isPublic !== false;
+      document.getElementById('setup-hide-balance').checked = cfg.hideOthersBalance !== false;
+      document.getElementById('setup-allow-spectator').checked = cfg.allowSpectator !== false;
+      
+      const hasPwd = !!cfg.password;
+      document.getElementById('setup-has-password').checked = hasPwd;
+      togglePasswordInput(hasPwd);
+      if (hasPwd) document.getElementById('setup-room-password').value = cfg.password;
+
+      if (Array.isArray(cfg.players) && cfg.players.length >= 2) {
+        cfg.players.forEach(p => addPlayerSetupRow(p.name, p.colorIndex));
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Default setup
+  addPlayerSetupRow('ผู้เล่น 1', 0);
+  addPlayerSetupRow('ผู้เล่น 2', 1);
+  addPlayerSetupRow('ผู้เล่น 3', 2);
+}
+
+function togglePasswordInput(checked) {
+  const container = document.getElementById('setup-password-container');
+  if (checked) container.classList.remove('hidden');
+  else container.classList.add('hidden');
+}
+
+function addPlayerSetupRow(defaultName = '', colorIdx = -1) {
   const container = document.getElementById('setup-player-list');
   const count = container.children.length;
   if (count >= 8) { showToast('รองรับสูงสุด 8 ผู้เล่น', 'warning'); return; }
 
-  const pal = PLAYER_PALETTE[count] || PLAYER_PALETTE[0];
+  const finalColorIdx = colorIdx >= 0 ? (colorIdx % PLAYER_PALETTE.length) : (count % PLAYER_PALETTE.length);
+  const pal = PLAYER_PALETTE[finalColorIdx];
+
   const row = document.createElement('div');
-  row.className = 'flex items-center gap-2 bg-slate-800/60 p-2 rounded-xl border border-slate-700/60';
+  row.className = 'setup-player-row flex items-center gap-2 bg-slate-800/80 p-2 rounded-xl border border-slate-700/60 relative';
+  row.dataset.colorIndex = finalColorIdx;
+
   row.innerHTML = `
-    <span class="text-xl pl-1">${pal.emoji}</span>
-    <input type="text" placeholder="ชื่อผู้เล่น ${count + 1}" value="${defaultName}" class="flex-1 bg-transparent text-sm text-white focus:outline-none placeholder:text-slate-500 font-medium"/>
-    ${count >= 2 ? `<button type="button" onclick="this.parentElement.remove()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-red-400 text-lg">×</button>` : ''}
+    <!-- Color picker button -->
+    <button type="button" onclick="cyclePlayerColor(this)" class="color-btn w-9 h-9 rounded-xl flex items-center justify-center text-xl bg-slate-900 border border-slate-700 shrink-0 shadow-inner" title="แตะเพื่อเปลี่ยนสี">
+      ${pal.emoji}
+    </button>
+    <input type="text" maxlength="15" placeholder="ชื่อผู้เล่น ${count + 1}" value="${escapeHtml(defaultName)}" class="player-name-input flex-1 bg-transparent text-sm text-white focus:outline-none placeholder:text-slate-500 font-medium"/>
+    <span class="text-[10px] text-slate-500 pr-1 char-counter">15</span>
+    ${count >= 2 ? `<button type="button" onclick="this.parentElement.remove()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-red-400 text-lg leading-none">×</button>` : ''}
   `;
+
+  // Attach char counter listener
+  const inp = row.querySelector('.player-name-input');
+  const counter = row.querySelector('.char-counter');
+  inp.addEventListener('input', () => {
+    counter.textContent = 15 - inp.value.length;
+  });
+  counter.textContent = 15 - defaultName.length;
+
   container.appendChild(row);
+}
+
+function cyclePlayerColor(btn) {
+  const row = btn.closest('.setup-player-row');
+  let curIdx = parseInt(row.dataset.colorIndex) || 0;
+  curIdx = (curIdx + 1) % PLAYER_PALETTE.length;
+  row.dataset.colorIndex = curIdx;
+  btn.textContent = PLAYER_PALETTE[curIdx].emoji;
 }
 
 async function handleCreateGame() {
@@ -768,11 +1068,14 @@ async function handleCreateGame() {
   const errBox = document.getElementById('setup-error');
   errBox.classList.add('hidden');
 
-  const rows = document.querySelectorAll('#setup-player-list input');
+  const rows = document.querySelectorAll('.setup-player-row');
   const players = [];
-  rows.forEach((inp, idx) => {
-    const val = inp.value.trim() || `ผู้เล่น ${idx + 1}`;
-    players.push({ name: val });
+
+  rows.forEach((row, idx) => {
+    const inp = row.querySelector('.player-name-input');
+    const val = (inp.value || '').trim() || `ผู้เล่น ${idx + 1}`;
+    const colorIdx = parseInt(row.dataset.colorIndex) || (idx % PLAYER_PALETTE.length);
+    players.push({ name: val.slice(0, 15), colorIndex: colorIdx });
   });
 
   if (players.length < 2) {
@@ -783,6 +1086,24 @@ async function handleCreateGame() {
 
   const startMoney = parseInt(document.getElementById('setup-start-money').value) || 15000;
   const bankMoney = parseInt(document.getElementById('setup-bank-limit').value) || 0;
+  const isPublic = document.getElementById('setup-is-public').checked;
+  const hideOthersBalance = document.getElementById('setup-hide-balance').checked;
+  const allowSpectator = document.getElementById('setup-allow-spectator').checked;
+  const hasPassword = document.getElementById('setup-has-password').checked;
+  const password = hasPassword ? (document.getElementById('setup-room-password').value || '').trim() : '';
+
+  // Save to LocalStorage for next time
+  try {
+    localStorage.setItem('monobank_last_setup', JSON.stringify({
+      players,
+      startingMoney: startMoney,
+      bankLimit: bankMoney,
+      isPublic,
+      hideOthersBalance,
+      allowSpectator,
+      password
+    }));
+  } catch(e) {}
 
   btn.disabled = true;
   btn.textContent = '⏳ กำลังสร้างห้องเกม...';
@@ -790,7 +1111,15 @@ async function handleCreateGame() {
   try {
     const data = await apiRequest('/api/game', {
       method: 'POST',
-      body: JSON.stringify({ players, startingMoney: startMoney, bankMoney })
+      body: JSON.stringify({
+        players,
+        startingMoney: startMoney,
+        bankMoney,
+        isPublic,
+        password,
+        allowSpectator,
+        hideOthersBalance
+      })
     });
     appState.currentRoomCode = data.roomCode;
     const fullData = await apiRequest(`/api/game/${data.roomCode}`);
@@ -801,11 +1130,11 @@ async function handleCreateGame() {
     errBox.classList.remove('hidden');
   } finally {
     btn.disabled = false;
-    btn.textContent = '🚀 ยืนยันสร้างห้องเกม';
+    btn.textContent = '🚀 บันทึกและสร้างห้องเกม';
   }
 }
 
-async function handleJoinGame() {
+async function handleJoinGameDirect() {
   const codeInp = document.getElementById('input-join-code');
   const code = codeInp.value.trim().toUpperCase();
   const errBox = document.getElementById('join-error');
@@ -819,48 +1148,119 @@ async function handleJoinGame() {
 
   try {
     const data = await apiRequest(`/api/game/${code}`);
-    appState.currentRoomCode = code;
-    appState.gameState = data;
-    showUserSelectionScreen();
+    if (data.game.hasPassword) {
+      requestJoinRoom(code, true, false);
+    } else {
+      joinRoomDirect(code, '', false);
+    }
   } catch(e) {
-    errBox.textContent = e.message || 'ไม่พบห้องเกม หรือเกมสิ้นสุดแล้ว';
+    errBox.textContent = e.message || 'ไม่พบห้องเกม หรือห้องถูกปิดแล้ว';
     errBox.classList.remove('hidden');
   }
 }
 
+// ==========================================
+// CHARACTER SELECTION (WITH SESSION LOCKING)
+// ==========================================
 function showUserSelectionScreen() {
   navScreen('screen-select-user');
   document.getElementById('display-room-code-badge').textContent = appState.currentRoomCode;
 
+  const specBox = document.getElementById('select-spectator-box');
+  if (appState.gameState?.game?.allowSpectator) specBox.classList.remove('hidden');
+  else specBox.classList.add('hidden');
+
+  renderUserSelectionList();
+}
+
+function renderUserSelectionList() {
   const list = document.getElementById('select-user-list');
   list.innerHTML = '';
-  appState.gameState.players.forEach(p => {
+
+  const players = appState.gameState?.players || [];
+  players.forEach(p => {
     const pal = PLAYER_PALETTE[p.color_index] || PLAYER_PALETTE[0];
+    const isClaimedByOther = p.is_claimed && p.claimed_session && p.claimed_session !== appState.sessionId;
+    const isClaimedByMe = p.claimed_session === appState.sessionId;
+
     const btn = document.createElement('button');
-    btn.className = 'w-full p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/60 flex items-center justify-between transition active:scale-[0.98] shadow-md';
-    btn.onclick = () => setUserIdentity(p.id);
+    btn.className = `w-full p-4 rounded-2xl border text-left transition flex items-center justify-between shadow-md ${
+      isClaimedByOther
+        ? 'bg-slate-900/40 border-slate-800/60 opacity-50 cursor-not-allowed'
+        : isClaimedByMe
+        ? 'bg-emerald-950/40 border-emerald-500 shadow-emerald-900/20 active:scale-[0.98]'
+        : 'bg-slate-900 border-slate-800 hover:border-emerald-500/60 active:scale-[0.98]'
+    }`;
+
+    if (!isClaimedByOther) {
+      btn.onclick = () => handleSelectPlayer(p.id);
+    }
+
+    const avatarHtml = p.avatar_url
+      ? `<img src="${p.avatar_url}" class="w-10 h-10 rounded-xl object-cover border border-white/20"/>`
+      : `<span class="text-3xl">${pal.emoji}</span>`;
+
     btn.innerHTML = `
       <div class="flex items-center gap-3">
-        <span class="text-3xl">${pal.emoji}</span>
-        <div class="text-left">
-          <p class="font-bold text-base text-white leading-tight">${escapeHtml(p.name)}</p>
+        ${avatarHtml}
+        <div>
+          <div class="flex items-center gap-1.5">
+            <p class="font-bold text-base text-white leading-tight">${escapeHtml(p.name)}</p>
+            ${isClaimedByMe ? `<span class="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 font-bold">เครื่องคุณ</span>` : ''}
+          </div>
           <p class="text-[11px] text-slate-400">บัญชีหมายเลข: 089-${p.id}</p>
         </div>
       </div>
       <div class="text-right">
-        <p class="text-sm font-bold text-emerald-400">฿${fmt(p.balance)}</p>
-        <span class="text-[10px] text-slate-400">แตะเพื่อเข้าใช้ →</span>
+        ${isClaimedByOther 
+          ? `<span class="px-2 py-1 rounded-lg bg-red-950/60 border border-red-800 text-[10px] text-red-300 font-semibold">🔒 มีผู้เล่นใช้งาน</span>`
+          : `<span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs">เลือกเล่น →</span>`
+        }
       </div>
     `;
     list.appendChild(btn);
   });
 }
 
-function setUserIdentity(playerId) {
-  appState.myPlayerId = playerId;
+async function handleSelectPlayer(playerId) {
+  try {
+    // Claim player on backend
+    await apiRequest(`/api/game/${appState.currentRoomCode}/claim`, {
+      method: 'POST',
+      body: JSON.stringify({
+        playerId,
+        sessionId: appState.sessionId,
+        action: 'claim'
+      })
+    });
+
+    appState.myPlayerId = playerId;
+    appState.isSpectator = false;
+
+    localStorage.setItem('monobank_session', JSON.stringify({
+      code: appState.currentRoomCode,
+      pid: playerId,
+      isSpec: false
+    }));
+
+    openMainApp();
+
+  } catch(e) {
+    showToast(e.message || 'ไม่สามารถเลือกผู้เล่นนี้ได้ (อาจมีผู้อื่นเข้าใช้งานแล้ว)', 'error');
+    // Refresh player list to get latest claimed status
+    const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
+    appState.gameState = data;
+    renderUserSelectionList();
+  }
+}
+
+function enterAsSpectator() {
+  appState.myPlayerId = null;
+  appState.isSpectator = true;
   localStorage.setItem('monobank_session', JSON.stringify({
     code: appState.currentRoomCode,
-    pid: playerId
+    pid: null,
+    isSpec: true
   }));
   openMainApp();
 }
@@ -880,24 +1280,31 @@ function renderMainAppUI() {
   if (!appState.gameState) return;
   const { game, players, recentLog } = appState.gameState;
 
-  // Render My Debit Card
   const myPlayer = players.find(p => p.id === appState.myPlayerId);
   const cardName = document.getElementById('my-card-name');
   const cardEmoji = document.getElementById('my-card-emoji');
   const cardBal = document.getElementById('my-card-balance');
   const cardAcc = document.getElementById('my-card-acc-num');
   const cardStatus = document.getElementById('my-card-status');
+  const avatarContainer = document.getElementById('my-card-avatar-container');
 
   if (myPlayer) {
     const pal = PLAYER_PALETTE[myPlayer.color_index] || PLAYER_PALETTE[0];
     cardName.textContent = myPlayer.name;
-    cardEmoji.textContent = pal.emoji;
+
+    // Render custom avatar if uploaded
+    if (myPlayer.avatar_url) {
+      avatarContainer.innerHTML = `<img src="${myPlayer.avatar_url}" class="w-full h-full object-cover"/>`;
+    } else {
+      avatarContainer.innerHTML = `<span id="my-card-emoji">${pal.emoji}</span>`;
+    }
+
     cardBal.textContent = appState.balanceVisible ? fmt(myPlayer.balance) : '••••••';
     cardAcc.textContent = `089-4-${appState.currentRoomCode}-${String(myPlayer.id).padStart(2, '0')}`;
 
     if (myPlayer.bankrupt) {
       cardStatus.className = 'px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-sans font-semibold text-[10px]';
-      cardStatus.textContent = '💀 ล้มละลาย';
+      cardStatus.textContent = '💀 ล้มละลาย (นายธนาคาร)';
     } else if (myPlayer.balance < 2000) {
       cardStatus.className = 'px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 font-sans font-semibold text-[10px]';
       cardStatus.textContent = '⚠️ เงินใกล้หมด';
@@ -907,15 +1314,20 @@ function renderMainAppUI() {
     }
   } else {
     cardName.textContent = 'โหมดผู้ชม (Spectator)';
-    cardEmoji.textContent = '👁️';
+    avatarContainer.innerHTML = '<span>👁️</span>';
     cardBal.textContent = '—';
     cardAcc.textContent = 'ผู้ชมทั่วไป';
     cardStatus.textContent = '● อ่านอย่างเดียว';
   }
 
-  // Central Bank Vault Balance
+  // Central Bank Balance
   const bankBalEl = document.getElementById('home-bank-balance');
   bankBalEl.textContent = game.bank_balance === null ? '∞ ไม่จำกัด' : fmt(game.bank_balance);
+
+  // Privacy Indicator
+  const privBadge = document.getElementById('privacy-indicator-badge');
+  if (game.hideOthersBalance) privBadge.textContent = '🙈 ซ่อนยอดเงินผู้อื่น';
+  else privBadge.textContent = '🌐 แสดงยอดเงินทุกคน';
 
   // Quick Payees Carousel
   const payeesCarousel = document.getElementById('quick-payees-carousel');
@@ -925,13 +1337,24 @@ function renderMainAppUI() {
     const btn = document.createElement('button');
     btn.className = 'flex flex-col items-center gap-1 shrink-0 p-2.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/60 active:scale-95 transition w-20';
     btn.onclick = () => {
+      if (myPlayer?.bankrupt) {
+        showToast('💀 คุณล้มละลายแล้ว ไม่สามารถโอนเงินส่วนตัวได้ (ให้เล่นเป็นธนาคารแทน)', 'warning');
+        return;
+      }
       appState.selectedRecipientId = p.id;
       switchTab('transfer');
     };
+
+    const avatarHtml = p.avatar_url
+      ? `<img src="${p.avatar_url}" class="w-10 h-10 rounded-full object-cover border border-slate-700"/>`
+      : `<div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xl shadow-inner">${pal.emoji}</div>`;
+
+    const displayBalance = game.hideOthersBalance ? '฿••••••' : `฿${fmt(p.balance)}`;
+
     btn.innerHTML = `
-      <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xl shadow-inner">${pal.emoji}</div>
+      ${avatarHtml}
       <span class="text-[11px] font-medium text-slate-200 truncate w-full text-center">${escapeHtml(p.name)}</span>
-      <span class="text-[9px] font-bold text-emerald-400">฿${fmt(p.balance)}</span>
+      <span class="text-[9px] font-bold text-emerald-400">${displayBalance}</span>
     `;
     payeesCarousel.appendChild(btn);
   });
@@ -946,11 +1369,30 @@ function renderMainAppUI() {
     top4.forEach(tx => recentList.appendChild(buildTxCard(tx)));
   }
 
-  // If currently on other tabs, refresh them
+  // Adjust Bank Tab Heading for Bankrupt users (Banker mode!)
+  if (myPlayer?.bankrupt) {
+    document.getElementById('bank-tab-heading').textContent = '🏛️ ผู้จัดการธนาคาร (Banker Mode)';
+    document.getElementById('bank-tab-subheading').textContent = 'คุณล้มละลายแล้ว ได้รับสิทธิ์บริหารจัดการเงินของธนาคารกลาง';
+  } else {
+    document.getElementById('bank-tab-heading').textContent = 'ธุรกรรมธนาคารกลาง';
+    document.getElementById('bank-tab-subheading').textContent = 'เบิกเงินรางวัล หรือชำระเงินให้กับธนาคารเกม';
+  }
+
   if (appState.currentTab === 'transfer') renderTransferTab();
   if (appState.currentTab === 'bank') renderBankTab();
   if (appState.currentTab === 'statement') renderStatementTab();
   if (appState.currentTab === 'players') renderFullPlayersTab();
+}
+
+// Transfer Button Check (Bankrupt restriction)
+function handleTransferButtonClick() {
+  const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
+  if (me?.bankrupt) {
+    showToast('💀 คุณล้มละลายแล้ว ไม่สามารถโอนเงินส่วนตัวได้ ให้เข้าแท็บ "ธนาคาร" เพื่อเล่นเป็นผู้จัดการธนาคาร', 'warning');
+    switchTab('bank');
+    return;
+  }
+  switchTab('transfer');
 }
 
 function buildTxCard(tx) {
@@ -1012,13 +1454,71 @@ function formatTxTime(dateStr) {
 }
 
 // ==========================================
-// TAB: TRANSFER (โอนเงิน)
+// AVATAR PHOTO UPLOAD (CLIENT-SIDE RESIZING)
+// ==========================================
+function triggerAvatarUpload() {
+  if (!appState.myPlayerId) return;
+  document.getElementById('input-avatar-file').click();
+}
+
+function handleAvatarFileSelected(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      // Resize to 120x120px to keep payload light and fast
+      const canvas = document.createElement('canvas');
+      canvas.width = 120;
+      canvas.height = 120;
+      const ctx = canvas.getContext('2d');
+      
+      const minDim = Math.min(img.width, img.height);
+      const sx = (img.width - minDim) / 2;
+      const sy = (img.height - minDim) / 2;
+      ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, 120, 120);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      uploadAvatarDataUrl(dataUrl);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadAvatarDataUrl(dataUrl) {
+  try {
+    showToast('⏳ กำลังอัปเดตรูปโปรไฟล์...', 'info');
+    await apiRequest(`/api/game/${appState.currentRoomCode}/profile`, {
+      method: 'POST',
+      body: JSON.stringify({
+        playerId: appState.myPlayerId,
+        avatarUrl: dataUrl
+      })
+    });
+    showToast('📷 อัปเดตรูปโปรไฟล์สำเร็จแล้ว!', 'success');
+    await refreshGameState(false);
+  } catch(e) {
+    showToast('อัปโหลดรูปไม่สำเร็จ: ' + e.message, 'error');
+  }
+}
+
+// ==========================================
+// TAB: TRANSFER (WITH +10 QUICK BUTTON)
 // ==========================================
 function renderTransferTab() {
   const myPlayer = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
   const pal = myPlayer ? (PLAYER_PALETTE[myPlayer.color_index] || PLAYER_PALETTE[0]) : { emoji: '👤' };
 
-  document.getElementById('transfer-from-emoji').textContent = pal.emoji;
+  const avatarBox = document.getElementById('transfer-from-avatar-box');
+  if (myPlayer?.avatar_url) {
+    avatarBox.innerHTML = `<img src="${myPlayer.avatar_url}" class="w-full h-full object-cover rounded-xl"/>`;
+  } else {
+    avatarBox.innerHTML = `<span class="text-xl">${pal.emoji}</span>`;
+  }
+
   document.getElementById('transfer-from-name').textContent = myPlayer ? myPlayer.name : 'ไม่ได้เลือกบัญชี';
   document.getElementById('transfer-from-balance').textContent = myPlayer ? `฿${fmt(myPlayer.balance)}` : '฿0';
 
@@ -1035,11 +1535,13 @@ function renderTransferTab() {
     appState.selectedRecipientId = candidates[0].id;
   }
 
+  const hideOthers = appState.gameState?.game?.hideOthersBalance;
+
   candidates.forEach(p => {
     const pPal = PLAYER_PALETTE[p.color_index] || PLAYER_PALETTE[0];
     const isSelected = p.id === appState.selectedRecipientId;
     const btn = document.createElement('button');
-    btn.className = `p-3 rounded-2xl border text-left transition flex items-center gap-2.5 ${
+    btn.className = `p-2.5 rounded-2xl border text-left transition flex items-center gap-2.5 ${
       isSelected
         ? 'bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-900/20'
         : 'bg-slate-900 border-slate-800 hover:border-slate-700'
@@ -1048,13 +1550,20 @@ function renderTransferTab() {
       appState.selectedRecipientId = p.id;
       renderTransferTab();
     };
+
+    const avatarHtml = p.avatar_url
+      ? `<img src="${p.avatar_url}" class="w-8 h-8 rounded-lg object-cover shrink-0"/>`
+      : `<span class="text-2xl">${pPal.emoji}</span>`;
+
+    const displayBal = hideOthers ? '฿••••••' : `฿${fmt(p.balance)}`;
+
     btn.innerHTML = `
-      <span class="text-2xl">${pPal.emoji}</span>
+      ${avatarHtml}
       <div class="min-w-0">
         <p class="font-bold text-xs text-white truncate">${escapeHtml(p.name)}</p>
-        <p class="text-[10px] text-emerald-400">฿${fmt(p.balance)}</p>
+        <p class="text-[10px] text-emerald-400 font-medium">${displayBal}</p>
       </div>
-      ${isSelected ? `<span class="ml-auto text-emerald-400 font-bold text-xs">✓</span>` : ''}
+      ${isSelected ? `<span class="ml-auto text-emerald-400 font-bold text-xs pr-1">✓</span>` : ''}
     `;
     grid.appendChild(btn);
   });
@@ -1088,6 +1597,7 @@ function prepareTransferReview() {
   const amount = parseInt(document.getElementById('input-transfer-amount').value);
   const reason = document.getElementById('input-transfer-reason').value.trim();
 
+  if (from.bankrupt) { showToast('คุณล้มละลายแล้ว ไม่สามารถโอนเงินได้', 'error'); return; }
   if (!to) { showToast('กรุณาเลือกผู้รับเงิน', 'error'); return; }
   if (from.id === to.id) { showToast('ไม่สามารถโอนเงินให้ตัวเองได้', 'error'); return; }
   if (!amount || amount <= 0) { showToast('กรุณาระบุจำนวนเงินที่ถูกต้อง', 'error'); return; }
@@ -1117,7 +1627,6 @@ function closeReviewModal() {
   document.getElementById('modal-transfer-review').classList.add('hidden');
 }
 
-// ⚠️ THE CRUCIAL EXECUTE FUNCTION (Fixed callback execution)
 async function confirmAndExecuteTransfer() {
   if (!appState.pendingTransfer) return;
   const { fromId, toId, fromName, toName, amount, reason } = appState.pendingTransfer;
@@ -1126,7 +1635,6 @@ async function confirmAndExecuteTransfer() {
   btn.textContent = '⏳ กำลังประมวลผล...';
 
   try {
-    // 1. Send API to Cloudflare Workers
     const result = await apiRequest(`/api/game/${appState.currentRoomCode}/transfer`, {
       method: 'POST',
       body: JSON.stringify({ fromPlayerId: fromId, toPlayerId: toId, amount, reason })
@@ -1135,11 +1643,9 @@ async function confirmAndExecuteTransfer() {
     closeReviewModal();
     playChime(true);
 
-    // 2. Clear inputs
     document.getElementById('input-transfer-amount').value = '';
     document.getElementById('input-transfer-reason').value = '';
 
-    // 3. Show Electronic Slip
     showSlipModal({
       refNo: result.refNo || ('TX' + Date.now().toString().slice(-8)),
       fromName: result.fromName || fromName,
@@ -1149,7 +1655,6 @@ async function confirmAndExecuteTransfer() {
       timestamp: result.timestamp ? formatSlipTime(result.timestamp) : getNowThaiString()
     });
 
-    // 4. Refresh State
     await refreshGameState(false);
 
   } catch(e) {
@@ -1163,7 +1668,7 @@ async function confirmAndExecuteTransfer() {
 }
 
 // ==========================================
-// TAB: BANK OPERATIONS (เบิก/จ่ายธนาคาร)
+// TAB: BANK OPERATIONS (WITH +10 QUICK BUTTON)
 // ==========================================
 function openBankModalWithTab(mode) {
   setBankTabMode(mode);
@@ -1229,6 +1734,12 @@ function renderBankPresets() {
   });
 }
 
+function addBankAmount(n) {
+  const inp = document.getElementById('input-bank-amount');
+  const cur = parseInt(inp.value) || 0;
+  inp.value = cur + n;
+}
+
 async function handleExecuteBankTransfer() {
   const pid = parseInt(document.getElementById('bank-player-select').value);
   const amount = parseInt(document.getElementById('input-bank-amount').value);
@@ -1270,7 +1781,7 @@ async function handleExecuteBankTransfer() {
 }
 
 // ==========================================
-// TAB: STATEMENT (สเตทเม้นต์)
+// TAB: STATEMENT
 // ==========================================
 function filterStatement(type) {
   appState.statementFilter = type;
@@ -1336,6 +1847,7 @@ function renderFullPlayersTab() {
   const container = document.getElementById('full-players-rank-list');
   container.innerHTML = '';
 
+  const hideOthers = appState.gameState?.game?.hideOthersBalance;
   const sorted = [...(appState.gameState?.players || [])].sort((a,b) => b.balance - a.balance);
 
   sorted.forEach((p, idx) => {
@@ -1347,21 +1859,27 @@ function renderFullPlayersTab() {
     } ${p.bankrupt ? 'opacity-40 grayscale' : ''}`;
 
     const crown = idx === 0 && !p.bankrupt ? '👑 อันดับ 1' : `อันดับ ${idx + 1}`;
+    const displayBalance = (isMe || !hideOthers) ? `฿${fmt(p.balance)}` : '฿••••••';
+
+    const avatarHtml = p.avatar_url
+      ? `<img src="${p.avatar_url}" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-slate-700"/>`
+      : `<span class="text-2xl">${pal.emoji}</span>`;
 
     card.innerHTML = `
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2.5">
-          <span class="text-2xl">${pal.emoji}</span>
+          ${avatarHtml}
           <div>
             <div class="flex items-center gap-1.5">
               <span class="font-bold text-sm text-white">${escapeHtml(p.name)}</span>
               ${isMe ? `<span class="px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-bold">คุณ</span>` : ''}
+              ${p.is_claimed ? `<span class="w-2 h-2 rounded-full bg-emerald-400" title="ออนไลน์"></span>` : ''}
             </div>
             <span class="text-[10px] text-amber-400 font-medium">${crown}</span>
           </div>
         </div>
         <div class="text-right">
-          <div class="text-base font-extrabold text-emerald-400">฿${fmt(p.balance)}</div>
+          <div class="text-base font-extrabold text-emerald-400">${displayBalance}</div>
           ${p.bankrupt ? '<span class="text-xs text-red-500 font-bold">💀 ล้มละลาย</span>' : ''}
         </div>
       </div>
@@ -1425,8 +1943,22 @@ function switchUserPrompt() {
   showUserSelectionScreen();
 }
 
-function confirmExitGame() {
-  if (confirm('คุณต้องการออกจากห้องเกมนี้หรือไม่? (ข้อมูลในเกมนังคงอยู่)')) {
+// Exit Room: Release character claim so others can play it!
+async function confirmExitGame() {
+  if (confirm('คุณต้องการออกจากห้องเกมนี้หรือไม่? (ตัวละครของคุณจะถูกปลดล็อคให้ผู้เล่นอื่นเลือกเล่นแทนได้)')) {
+    try {
+      if (appState.myPlayerId) {
+        await apiRequest(`/api/game/${appState.currentRoomCode}/claim`, {
+          method: 'POST',
+          body: JSON.stringify({
+            playerId: appState.myPlayerId,
+            sessionId: appState.sessionId,
+            action: 'release'
+          })
+        });
+      }
+    } catch(e) {}
+
     localStorage.removeItem('monobank_session');
     stopPolling();
     appState.currentRoomCode = '';
@@ -1471,7 +2003,7 @@ async function refreshGameState(showIndicator = false) {
     renderMainAppUI();
     if (showIndicator) showToast('ซิงค์ข้อมูลล่าสุดแล้ว', 'info');
   } catch(e) {
-    // silent catch on background poll
+    // silent catch
   } finally {
     if (syncBtn) syncBtn.classList.remove('animate-spin');
   }
