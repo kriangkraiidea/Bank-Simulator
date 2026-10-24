@@ -2,11 +2,11 @@
 CREATE TABLE IF NOT EXISTS games (
   id TEXT PRIMARY KEY,
   room_code TEXT UNIQUE NOT NULL,
+  room_name TEXT,
   bank_balance INTEGER,          -- NULL = unlimited
   starting_money INTEGER NOT NULL DEFAULT 15000,
   round INTEGER NOT NULL DEFAULT 1,
   active INTEGER NOT NULL DEFAULT 1,
-  is_public INTEGER NOT NULL DEFAULT 1,
   password TEXT,
   allow_spectator INTEGER NOT NULL DEFAULT 1,
   hide_others_balance INTEGER NOT NULL DEFAULT 1,

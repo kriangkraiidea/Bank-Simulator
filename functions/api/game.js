@@ -1,20 +1,20 @@
 // API: /api/game
-// GET  - List active games for Lobby
-// POST - Create a new game with privacy, password & custom colors
+// GET  - List all active games for Lobby (latest first)
+// POST - Create a new game with room name, password, privacy & custom colors
 
 export async function onRequestGet({ env }) {
   try {
-    await ensureSchema(env.DB);
+    await autoMigrateSchema(env.DB);
 
     const { results } = await env.DB.prepare(`
       SELECT 
         g.id, 
         g.room_code, 
+        COALESCE(g.room_name, g.room_code) as room_name,
         g.bank_balance, 
         g.starting_money, 
         g.round, 
         g.active, 
-        COALESCE(g.is_public, 1) as is_public,
         CASE WHEN g.password IS NOT NULL AND g.password != '' THEN 1 ELSE 0 END as has_password,
         COALESCE(g.allow_spectator, 1) as allow_spectator,
         COALESCE(g.hide_others_balance, 1) as hide_others_balance,
@@ -25,8 +25,8 @@ export async function onRequestGet({ env }) {
       LEFT JOIN players p ON p.game_id = g.id
       WHERE g.active = 1
       GROUP BY g.id
-      ORDER BY g.created_at DESC
-      LIMIT 20
+      ORDER BY g.rowid DESC, g.created_at DESC
+      LIMIT 30
     `).all();
 
     return json({ games: results || [] });
@@ -37,14 +37,14 @@ export async function onRequestGet({ env }) {
 
 export async function onRequestPost({ request, env }) {
   try {
-    await ensureSchema(env.DB);
+    await autoMigrateSchema(env.DB);
 
     const body = await request.json();
     const {
+      roomName = '',
       players,
       startingMoney = 15000,
       bankMoney = 0,
-      isPublic = true,
       password = '',
       allowSpectator = true,
       hideOthersBalance = true
@@ -54,11 +54,25 @@ export async function onRequestPost({ request, env }) {
       return json({ error: 'ต้องมีผู้เล่น 2–8 คน' }, 400);
     }
 
-    // Validate player names <= 15 chars
+    // Validate room name (<= 20 chars)
+    const finalRoomName = (roomName || '').trim().slice(0, 20) || 'ห้องเกมเศรษฐี';
+
+    // Validate player names <= 12 chars
     for (const p of players) {
-      if ((p.name || '').trim().length > 15) {
-        return json({ error: `ชื่อ "${p.name}" ยาวเกิน 15 ตัวอักษร` }, 400);
+      const name = (p.name || '').trim();
+      if (name.length > 12) {
+        return json({ error: `ชื่อผู้เล่น "${name}" ต้องไม่เกิน 12 ตัวอักษร` }, 400);
       }
+    }
+
+    // Check duplicate colors among players
+    const colorSet = new Set();
+    for (const p of players) {
+      const c = p.colorIndex;
+      if (colorSet.has(c)) {
+        return json({ error: 'สีของผู้เล่นต้องไม่ซ้ำกัน' }, 400);
+      }
+      colorSet.add(c);
     }
 
     const roomCode = genCode();
@@ -67,15 +81,15 @@ export async function onRequestPost({ request, env }) {
 
     await env.DB.prepare(`
       INSERT INTO games (
-        id, room_code, bank_balance, starting_money,
-        is_public, password, allow_spectator, hide_others_balance
+        id, room_code, room_name, bank_balance, starting_money,
+        password, allow_spectator, hide_others_balance
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       gameId,
       roomCode,
+      finalRoomName,
       bankBalance,
       startingMoney,
-      isPublic ? 1 : 0,
       (password || '').trim() || null,
       allowSpectator ? 1 : 0,
       hideOthersBalance ? 1 : 0
@@ -88,7 +102,7 @@ export async function onRequestPost({ request, env }) {
         VALUES (?, ?, ?, ?)
       `).bind(
         gameId,
-        player.name.trim().slice(0, 15) || `ผู้เล่น ${i + 1}`,
+        player.name.trim().slice(0, 12) || `ผู้เล่น ${i + 1}`,
         colorIdx,
         startingMoney
       ).run();
@@ -97,19 +111,19 @@ export async function onRequestPost({ request, env }) {
     const playerNames = players.map(p => p.name.trim()).join(', ');
     await env.DB.prepare(`
       INSERT INTO transactions (game_id, type, icon, from_label, to_label, reason, round)
-       VALUES (?, 'system', '🎮', 'ระบบ', 'ผู้เล่นทุกคน', ?, 1)
-    `).bind(gameId, `เริ่มเกมแล้ว! ผู้เล่น: ${playerNames} | เงินเริ่มต้น: ${fmt(startingMoney)} บาท/คน`).run();
+      VALUES (?, 'system', '🎮', 'ระบบ', 'ผู้เล่นทุกคน', ?, 1)
+    `).bind(gameId, `เริ่มเกม "${finalRoomName}"! ผู้เล่น: ${playerNames} | เงินเริ่มต้น: ${fmt(startingMoney)} บาท/คน`).run();
 
-    return json({ gameId, roomCode });
+    return json({ gameId, roomCode, roomName: finalRoomName });
   } catch (e) {
     return json({ error: e.message }, 500);
   }
 }
 
-// Auto-migrate schema helper
-async function ensureSchema(db) {
+// Auto-migrate schema with safe individual ALTER TABLE statements
+async function autoMigrateSchema(db) {
   try {
-    await db.exec(`
+    await db.prepare(`
       CREATE TABLE IF NOT EXISTS games (
         id TEXT PRIMARY KEY,
         room_code TEXT UNIQUE NOT NULL,
@@ -117,13 +131,12 @@ async function ensureSchema(db) {
         starting_money INTEGER NOT NULL DEFAULT 15000,
         round INTEGER NOT NULL DEFAULT 1,
         active INTEGER NOT NULL DEFAULT 1,
-        is_public INTEGER NOT NULL DEFAULT 1,
-        password TEXT,
-        allow_spectator INTEGER NOT NULL DEFAULT 1,
-        hide_others_balance INTEGER NOT NULL DEFAULT 1,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now'))
-      );
+      )
+    `).run();
+
+    await db.prepare(`
       CREATE TABLE IF NOT EXISTS players (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         game_id TEXT NOT NULL,
@@ -131,11 +144,11 @@ async function ensureSchema(db) {
         color_index INTEGER NOT NULL DEFAULT 0,
         balance INTEGER NOT NULL DEFAULT 0,
         bankrupt INTEGER NOT NULL DEFAULT 0,
-        avatar_url TEXT,
-        claimed_session TEXT,
-        claimed_at TEXT,
         FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
-      );
+      )
+    `).run();
+
+    await db.prepare(`
       CREATE TABLE IF NOT EXISTS transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         game_id TEXT NOT NULL,
@@ -148,28 +161,33 @@ async function ensureSchema(db) {
         round INTEGER NOT NULL DEFAULT 1,
         created_at TEXT DEFAULT (datetime('now')),
         FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
-      );
-    `);
+      )
+    `).run();
 
-    // Add columns if table existed without them
-    const gCols = [
-      'is_public INTEGER DEFAULT 1',
+    // Add columns individually (ignoring if already exists)
+    const gameColumns = [
+      'room_name TEXT',
       'password TEXT',
       'allow_spectator INTEGER DEFAULT 1',
       'hide_others_balance INTEGER DEFAULT 1'
     ];
-    for (const col of gCols) {
-      try { await db.prepare(`ALTER TABLE games ADD COLUMN ${col}`).run(); } catch(e) {}
+    for (const col of gameColumns) {
+      try {
+        await db.prepare(`ALTER TABLE games ADD COLUMN ${col}`).run();
+      } catch (_) {}
     }
-    const pCols = [
+
+    const playerColumns = [
       'avatar_url TEXT',
       'claimed_session TEXT',
       'claimed_at TEXT'
     ];
-    for (const col of pCols) {
-      try { await db.prepare(`ALTER TABLE players ADD COLUMN ${col}`).run(); } catch(e) {}
+    for (const col of playerColumns) {
+      try {
+        await db.prepare(`ALTER TABLE players ADD COLUMN ${col}`).run();
+      } catch (_) {}
     }
-  } catch(e) {}
+  } catch (_) {}
 }
 
 function genCode() {

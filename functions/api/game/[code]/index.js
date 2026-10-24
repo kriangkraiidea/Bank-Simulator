@@ -7,11 +7,11 @@ export async function onRequestGet({ params, env }) {
       SELECT 
         id, 
         room_code, 
+        COALESCE(room_name, room_code) as room_name,
         bank_balance, 
         starting_money, 
         round, 
         active, 
-        COALESCE(is_public, 1) as is_public,
         CASE WHEN password IS NOT NULL AND password != '' THEN 1 ELSE 0 END as has_password,
         COALESCE(allow_spectator, 1) as allow_spectator,
         COALESCE(hide_others_balance, 1) as hide_others_balance,
@@ -49,11 +49,11 @@ export async function onRequestGet({ params, env }) {
     return json({
       game: {
         ...game,
+        roomName: game.room_name || game.room_code,
         bankBalance: game.bank_balance,
         hasPassword: game.has_password === 1,
         allowSpectator: game.allow_spectator === 1,
         hideOthersBalance: game.hide_others_balance === 1,
-        isPublic: game.is_public === 1,
       },
       players: players || [],
       recentLog: recentLog || [],
