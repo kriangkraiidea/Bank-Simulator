@@ -175,7 +175,7 @@
       </button>
     </div>
 
-    <!-- Active Games Lobby Section (Latest First) -->
+    <!-- Active Games Lobby Section (Latest First & Searchable) -->
     <div class="space-y-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -188,7 +188,13 @@
         </button>
       </div>
 
-      <div id="lobby-games-list" class="space-y-2.5 max-h-[52vh] overflow-y-auto hide-scrollbar pb-2">
+      <!-- Real-time Room Search Input -->
+      <div class="relative">
+        <input id="input-lobby-search" oninput="filterLobbyGames()" type="text" placeholder="🔍 พิมพ์ค้นหาชื่อห้องหรือรหัส..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none"/>
+        <svg class="w-4 h-4 text-slate-500 absolute left-3 top-3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/></svg>
+      </div>
+
+      <div id="lobby-games-list" class="space-y-2.5 max-h-[46vh] overflow-y-auto hide-scrollbar pb-2">
         <div class="p-6 text-center text-xs text-slate-500 bg-slate-900/60 rounded-2xl border border-slate-800">
           กำลังค้นหาห้องเกม...
         </div>
@@ -196,10 +202,20 @@
     </div>
   </div>
 
-  <div class="text-center pt-4 pb-2">
-    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/60 border border-slate-700/40 text-[10px] text-slate-400">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-      Cloudflare D1 Real-time Engine
+  <!-- Footer: Creator, GitHub Link & Donate Button -->
+  <div class="pt-5 pb-2 border-t border-slate-800/80 text-center space-y-2.5">
+    <div class="flex items-center justify-center gap-2">
+      <button onclick="openDonateModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-300 text-xs font-semibold hover:bg-amber-500/30 transition active:scale-95 shadow-sm">
+        <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="currentColor"/></svg>
+        <span>สนับสนุน / โดเนท</span>
+      </button>
+      <a href="https://github.com/kriangkraiidea/Bank-Simulator" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition active:scale-95">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>GitHub</span>
+      </a>
+    </div>
+    <div class="text-[11px] text-slate-400">
+      สร้างโดย <span class="text-emerald-400 font-semibold">นาย เกรียงไกร เกตุรักษา</span>
     </div>
   </div>
 </div>
@@ -331,6 +347,9 @@
     </div>
 
     <div class="flex items-center gap-2 shrink-0">
+      <button onclick="openDonateModal()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 hover:border-amber-500/50 flex items-center justify-center text-amber-400 text-xs active:scale-95 transition" title="สนับสนุนผู้พัฒนา (Donate)">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="currentColor"/></svg>
+      </button>
       <button onclick="refreshGameState(true)" id="btn-sync" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs active:scale-95 transition" title="ซิงค์ข้อมูล">
         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-refresh"/></svg>
       </button>
@@ -387,34 +406,38 @@
       </div>
     </div>
 
-    <!-- Quick Action Grid (Bank App Style) -->
-    <div class="grid grid-cols-4 gap-2.5">
-      <button onclick="handleTransferButtonClick()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
-        <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shadow-inner">
+    <!-- Quick Action Grid (Bank App Style: โอนเงิน, เบิกธนาคาร, จ่ายธนาคาร, คิดเลข) -->
+    <div id="home-quick-actions" class="grid grid-cols-4 gap-2">
+      <!-- 1. โอนเงิน (ซ่อนเมื่อล้มละลาย) -->
+      <button id="home-action-transfer" onclick="handleTransferButtonClick()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
         </div>
         <span class="text-[11px] font-medium text-slate-200">โอนเงิน</span>
       </button>
 
-      <button onclick="switchTab('calc')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
-        <div class="w-11 h-11 rounded-2xl bg-blue-500/15 text-blue-400 flex items-center justify-center shadow-inner">
+      <!-- 2. เบิกธนาคาร -->
+      <button onclick="openBankModalWithTab('receive')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-teal-500/50 active:scale-95 transition">
+        <div class="w-10 h-10 rounded-2xl bg-teal-500/15 text-teal-400 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-receive"/></svg>
+        </div>
+        <span class="text-[11px] font-medium text-slate-200">เบิกธนาคาร</span>
+      </button>
+
+      <!-- 3. จ่ายธนาคาร -->
+      <button onclick="openBankModalWithTab('pay')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 active:scale-95 transition">
+        <div class="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
+        </div>
+        <span class="text-[11px] font-medium text-slate-200">จ่ายธนาคาร</span>
+      </button>
+
+      <!-- 4. คิดเลข -->
+      <button onclick="switchTab('calc')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-blue-500/50 active:scale-95 transition">
+        <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-calc"/></svg>
         </div>
         <span class="text-[11px] font-medium text-slate-200">คิดเลข</span>
-      </button>
-
-      <button onclick="openBankModalWithTab('receive')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
-        <div class="w-11 h-11 rounded-2xl bg-teal-500/15 text-teal-400 flex items-center justify-center shadow-inner">
-          <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
-        </div>
-        <span class="text-[11px] font-medium text-slate-200">ธนาคาร</span>
-      </button>
-
-      <button onclick="switchTab('statement')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
-        <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center shadow-inner">
-          <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-statement"/></svg>
-        </div>
-        <span class="text-[11px] font-medium text-slate-200">สเตทเม้นต์</span>
       </button>
     </div>
 
@@ -528,12 +551,16 @@
 
   <!-- TAB CONTENT 3: CALCULATOR (เครื่องคิดเลขส่งยอดได้) -->
   <main id="tab-content-calc" class="hidden p-5 space-y-4 flex-1">
-    <div class="text-center pb-1">
-      <h3 class="text-base font-bold text-white flex items-center justify-center gap-1.5">
+    <div class="flex items-center justify-between pb-1">
+      <button onclick="switchTab('home')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-slate-900 border border-slate-800 transition active:scale-95">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span>หน้าหลัก</span>
+      </button>
+      <h3 class="text-base font-bold text-white flex items-center gap-1.5">
         <svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24"><use href="#icon-calc"/></svg>
-        <span>เครื่องคิดเลขการเงิน</span>
+        <span>เครื่องคิดเลข</span>
       </h3>
-      <p class="text-xs text-slate-400">คำนวณยอดเงิน แล้วกดส่งยอดไปโอนเงินหรือธนาคารได้ทันที</p>
+      <div class="w-16"></div>
     </div>
 
     <!-- Calculator Display Screen -->
@@ -695,8 +722,8 @@
     <div id="full-players-rank-list" class="space-y-3"></div>
   </main>
 
-  <!-- Bottom Navigation Bar (6 Sleek Items) -->
-  <nav class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 grid grid-cols-6 py-2 px-1 text-center">
+  <!-- Bottom Navigation Bar (5 Sleek Items) -->
+  <nav id="main-bottom-nav" class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 grid grid-cols-5 py-2 px-1 text-center">
     <button onclick="switchTab('home')" id="nav-btn-home" class="nav-item active flex flex-col items-center gap-1 py-1 text-slate-400 transition">
       <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-home"/></svg>
       <span class="text-[9px] font-medium">หน้าหลัก</span>
@@ -705,11 +732,6 @@
     <button onclick="handleTransferButtonClick()" id="nav-btn-transfer" class="nav-item flex flex-col items-center gap-1 py-1 text-slate-400 transition">
       <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
       <span class="text-[9px] font-medium">โอนเงิน</span>
-    </button>
-
-    <button onclick="switchTab('calc')" id="nav-btn-calc" class="nav-item flex flex-col items-center gap-1 py-1 text-slate-400 transition">
-      <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24"><use href="#icon-calc"/></svg>
-      <span class="text-[9px] font-medium">คิดเลข</span>
     </button>
 
     <button onclick="switchTab('bank')" id="nav-btn-bank" class="nav-item flex flex-col items-center gap-1 py-1 text-slate-400 transition">
@@ -906,6 +928,105 @@
   </div>
 </div>
 
+<!-- ========================= MODAL: DELETE ROOM (ใส่รหัส pookky) ========================= -->
+<div id="modal-delete-room" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4" onclick="if(event.target === this) closeDeleteRoomModal();">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+    <div class="text-center pb-1">
+      <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-2">
+        <svg class="w-6 h-6" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3 class="font-bold text-base text-white">ยืนยันลบห้องเกม</h3>
+      <p class="text-xs text-slate-300 mt-1 font-semibold truncate max-w-[240px] mx-auto" id="delete-room-title">—</p>
+      <span class="text-[10px] font-mono text-slate-400" id="delete-room-code-tag">—</span>
+    </div>
+
+    <!-- Notice as requested -->
+    <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs leading-relaxed">
+      <div class="font-bold mb-0.5">⚠️ ใส่รหัสผ่านจากผู้สร้างเว็บเท่านั้น</div>
+      <div class="text-[11px] text-amber-200">รหัสคือชื่อหมาตัวแรกของผู้สร้างเป็นภาษาอังกฤษพิมพ์เล็ก</div>
+    </div>
+
+    <div>
+      <label class="text-xs text-slate-400 block mb-1.5 font-medium">รหัสผ่านผู้สร้างเว็บ</label>
+      <input id="input-delete-admin-pass" type="password" placeholder="ใส่รหัสผ่านเพื่อลบห้อง" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:border-red-500 focus:outline-none"/>
+      <p id="delete-room-error" class="hidden text-xs text-red-400 mt-1.5"></p>
+    </div>
+
+    <div class="flex gap-2.5 pt-1">
+      <button onclick="closeDeleteRoomModal()" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">
+        ยกเลิก
+      </button>
+      <button onclick="confirmDeleteRoom()" id="btn-confirm-delete-room" class="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-600/30 active:scale-95 transition">
+        ยืนยันลบห้อง
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= MODAL: DONATE / SUPPORT ========================= -->
+<div id="modal-donate" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4" onclick="if(event.target === this) closeDonateModal();">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4 max-h-[92vh] overflow-y-auto hide-scrollbar">
+    
+    <div class="text-center pb-1">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-2">
+        <svg class="w-6 h-6" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="currentColor"/></svg>
+      </div>
+      <h3 class="font-bold text-lg text-white">สนับสนุนผู้พัฒนา (Donate)</h3>
+      <p class="text-xs text-slate-400 mt-0.5">ขอบคุณทุกการสนับสนุนเพื่อพัฒนาเว็บแอปนี้ต่อไปครับ 🙏</p>
+    </div>
+
+    <!-- QR Code Image -->
+    <div class="bg-white p-3 rounded-2xl shadow-md text-center">
+      <img src="/donate-qr.jpg" alt="Thai QR PromptPay" class="w-full max-w-[220px] mx-auto rounded-xl"/>
+      <p class="text-[11px] text-slate-500 font-medium mt-1">สแกน QR ด้วยแอปธนาคารทุกธนาคาร</p>
+    </div>
+
+    <!-- Bank Account Info -->
+    <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/60 space-y-2 text-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-slate-400">ธนาคาร</span>
+        <span class="font-bold text-emerald-400 flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+          กสิกรไทย (KBANK)
+        </span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-400">ชื่อบัญชี</span>
+        <span class="font-bold text-white">นาย เกรียงไกร เกตุรักษา</span>
+      </div>
+      <div class="flex items-center justify-between pt-1 border-t border-slate-700/50">
+        <span class="text-slate-400">เลขที่บัญชี</span>
+        <span class="font-mono text-base font-extrabold text-amber-300">1288157290</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="space-y-2">
+      <!-- Copy Account Number -->
+      <button onclick="copyDonateAccount()" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+        <svg class="w-4 h-4" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span>คัดลอกเลขบัญชี (1288157290)</span>
+      </button>
+
+      <!-- Download QR Code -->
+      <a href="/donate-qr.jpg" download="PromptPay_Kriangkrai.jpg" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow text-center">
+        <svg class="w-4 h-4" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2"/></svg>
+        <span>บันทึก / ดาวน์โหลด QR Code</span>
+      </a>
+
+      <!-- Open K PLUS App Link -->
+      <button onclick="openKPlusApp()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow">
+        <svg class="w-4 h-4" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2" fill="none"/><line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span>เปิดแอป K PLUS (กสิกรไทย)</span>
+      </button>
+    </div>
+
+    <button onclick="closeDonateModal()" class="w-full py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 font-medium text-xs transition">
+      ปิดหน้าต่าง
+    </button>
+  </div>
+</div>
+
 <!-- ========================= TOAST NOTIFICATION ========================= -->
 <div id="toast" class="hidden fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-white text-xs font-semibold shadow-2xl max-w-[90vw] text-center flex items-center gap-2 transition-all"></div>
 
@@ -1063,8 +1184,10 @@ function switchTab(tabId) {
 }
 
 // ==========================================
-// LOBBY (ACTIVE GAMES LIST - LATEST FIRST)
+// LOBBY (ACTIVE GAMES LIST - LATEST FIRST & SEARCHABLE)
 // ==========================================
+let pendingDeleteRoomCode = '';
+
 async function loadActiveLobbyGames() {
   const container = document.getElementById('lobby-games-list');
   const icon = document.getElementById('lobby-refresh-icon');
@@ -1072,51 +1195,8 @@ async function loadActiveLobbyGames() {
 
   try {
     const data = await apiRequest('/api/game');
-    const games = data.games || [];
-
-    if (games.length === 0) {
-      container.innerHTML = `
-        <div class="p-6 text-center text-xs text-slate-500 bg-slate-900/60 rounded-2xl border border-slate-800">
-          ยังไม่มีห้องเกมที่เปิดอยู่ กดปุ่ม "สร้างห้องเกมใหม่" เพื่อเริ่มเล่น
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = '';
-    games.forEach(g => {
-      const isFull = g.active_players >= g.max_players;
-      const card = document.createElement('div');
-      card.className = 'p-3.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-between transition shadow-sm';
-      
-      const badgePwd = g.has_password ? `<span class="inline-flex items-center gap-0.5 text-[10px] text-amber-400 font-bold ml-1"><svg class="w-3 h-3" viewBox="0 0 24 24"><use href="#icon-lock"/></svg> มีรหัส</span>` : '';
-      const roomTitle = g.room_name || g.room_code;
-
-      card.innerHTML = `
-        <div class="min-w-0 pr-2">
-          <div class="flex items-center gap-1.5">
-            <h4 class="font-bold text-sm text-white truncate max-w-[170px]">${escapeHtml(roomTitle)}</h4>
-            ${badgePwd}
-          </div>
-          <p class="text-[11px] text-slate-400 mt-0.5">
-            ผู้เล่น: <span class="font-semibold text-slate-200">${g.active_players || 0}/${g.max_players || 0} คน</span>
-            ${g.hide_others_balance ? ' · ซ่อนยอด' : ''}
-          </p>
-        </div>
-        <div class="flex items-center gap-1.5 shrink-0">
-          ${g.allow_spectator ? `
-            <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, true)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium" title="เข้าเป็นผู้ชม">
-              ดู
-            </button>
-          ` : ''}
-          <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, false)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
-            ${isFull ? 'ดู/รอว่าง' : 'เข้าร่วม'}
-          </button>
-        </div>
-      `;
-      container.appendChild(card);
-    });
-
+    appState.lobbyGames = data.games || [];
+    filterLobbyGames();
   } catch(e) {
     container.innerHTML = `
       <div class="p-4 text-center text-xs text-red-400 bg-red-950/40 rounded-2xl border border-red-900">
@@ -1126,6 +1206,163 @@ async function loadActiveLobbyGames() {
   } finally {
     if (icon) icon.classList.remove('animate-spin');
   }
+}
+
+function filterLobbyGames() {
+  const container = document.getElementById('lobby-games-list');
+  const query = (document.getElementById('input-lobby-search')?.value || '').trim().toLowerCase();
+  const allGames = appState.lobbyGames || [];
+
+  if (allGames.length === 0) {
+    container.innerHTML = `
+      <div class="p-6 text-center text-xs text-slate-500 bg-slate-900/60 rounded-2xl border border-slate-800">
+        ยังไม่มีห้องเกมที่เปิดอยู่ กดปุ่ม "สร้างห้องเกมใหม่" เพื่อเริ่มเล่น
+      </div>
+    `;
+    return;
+  }
+
+  const filtered = query
+    ? allGames.filter(g => {
+        const title = (g.room_name || '').toLowerCase();
+        const code = (g.room_code || '').toLowerCase();
+        return title.includes(query) || code.includes(query);
+      })
+    : allGames;
+
+  renderLobbyGamesList(filtered);
+}
+
+function renderLobbyGamesList(games) {
+  const container = document.getElementById('lobby-games-list');
+  container.innerHTML = '';
+
+  if (games.length === 0) {
+    container.innerHTML = `
+      <div class="p-6 text-center text-xs text-slate-500 bg-slate-900/60 rounded-2xl border border-slate-800">
+        ไม่พบห้องเกมที่ตรงกับคำค้นหา
+      </div>
+    `;
+    return;
+  }
+
+  games.forEach(g => {
+    const isFull = g.active_players >= g.max_players;
+    const card = document.createElement('div');
+    card.className = 'p-3.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-between transition shadow-sm';
+    
+    const badgePwd = g.has_password ? `<span class="inline-flex items-center gap-0.5 text-[10px] text-amber-400 font-bold ml-1"><svg class="w-3 h-3" viewBox="0 0 24 24"><use href="#icon-lock"/></svg> มีรหัส</span>` : '';
+    const roomTitle = g.room_name || g.room_code;
+
+    card.innerHTML = `
+      <div class="min-w-0 pr-2">
+        <div class="flex items-center gap-1.5">
+          <h4 class="font-bold text-sm text-white truncate max-w-[150px]">${escapeHtml(roomTitle)}</h4>
+          ${badgePwd}
+        </div>
+        <p class="text-[11px] text-slate-400 mt-0.5">
+          ผู้เล่น: <span class="font-semibold text-slate-200">${g.active_players || 0}/${g.max_players || 0} คน</span>
+          ${g.hide_others_balance ? ' · ซ่อนยอด' : ''}
+        </p>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button onclick="promptDeleteRoom('${g.room_code}', '${escapeHtml(roomTitle)}')" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 active:scale-95 transition" title="ลบห้องนี้ (ต้องใส่รหัสผู้สร้างเว็บ)">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        ${g.allow_spectator ? `
+          <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, true)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium" title="เข้าเป็นผู้ชม">
+            ดู
+          </button>
+        ` : ''}
+        <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, false)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
+          ${isFull ? 'ดู/รอว่าง' : 'เข้าร่วม'}
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ==========================================
+// DELETE ROOM (PROTECTED BY CREATOR PASS: pookky)
+// ==========================================
+function promptDeleteRoom(roomCode, roomTitle) {
+  pendingDeleteRoomCode = roomCode;
+  document.getElementById('delete-room-title').textContent = roomTitle || roomCode;
+  document.getElementById('delete-room-code-tag').textContent = `รหัสห้อง: ${roomCode}`;
+  document.getElementById('input-delete-admin-pass').value = '';
+  document.getElementById('delete-room-error').classList.add('hidden');
+  document.getElementById('modal-delete-room').classList.remove('hidden');
+  setTimeout(() => document.getElementById('input-delete-admin-pass')?.focus(), 100);
+}
+
+function closeDeleteRoomModal() {
+  document.getElementById('modal-delete-room').classList.add('hidden');
+  pendingDeleteRoomCode = '';
+}
+
+async function confirmDeleteRoom() {
+  if (!pendingDeleteRoomCode) return;
+  const pass = (document.getElementById('input-delete-admin-pass').value || '').trim();
+  const err = document.getElementById('delete-room-error');
+
+  if (!pass) {
+    err.textContent = 'กรุณากรอกรหัสผ่านจากผู้สร้างเว็บ';
+    err.classList.remove('hidden');
+    return;
+  }
+
+  if (pass !== 'pookky') {
+    err.textContent = 'รหัสผ่านผู้สร้างเว็บไม่ถูกต้อง! (รหัสคือชื่อหมาตัวแรกของผู้สร้างเป็นภาษาอังกฤษพิมพ์เล็ก)';
+    err.classList.remove('hidden');
+    return;
+  }
+
+  const btn = document.getElementById('btn-confirm-delete-room');
+  btn.disabled = true;
+  btn.textContent = 'กำลังลบ...';
+
+  try {
+    const res = await apiRequest(`/api/game/${pendingDeleteRoomCode}/delete`, {
+      method: 'POST',
+      body: JSON.stringify({ adminPass: pass })
+    });
+    showToast(res.message || 'ลบห้องเกมสำเร็จเรียบร้อยแล้ว', 'success');
+    closeDeleteRoomModal();
+    await loadActiveLobbyGames();
+  } catch(e) {
+    err.textContent = e.message || 'ลบห้องไม่สำเร็จ';
+    err.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'ยืนยันลบห้อง';
+  }
+}
+
+// ==========================================
+// DONATE / SUPPORT MODAL
+// ==========================================
+function openDonateModal() {
+  document.getElementById('modal-donate').classList.remove('hidden');
+}
+
+function closeDonateModal() {
+  document.getElementById('modal-donate').classList.add('hidden');
+}
+
+function copyDonateAccount() {
+  navigator.clipboard?.writeText('1288157290').then(() => {
+    showToast('คัดลอกเลขบัญชี 1288157290 สำเร็จ!', 'success');
+  }).catch(() => {
+    showToast('เลขบัญชี: 1288157290 (กสิกรไทย)', 'info');
+  });
+}
+
+function openKPlusApp() {
+  window.location.href = 'kplus://';
+  setTimeout(() => {
+    showToast('หากเครื่องไม่ได้ติดตั้ง K PLUS สามารถใช้ภาพ QR หรือเลขบัญชีโอนผ่านแอปใดก็ได้ครับ', 'info');
+  }, 1200);
 }
 
 function requestJoinRoom(roomCode, roomTitle, hasPassword, isSpectator = false) {
@@ -1644,8 +1881,41 @@ function renderMainAppUI() {
     top4.forEach(tx => recentList.appendChild(buildTxCard(tx)));
   }
 
-  // Adjust Bank Tab Heading for Bankrupt users
-  if (myPlayer?.bankrupt) {
+  // Adjust Bank Tab Heading & Hide Transfer options for Bankrupt users
+  const isBankrupt = isPlayerBankrupt(myPlayer) || !myPlayer;
+  const homeTxBtn = document.getElementById('home-action-transfer');
+  const homeGrid = document.getElementById('home-quick-actions');
+  const navTxBtn = document.getElementById('nav-btn-transfer');
+  const mainNav = document.getElementById('main-bottom-nav');
+
+  if (isBankrupt) {
+    if (homeTxBtn) homeTxBtn.classList.add('hidden');
+    if (homeGrid) {
+      homeGrid.classList.remove('grid-cols-4');
+      homeGrid.classList.add('grid-cols-3');
+    }
+    if (navTxBtn) navTxBtn.classList.add('hidden');
+    if (mainNav) {
+      mainNav.classList.remove('grid-cols-5');
+      mainNav.classList.add('grid-cols-4');
+    }
+    if (appState.currentTab === 'transfer') {
+      switchTab('home');
+    }
+  } else {
+    if (homeTxBtn) homeTxBtn.classList.remove('hidden');
+    if (homeGrid) {
+      homeGrid.classList.remove('grid-cols-3');
+      homeGrid.classList.add('grid-cols-4');
+    }
+    if (navTxBtn) navTxBtn.classList.remove('hidden');
+    if (mainNav) {
+      mainNav.classList.remove('grid-cols-4');
+      mainNav.classList.add('grid-cols-5');
+    }
+  }
+
+  if (isBankrupt && myPlayer) {
     document.getElementById('bank-tab-heading').textContent = 'ผู้จัดการธนาคาร (Banker Mode)';
     document.getElementById('bank-tab-subheading').textContent = 'คุณล้มละลายแล้ว ได้รับสิทธิ์บริหารจัดการเงินของธนาคารกลาง';
   } else {
@@ -1653,7 +1923,7 @@ function renderMainAppUI() {
     document.getElementById('bank-tab-subheading').textContent = 'เบิกเงินรางวัล หรือชำระเงินให้กับธนาคารเกม';
   }
 
-  if (appState.currentTab === 'transfer') renderTransferTab();
+  if (appState.currentTab === 'transfer' && !isBankrupt) renderTransferTab();
   if (appState.currentTab === 'bank') renderBankTab();
   if (appState.currentTab === 'statement') renderStatementTab();
   if (appState.currentTab === 'players') renderFullPlayersTab();
@@ -1661,7 +1931,7 @@ function renderMainAppUI() {
 
 function handleTransferButtonClick() {
   const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
-  if (me?.bankrupt) {
+  if (isPlayerBankrupt(me)) {
     showToast('คุณล้มละลายแล้ว ไม่สามารถโอนเงินส่วนตัวได้ ให้เข้าแท็บ "ธนาคาร" เพื่อเล่นเป็นผู้จัดการธนาคาร', 'warning');
     switchTab('bank');
     return;
@@ -2030,6 +2300,11 @@ function getCalcAmountValue() {
 }
 
 function applyCalcToTransfer() {
+  const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
+  if (isPlayerBankrupt(me)) {
+    showToast('คุณล้มละลายแล้ว ไม่สามารถโอนเงินส่วนตัวได้', 'warning');
+    return;
+  }
   const amt = getCalcAmountValue();
   if (amt <= 0) { showToast('กรุณาคำนวณจำนวนเงินที่มากกว่า 0', 'warning'); return; }
   document.getElementById('input-transfer-amount').value = amt;
