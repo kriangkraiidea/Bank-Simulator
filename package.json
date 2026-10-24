@@ -9,6 +9,6 @@
     "deploy": "wrangler pages deploy public --project-name=bank-simulator"
   },
   "devDependencies": {
-    "wrangler": "^3.101.0"
+    "wrangler": "^4.152.0"
   }
 }
