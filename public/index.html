@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🏦 เศรษฐี Digital Bank</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; }
+    .tab-active { border-bottom: 3px solid var(--primary); color: var(--primary); font-weight: 600; }
+    .player-card { transition: transform 0.15s, box-shadow 0.15s; }
+    .player-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .log-entry { animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .modal-bg { background: rgba(0,0,0,0.55); backdrop-filter: blur(5px); }
+    .bankrupt-card { opacity: 0.45; filter: grayscale(70%); }
+    .money-in { color: #16a34a; }
+    .money-out { color: #dc2626; }
+    .btn-p { background: var(--primary); color: var(--primary-foreground); }
+    .btn-p:hover { opacity: 0.88; }
+    .btn-s { background: var(--secondary); color: var(--secondary-foreground); }
+    .btn-s:hover { opacity: 0.85; }
+    select, input[type=text], input[type=number] {
+      background: var(--card); color: var(--foreground);
+      border: 1px solid var(--border); border-radius: 0.5rem;
+    }
+    select:focus, input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] min-h-screen">
+
+<!-- =============== HOME SCREEN =============== -->
+<div id="s-home" class="flex flex-col items-center justify-center min-h-screen p-6 text-center">
+  <div class="mb-6">
+    <div class="text-6xl mb-3">🏦</div>
+    <h1 class="text-3xl font-bold">เศรษฐี Digital Bank</h1>
+    <p class="text-[var(--muted-foreground)] mt-2 text-sm">ระบบธนาคารดิจิทัลสำหรับเกม Monopoly / เศรษฐี<br>เล่นข้ามมือถือได้ ไม่ต้องใช้เงินกระดาษ</p>
+  </div>
+  <div class="w-full max-w-xs space-y-3">
+    <button onclick="showScreen('s-setup')" class="btn-p w-full py-3.5 rounded-xl font-bold text-base transition">
+      🎲 สร้างเกมใหม่
+    </button>
+    <button onclick="showScreen('s-join')" class="btn-s w-full py-3.5 rounded-xl font-bold text-base transition">
+      🔑 เข้าร่วมเกม (มี Room Code)
+    </button>
+  </div>
+  <p class="text-xs text-[var(--muted-foreground)] mt-8">ข้อมูลเก็บใน Cloudflare D1 · เล่นได้ทุกอุปกรณ์</p>
+</div>
+
+<!-- =============== SETUP SCREEN =============== -->
+<div id="s-setup" class="hidden max-w-lg mx-auto p-4 pt-8">
+  <button onclick="showScreen('s-home')" class="text-sm text-[var(--muted-foreground)] mb-4 flex items-center gap-1 hover:underline">← กลับ</button>
+  <div class="text-center mb-5">
+    <div class="text-4xl mb-1">⚙️</div>
+    <h2 class="text-xl font-bold">ตั้งค่าเกม</h2>
+  </div>
+
+  <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow space-y-4">
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs text-[var(--muted-foreground)]">เงินเริ่มต้น/คน (฿)</label>
+        <input id="startMoney" type="number" value="15000" min="0" class="mt-1 w-full px-3 py-2 text-sm"/>
+      </div>
+      <div>
+        <label class="text-xs text-[var(--muted-foreground)]">วงเงินธนาคาร (0=ไม่จำกัด)</label>
+        <input id="bankLimit" type="number" value="0" min="0" class="mt-1 w-full px-3 py-2 text-sm"/>
+      </div>
+    </div>
+
+    <div>
+      <label class="text-xs font-medium text-[var(--muted-foreground)]">👥 ผู้เล่น (2–8 คน)</label>
+      <div id="playerInputs" class="mt-2 space-y-2"></div>
+      <button onclick="addPlayerInput()" class="mt-2 text-sm text-[var(--primary)] hover:underline">+ เพิ่มผู้เล่น</button>
+    </div>
+
+    <button onclick="createGame()" id="btnCreate"
+      class="btn-p w-full py-3 rounded-xl font-bold text-base transition">
+      🚀 สร้างเกม!
+    </button>
+    <div id="createError" class="hidden text-red-500 text-sm text-center"></div>
+  </div>
+</div>
+
+<!-- =============== JOIN SCREEN =============== -->
+<div id="s-join" class="hidden flex flex-col items-center justify-center min-h-screen p-6">
+  <button onclick="showScreen('s-home')" class="self-start text-sm text-[var(--muted-foreground)] mb-4 flex items-center gap-1 hover:underline">← กลับ</button>
+  <div class="text-center mb-6 w-full">
+    <div class="text-4xl mb-2">🔑</div>
+    <h2 class="text-xl font-bold">เข้าร่วมเกม</h2>
+  </div>
+  <div class="w-full max-w-xs bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow space-y-4">
+    <div>
+      <label class="text-xs text-[var(--muted-foreground)]">Room Code (6 ตัวอักษร)</label>
+      <input id="joinCode" type="text" maxlength="6" placeholder="เช่น ABC123"
+        class="mt-1 w-full px-3 py-2.5 text-base text-center font-mono uppercase tracking-widest"/>
+    </div>
+    <button onclick="joinGame()" class="btn-p w-full py-3 rounded-xl font-bold transition">🔑 เข้าร่วม</button>
+    <div id="joinError" class="hidden text-red-500 text-sm text-center"></div>
+  </div>
+</div>
+
+<!-- =============== PLAYER SELECT SCREEN =============== -->
+<div id="s-playerselect" class="hidden flex flex-col items-center justify-center min-h-screen p-6">
+  <div class="text-center mb-6">
+    <div class="text-4xl mb-2">👤</div>
+    <h2 class="text-xl font-bold">คุณคือใคร?</h2>
+    <p class="text-sm text-[var(--muted-foreground)] mt-1">เลือกชื่อของคุณในเกมนี้</p>
+  </div>
+  <div id="playerSelectList" class="w-full max-w-xs space-y-2"></div>
+  <p id="psRoomCode" class="mt-6 text-xs text-[var(--muted-foreground)]">Room: —</p>
+</div>
+
+<!-- =============== GAME SCREEN =============== -->
+<div id="s-game" class="hidden max-w-2xl mx-auto p-3 pb-8">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-3 pt-1">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🏦</span>
+      <div>
+        <h1 class="font-bold text-base leading-tight">เศรษฐี Digital Bank</h1>
+        <div class="flex items-center gap-2 mt-0.5">
+          <span id="hRound" class="text-xs text-[var(--muted-foreground)]">รอบ 1</span>
+          <span class="text-xs text-[var(--muted-foreground)]">·</span>
+          <button onclick="copyRoomCode()" class="text-xs text-[var(--primary)] font-mono font-bold hover:underline" id="hCode" title="คลิกเพื่อคัดลอก">ABC123 📋</button>
+        </div>
+      </div>
+    </div>
+    <div class="flex gap-1.5">
+      <span id="syncStatus" class="text-xs px-2 py-1 rounded-lg bg-[var(--secondary)] text-[var(--muted-foreground)] pulse">⟳</span>
+      <button onclick="confirmExportLog()" class="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--secondary)] transition" title="Export Log">📥</button>
+      <button onclick="confirmReset()" class="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-red-500 hover:bg-[var(--secondary)] transition">🔄</button>
+    </div>
+  </div>
+
+  <!-- My Balance Card -->
+  <div id="myBalanceCard" class="hidden bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-2xl p-3.5 mb-3 shadow">
+    <p class="text-xs opacity-75">คุณ (<span id="myName">—</span>)</p>
+    <p id="myBalance" class="text-3xl font-bold mt-0.5">฿0</p>
+    <p id="myWarning" class="hidden text-xs mt-1 text-yellow-300">⚠️ เงินใกล้หมด!</p>
+  </div>
+
+  <!-- Bank Balance Card -->
+  <div class="bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-2xl p-3.5 mb-3 shadow">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs opacity-75">🏦 ธนาคาร</p>
+        <p id="bankBal" class="text-2xl font-bold">∞</p>
+      </div>
+      <button onclick="openBankModal()" class="bg-white/20 hover:bg-white/30 text-white text-sm px-3.5 py-2 rounded-xl transition font-medium">
+        💰 รับ/จ่ายเงิน
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex border-b border-[var(--border)] mb-3 overflow-x-auto">
+    <button onclick="switchTab('players')" id="tab-players" class="px-4 py-2 text-sm tab-active whitespace-nowrap transition">👥 ผู้เล่น</button>
+    <button onclick="switchTab('transfer')" id="tab-transfer" class="px-4 py-2 text-sm whitespace-nowrap transition">💸 โอนเงิน</button>
+    <button onclick="switchTab('log')" id="tab-log" class="px-4 py-2 text-sm whitespace-nowrap transition">📋 Log</button>
+  </div>
+
+  <!-- PLAYERS TAB -->
+  <div id="tc-players">
+    <div id="playersGrid" class="grid grid-cols-2 gap-2"></div>
+  </div>
+
+  <!-- TRANSFER TAB -->
+  <div id="tc-transfer" class="hidden">
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 space-y-3.5">
+      <h3 class="font-semibold">💸 โอนเงินระหว่างผู้เล่น</h3>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-[var(--muted-foreground)]">จาก</label>
+          <select id="txFrom" class="mt-1 w-full px-2 py-2 text-sm"></select>
+        </div>
+        <div>
+          <label class="text-xs text-[var(--muted-foreground)]">ไปยัง</label>
+          <select id="txTo" class="mt-1 w-full px-2 py-2 text-sm"></select>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-[var(--muted-foreground)]">จำนวน (฿)</label>
+        <input id="txAmount" type="number" placeholder="เช่น 200" min="1" class="mt-1 w-full px-3 py-2 text-sm"/>
+      </div>
+      <div>
+        <label class="text-xs text-[var(--muted-foreground)]">เหตุผล</label>
+        <input id="txReason" type="text" placeholder="เช่น ค่าเช่า..." class="mt-1 w-full px-3 py-2 text-sm"/>
+        <div class="flex flex-wrap gap-1 mt-1.5">
+          <button onclick="setR('txReason','ค่าเช่าที่ดิน')" class="text-xs px-2 py-1 rounded-lg btn-s transition">🏠 ค่าเช่า</button>
+          <button onclick="setR('txReason','ผ่านจุดสตาร์ท')" class="text-xs px-2 py-1 rounded-lg btn-s transition">🚀 ผ่าน GO</button>
+          <button onclick="setR('txReason','ไพ่โชค')" class="text-xs px-2 py-1 rounded-lg btn-s transition">🃏 ไพ่โชค</button>
+          <button onclick="setR('txReason','ภาษี')" class="text-xs px-2 py-1 rounded-lg btn-s transition">💼 ภาษี</button>
+          <button onclick="setR('txReason','ซื้อที่ดิน')" class="text-xs px-2 py-1 rounded-lg btn-s transition">🏘️ ที่ดิน</button>
+          <button onclick="setR('txReason','สร้างบ้าน/โรงแรม')" class="text-xs px-2 py-1 rounded-lg btn-s transition">🏨 บ้าน</button>
+          <button onclick="setR('txReason','ค่าประกันตัว')" class="text-xs px-2 py-1 rounded-lg btn-s transition">⛓️ ติดคุก</button>
+        </div>
+      </div>
+      <button onclick="doTransfer()" class="btn-p w-full py-3 rounded-xl font-bold transition">💸 โอนเงิน</button>
+    </div>
+  </div>
+
+  <!-- LOG TAB -->
+  <div id="tc-log" class="hidden">
+    <div class="flex items-center justify-between mb-2">
+      <p id="logCount" class="text-sm text-[var(--muted-foreground)]">0 รายการ</p>
+      <div class="flex gap-2">
+        <select id="logFilter" onchange="loadLog()" class="text-xs rounded-lg px-2 py-1">
+          <option value="">ทั้งหมด</option>
+          <option value="bank">ธนาคาร</option>
+          <option value="transfer">ผู้เล่น→ผู้เล่น</option>
+          <option value="system">ระบบ</option>
+        </select>
+        <button onclick="confirmExportLog()" class="text-xs px-2.5 py-1 rounded-lg border border-[var(--border)] hover:bg-[var(--secondary)] transition">📥 CSV</button>
+      </div>
+    </div>
+    <div id="logList" class="space-y-2 max-h-[55vh] overflow-y-auto pr-1"></div>
+  </div>
+</div>
+
+<!-- =============== BANK MODAL =============== -->
+<div id="bankModal" class="hidden fixed inset-0 modal-bg z-50 flex items-end sm:items-center justify-center p-4">
+  <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+    <h3 class="font-bold text-base mb-4">🏦 โอนเงินกับธนาคาร</h3>
+    <div class="mb-3">
+      <label class="text-xs text-[var(--muted-foreground)]">ผู้เล่น</label>
+      <select id="bkPlayer" class="mt-1 w-full px-2 py-2 text-sm"></select>
+    </div>
+    <div class="mb-3">
+      <label class="text-xs text-[var(--muted-foreground)]">ทิศทาง</label>
+      <div class="flex gap-2 mt-1">
+        <button onclick="setBkDir('receive')" id="bkBtnR" class="flex-1 py-2 rounded-lg text-sm font-medium btn-p transition">📥 รับจากธนาคาร</button>
+        <button onclick="setBkDir('pay')" id="bkBtnP" class="flex-1 py-2 rounded-lg text-sm font-medium btn-s transition">📤 จ่ายให้ธนาคาร</button>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="text-xs text-[var(--muted-foreground)]">จำนวน (฿)</label>
+      <input id="bkAmount" type="number" placeholder="จำนวนเงิน" min="1" class="mt-1 w-full px-3 py-2 text-sm"/>
+    </div>
+    <div class="mb-4">
+      <label class="text-xs text-[var(--muted-foreground)]">เหตุผล <span class="text-red-400">*บังคับ</span></label>
+      <input id="bkReason" type="text" placeholder="ระบุเหตุผล" class="mt-1 w-full px-3 py-2 text-sm"/>
+      <div class="flex flex-wrap gap-1 mt-1.5">
+        <button onclick="setR('bkReason','ผ่านจุดสตาร์ท')" class="text-xs px-2 py-0.5 rounded-lg btn-s transition">🚀 ผ่าน GO</button>
+        <button onclick="setR('bkReason','ไพ่โชค')" class="text-xs px-2 py-0.5 rounded-lg btn-s transition">🃏 ไพ่โชค</button>
+        <button onclick="setR('bkReason','ซื้อที่ดิน')" class="text-xs px-2 py-0.5 rounded-lg btn-s transition">🏘️ ซื้อที่ดิน</button>
+        <button onclick="setR('bkReason','สร้างบ้าน')" class="text-xs px-2 py-0.5 rounded-lg btn-s transition">🏠 สร้างบ้าน</button>
+        <button onclick="setR('bkReason','ภาษีรายได้')" class="text-xs px-2 py-0.5 rounded-lg btn-s transition">💼 ภาษี</button>
+        <button onclick="setR('bkReason','ค่าประกันตัว')" class="text-xs px-2 py-0.5 rounded-lg btn-s transition">⛓️ ประกัน</button>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeBkModal()" class="flex-1 py-2.5 rounded-xl btn-s font-medium text-sm">ยกเลิก</button>
+      <button onclick="doBankTransfer()" class="flex-1 py-2.5 rounded-xl btn-p font-bold text-sm">✅ ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== CONFIRM MODAL =============== -->
+<div id="confirmModal" class="hidden fixed inset-0 modal-bg z-50 flex items-center justify-center p-4">
+  <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+    <h3 class="font-bold text-base mb-3" id="cfTitle">ยืนยัน?</h3>
+    <div id="cfBody" class="text-sm text-[var(--muted-foreground)] mb-5"></div>
+    <div class="flex gap-2">
+      <button onclick="closeCf()" class="flex-1 py-2.5 rounded-xl btn-s font-medium">ยกเลิก</button>
+      <button onclick="execCf()" id="cfBtn" class="flex-1 py-2.5 rounded-xl btn-p font-bold">✅ ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== TOAST =============== -->
+<div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-white text-sm font-semibold shadow-lg max-w-[90vw] text-center"></div>
+
+<script>
+// ===================== CONSTANTS =====================
+const COLORS = [
+  { bg:'#ef4444', text:'#fff', emoji:'🔴' },
+  { bg:'#3b82f6', text:'#fff', emoji:'🔵' },
+  { bg:'#22c55e', text:'#fff', emoji:'🟢' },
+  { bg:'#facc15', text:'#000', emoji:'🟡' },
+  { bg:'#a855f7', text:'#fff', emoji:'🟣' },
+  { bg:'#f97316', text:'#fff', emoji:'🟠' },
+  { bg:'#f472b6', text:'#fff', emoji:'🩷' },
+  { bg:'#14b8a6', text:'#fff', emoji:'🩵' },
+];
+
+// ===================== STATE =====================
+let currentRoomCode = '';
+let myPlayerId = null;
+let gameState = null;
+let pollTimer = null;
+let cfCallback = null;
+let bankDir = 'receive';
+let allLog = [];
+
+// ===================== INIT =====================
+window.onload = () => {
+  addPlayerInput(); addPlayerInput(); addPlayerInput();
+  const saved = localStorage.getItem('mbank_session');
+  if (saved) {
+    try {
+      const { code, pid } = JSON.parse(saved);
+      if (code) { currentRoomCode = code; myPlayerId = pid; resumeGame(); }
+    } catch(e) {}
+  }
+};
+
+async function resumeGame() {
+  try {
+    const data = await apiFetch(`/api/game/${currentRoomCode}`);
+    gameState = data;
+    showScreen('s-game');
+    renderGame();
+    startPolling();
+  } catch(e) {
+    localStorage.removeItem('mbank_session');
+    showScreen('s-home');
+  }
+}
+
+// ===================== SETUP =====================
+function addPlayerInput() {
+  const c = document.getElementById('playerInputs');
+  const i = c.children.length;
+  if (i >= 8) { toast('สูงสุด 8 ผู้เล่น', 'error'); return; }
+  const d = document.createElement('div');
+  d.className = 'flex items-center gap-2';
+  d.innerHTML = `
+    <span>${COLORS[i].emoji}</span>
+    <input type="text" placeholder="ชื่อผู้เล่น ${i+1}" class="flex-1 px-3 py-2 text-sm"/>
+    ${i>=2?`<button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 text-xl leading-none px-1">×</button>`:''}
+  `;
+  c.appendChild(d);
+}
+
+async function createGame() {
+  const inputs = document.querySelectorAll('#playerInputs input');
+  const names = [...inputs].map((el,i) => ({ name: el.value.trim()||`ผู้เล่น ${i+1}` }));
+  if (names.length < 2) { showErr('createError','ต้องมีผู้เล่นอย่างน้อย 2 คน'); return; }
+
+  const btn = document.getElementById('btnCreate');
+  btn.textContent = '⏳ กำลังสร้าง...'; btn.disabled = true;
+
+  try {
+    const data = await apiFetch('/api/game', {
+      method: 'POST',
+      body: JSON.stringify({
+        players: names,
+        startingMoney: parseInt(document.getElementById('startMoney').value)||15000,
+        bankMoney: parseInt(document.getElementById('bankLimit').value)||0,
+      })
+    });
+    currentRoomCode = data.roomCode;
+    myPlayerId = null;
+    const gameData = await apiFetch(`/api/game/${currentRoomCode}`);
+    gameState = gameData;
+    showPlayerSelect();
+  } catch(e) {
+    showErr('createError', e.message);
+  } finally {
+    btn.textContent = '🚀 สร้างเกม!'; btn.disabled = false;
+  }
+}
+
+async function joinGame() {
+  const code = document.getElementById('joinCode').value.trim().toUpperCase();
+  if (code.length !== 6) { showErr('joinError','Room Code ต้อง 6 ตัวอักษร'); return; }
+  try {
+    const data = await apiFetch(`/api/game/${code}`);
+    currentRoomCode = code;
+    gameState = data;
+    myPlayerId = null;
+    showPlayerSelect();
+  } catch(e) {
+    showErr('joinError', 'ไม่พบห้องเกมหรือเกมสิ้นสุดแล้ว');
+  }
+}
+
+function showPlayerSelect() {
+  showScreen('s-playerselect');
+  document.getElementById('psRoomCode').textContent = `Room Code: ${currentRoomCode}`;
+  const list = document.getElementById('playerSelectList');
+  list.innerHTML = '';
+  gameState.players.forEach(p => {
+    const c = COLORS[p.color_index] || COLORS[0];
+    const btn = document.createElement('button');
+    btn.className = 'w-full flex items-center gap-3 p-3.5 rounded-2xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)] transition text-left';
+    btn.innerHTML = `
+      <span class="text-2xl">${c.emoji}</span>
+      <span class="font-semibold">${p.name}</span>
+      <span class="ml-auto text-sm text-[var(--muted-foreground)]">฿${fmt(p.balance)}</span>
+    `;
+    btn.onclick = () => selectPlayer(p.id);
+    list.appendChild(btn);
+  });
+
+  // Add "Spectator" option
+  const spec = document.createElement('button');
+  spec.className = 'w-full flex items-center gap-3 p-3.5 rounded-2xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)] transition text-left mt-2';
+  spec.innerHTML = `<span class="text-2xl">👁️</span><span class="font-semibold text-[var(--muted-foreground)]">ดูเกม (ไม่เล่น)</span>`;
+  spec.onclick = () => selectPlayer(null);
+  list.appendChild(spec);
+}
+
+function selectPlayer(pid) {
+  myPlayerId = pid;
+  localStorage.setItem('mbank_session', JSON.stringify({ code: currentRoomCode, pid }));
+  showScreen('s-game');
+  renderGame();
+  startPolling();
+}
+
+// ===================== GAME RENDER =====================
+function renderGame() {
+  if (!gameState) return;
+  const { game, players, recentLog } = gameState;
+
+  // Header
+  document.getElementById('hCode').textContent = `${currentRoomCode} 📋`;
+  document.getElementById('hRound').textContent = `รอบ ${game.round}`;
+
+  // Bank
+  document.getElementById('bankBal').textContent =
+    game.bank_balance === null ? '∞ ไม่จำกัด' : `฿${fmt(game.bank_balance)}`;
+
+  // My balance
+  const myCard = document.getElementById('myBalanceCard');
+  if (myPlayerId) {
+    const me = players.find(p => p.id === myPlayerId);
+    if (me) {
+      myCard.classList.remove('hidden');
+      document.getElementById('myName').textContent = me.name;
+      document.getElementById('myBalance').textContent = `฿${fmt(me.balance)}`;
+      const warn = document.getElementById('myWarning');
+      if (me.balance < 2000 && !me.bankrupt) warn.classList.remove('hidden');
+      else warn.classList.add('hidden');
+    }
+  } else {
+    myCard.classList.add('hidden');
+  }
+
+  // Players grid
+  const grid = document.getElementById('playersGrid');
+  grid.innerHTML = '';
+  players.forEach(p => {
+    const c = COLORS[p.color_index] || COLORS[0];
+    const low = p.balance < 2000 && !p.bankrupt;
+    const neg = p.balance < 0;
+    const div = document.createElement('div');
+    div.className = `player-card bg-[var(--card)] border border-[var(--border)] rounded-2xl p-3 shadow-sm cursor-pointer ${p.bankrupt?'bankrupt-card':''}`;
+    div.onclick = () => { switchTab('transfer'); setTimeout(()=>{ document.getElementById('txFrom').value=p.id; },50); };
+    div.innerHTML = `
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-1.5">
+          <span class="text-lg">${c.emoji}</span>
+          <span class="font-semibold text-sm truncate max-w-[80px]">${p.name}</span>
+          ${p.id===myPlayerId?'<span class="text-xs bg-[var(--primary)] text-[var(--primary-foreground)] px-1.5 py-0.5 rounded-full">나</span>':''}
+        </div>
+        ${p.bankrupt?'<span class="text-xs text-red-500 font-bold">💀</span>':''}
+      </div>
+      <div class="text-xl font-bold ${low?'text-orange-500':''} ${neg?'text-red-600':''}">
+        ${neg?'⚠️ -':''}฿${fmt(Math.abs(p.balance))}
+      </div>
+      ${low&&!p.bankrupt?'<p class="text-xs text-orange-400 mt-0.5">⚠️ เงินใกล้หมด</p>':''}
+      ${p.bankrupt?`<button onclick="event.stopPropagation();toggleBankrupt(${p.id})" class="text-xs text-blue-500 mt-1 hover:underline">↩️ เคลียร์</button>`:`<button onclick="event.stopPropagation();toggleBankrupt(${p.id})" class="text-xs text-red-400 mt-1 hover:underline">💀 ล้มละลาย</button>`}
+    `;
+    grid.appendChild(div);
+  });
+
+  // Update transfer selects
+  renderTransferSelects(players);
+
+  // Log (recent, only if on log tab)
+  if (!document.getElementById('tc-log').classList.contains('hidden')) {
+    renderLogEntries(recentLog);
+  }
+}
+
+function renderTransferSelects(players) {
+  [document.getElementById('txFrom'), document.getElementById('txTo'), document.getElementById('bkPlayer')].forEach(sel => {
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = '';
+    (players||gameState?.players||[]).filter(p => !p.bankrupt).forEach(p => {
+      const c = COLORS[p.color_index]||COLORS[0];
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${c.emoji} ${p.name} (฿${fmt(p.balance)})`;
+      sel.appendChild(opt);
+    });
+    if (prev) sel.value = prev;
+  });
+  // Make txTo default to different from txFrom
+  const from = document.getElementById('txFrom');
+  const to = document.getElementById('txTo');
+  if (from && to && from.value === to.value && to.options.length >= 2) {
+    to.selectedIndex = (from.selectedIndex + 1) % to.options.length;
+  }
+}
+
+function renderLogEntries(entries) {
+  const list = document.getElementById('logList');
+  if (!list || !entries) return;
+  document.getElementById('logCount').textContent = `${entries.length} รายการ`;
+  list.innerHTML = '';
+  entries.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'log-entry bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 text-sm';
+    const isIn = e.type === 'bank' && e.icon === '📥';
+    const amount = e.amount ? `<span class="font-bold text-sm ${isIn?'money-in':'money-out'} shrink-0">${isIn?'+':'-'}฿${fmt(e.amount)}</span>` : '';
+    div.innerHTML = `
+      <div class="flex items-start gap-2">
+        <span class="text-base mt-0.5">${e.icon}</span>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium leading-snug">${e.from_label?`${e.from_label} → ${e.to_label}`:''}</p>
+          ${e.reason?`<p class="text-xs text-[var(--muted-foreground)] mt-0.5">📌 ${e.reason}</p>`:''}
+          <p class="text-xs text-[var(--muted-foreground)] mt-1">${e.created_at?.slice(11,19)||''} · รอบ ${e.round}</p>
+        </div>
+        ${amount}
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ===================== TABS =====================
+function switchTab(tab) {
+  ['players','transfer','log'].forEach(t => {
+    document.getElementById(`tc-${t}`).classList.add('hidden');
+    document.getElementById(`tab-${t}`).classList.remove('tab-active');
+  });
+  document.getElementById(`tc-${tab}`).classList.remove('hidden');
+  document.getElementById(`tab-${tab}`).classList.add('tab-active');
+  if (tab === 'log') loadLog();
+  if (tab === 'transfer' && gameState) renderTransferSelects(gameState.players);
+}
+
+// ===================== TRANSFER =====================
+function setR(id, val) { document.getElementById(id).value = val; }
+
+async function doTransfer() {
+  const fromId = parseInt(document.getElementById('txFrom').value);
+  const toId = parseInt(document.getElementById('txTo').value);
+  const amount = parseInt(document.getElementById('txAmount').value);
+  const reason = document.getElementById('txReason').value.trim();
+
+  if (fromId === toId) { toast('ต้นทางและปลายทางต้องไม่ใช่คนเดียวกัน', 'error'); return; }
+  if (!amount || amount <= 0) { toast('กรุณาใส่จำนวนเงิน', 'error'); return; }
+
+  const from = gameState.players.find(p=>p.id===fromId);
+  const to = gameState.players.find(p=>p.id===toId);
+  const c1 = COLORS[from?.color_index]?.emoji||'👤';
+  const c2 = COLORS[to?.color_index]?.emoji||'👤';
+
+  openCf('ยืนยันการโอน?', `
+    <div class="bg-[var(--secondary)] rounded-xl p-3 mb-2 text-[var(--foreground)]">
+      <div class="flex justify-between items-center mb-2 text-sm">
+        <b>${c1} ${from?.name}</b> <span>→</span> <b>${c2} ${to?.name}</b>
+      </div>
+      <div class="text-center text-2xl font-bold">฿${fmt(amount)}</div>
+      ${reason?`<div class="text-center text-xs mt-1 text-[var(--muted-foreground)]">📌 ${reason}</div>`:''}
+    </div>
+    ${from?.balance<amount?`<p class="text-orange-500 text-xs">⚠️ ${from?.name} อาจมีเงินไม่พอ</p>`:''}
+  `, async () => {
+    try {
+      await apiFetch(`/api/game/${currentRoomCode}/transfer`, {
+        method: 'POST',
+        body: JSON.stringify({ fromPlayerId: fromId, toPlayerId: toId, amount, reason })
+      });
+      document.getElementById('txAmount').value = '';
+      document.getElementById('txReason').value = '';
+      toast(`💸 โอน ฿${fmt(amount)} สำเร็จ!`,'success');
+      await refreshState();
+    } catch(e) { toast(e.message,'error'); }
+  });
+}
+
+// ===================== BANK =====================
+function openBankModal() {
+  if (gameState) renderTransferSelects(gameState.players);
+  setBkDir('receive');
+  document.getElementById('bkAmount').value = '';
+  document.getElementById('bkReason').value = '';
+  // Pre-select "me"
+  if (myPlayerId) { const sel = document.getElementById('bkPlayer'); if (sel) sel.value = myPlayerId; }
+  document.getElementById('bankModal').classList.remove('hidden');
+}
+function closeBkModal() { document.getElementById('bankModal').classList.add('hidden'); }
+
+function setBkDir(dir) {
+  bankDir = dir;
+  document.getElementById('bkBtnR').className = `flex-1 py-2 rounded-lg text-sm font-medium ${dir==='receive'?'btn-p':'btn-s'} transition`;
+  document.getElementById('bkBtnP').className = `flex-1 py-2 rounded-lg text-sm font-medium ${dir==='pay'?'btn-p':'btn-s'} transition`;
+}
+
+async function doBankTransfer() {
+  const pid = parseInt(document.getElementById('bkPlayer').value);
+  const amount = parseInt(document.getElementById('bkAmount').value);
+  const reason = document.getElementById('bkReason').value.trim();
+
+  if (!amount || amount <= 0) { toast('กรุณาใส่จำนวนเงิน','error'); return; }
+  if (!reason) { toast('กรุณาระบุเหตุผล (บังคับ)','error'); return; }
+
+  const player = gameState?.players.find(p=>p.id===pid);
+  const isR = bankDir === 'receive';
+  const icon = isR ? '📥' : '📤';
+  const fromLabel = isR ? '🏦 ธนาคาร' : player?.name;
+  const toLabel = isR ? player?.name : '🏦 ธนาคาร';
+
+  openCf('ยืนยันการโอน?', `
+    <div class="bg-[var(--secondary)] rounded-xl p-3 mb-2 text-[var(--foreground)]">
+      <div class="flex justify-between items-center mb-2 text-sm">
+        <b>${fromLabel}</b> <span>→</span> <b>${toLabel}</b>
+      </div>
+      <div class="text-center text-2xl font-bold">฿${fmt(amount)}</div>
+      <div class="text-center text-xs mt-1 text-[var(--muted-foreground)]">📌 ${reason}</div>
+    </div>
+  `, async () => {
+    try {
+      await apiFetch(`/api/game/${currentRoomCode}/bank`, {
+        method: 'POST',
+        body: JSON.stringify({ playerId: pid, direction: bankDir, amount, reason })
+      });
+      closeBkModal();
+      toast(`${icon} โอน ฿${fmt(amount)} สำเร็จ!`,'success');
+      await refreshState();
+    } catch(e) { toast(e.message,'error'); }
+  });
+}
+
+// ===================== BANKRUPT =====================
+async function toggleBankrupt(pid) {
+  const player = gameState?.players.find(p=>p.id===pid);
+  if (!player) return;
+  const action = player.bankrupt ? 'กู้' : 'ประกาศล้มละลาย';
+  openCf(`${action} ${player.name}?`, `<p class="text-[var(--muted-foreground)]">${player.bankrupt?'กู้คืนสถานะผู้เล่นนี้':'ยืนยันว่า '+player.name+' ล้มละลาย'}</p>`, async () => {
+    await apiFetch(`/api/game/${currentRoomCode}/bankrupt`, { method:'POST', body: JSON.stringify({ playerId: pid }) });
+    await refreshState();
+  });
+}
+
+// ===================== LOG =====================
+async function loadLog() {
+  if (!currentRoomCode) return;
+  const type = document.getElementById('logFilter')?.value || '';
+  try {
+    const url = `/api/game/${currentRoomCode}/log${type?`?type=${type}`:''}`;
+    const data = await apiFetch(url);
+    allLog = data.transactions;
+    renderLogEntries(allLog);
+  } catch(e) {}
+}
+
+// ===================== EXPORT =====================
+async function confirmExportLog() {
+  if (allLog.length === 0) {
+    try { const d = await apiFetch(`/api/game/${currentRoomCode}/log`); allLog = d.transactions; } catch(e){}
+  }
+  const rows = ['\uFEFFรอบ,เวลา,ประเภท,ไอคอน,จาก,ไปยัง,จำนวน,เหตุผล'];
+  allLog.forEach(e => {
+    rows.push(`${e.round},"${e.created_at||''}","${e.type}","${e.icon}","${e.from_label||''}","${e.to_label||''}",${e.amount||''},"${e.reason||''}"`);
+  });
+  const blob = new Blob([rows.join('\n')], { type:'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `monopoly_log_${currentRoomCode}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('📥 Export CSV สำเร็จ!','success');
+}
+
+// ===================== CONFIRM MODAL =====================
+function openCf(title, body, cb) {
+  document.getElementById('cfTitle').textContent = title;
+  document.getElementById('cfBody').innerHTML = body;
+  cfCallback = cb;
+  document.getElementById('confirmModal').classList.remove('hidden');
+}
+function closeCf() { document.getElementById('confirmModal').classList.add('hidden'); cfCallback = null; }
+async function execCf() {
+  closeCf();
+  if (cfCallback) { try { await cfCallback(); } catch(e) { toast(e.message,'error'); } }
+}
+
+// ===================== RESET =====================
+function confirmReset() {
+  openCf('🔄 เริ่มเกมใหม่?', `
+    <p class="text-[var(--muted-foreground)]">คุณจะออกจากเกมนี้และกลับไปหน้าหลัก<br>ข้อมูลเกมในฐานข้อมูลยังคงอยู่</p>
+  `, () => {
+    stopPolling();
+    localStorage.removeItem('mbank_session');
+    currentRoomCode = '';
+    myPlayerId = null;
+    gameState = null;
+    showScreen('s-home');
+  });
+}
+
+// ===================== ROOM CODE =====================
+function copyRoomCode() {
+  navigator.clipboard?.writeText(currentRoomCode).then(() => toast('📋 คัดลอก Room Code แล้ว!','success')).catch(()=>{});
+}
+
+// ===================== POLLING =====================
+function startPolling() {
+  stopPolling();
+  pollTimer = setInterval(async () => {
+    try {
+      const data = await apiFetch(`/api/game/${currentRoomCode}`);
+      gameState = data;
+      renderGame();
+      const ss = document.getElementById('syncStatus');
+      ss.textContent = '✓';
+      ss.style.color = 'var(--primary)';
+      setTimeout(() => { ss.textContent = '⟳'; ss.style.color = ''; }, 1500);
+    } catch(e) {
+      document.getElementById('syncStatus').textContent = '✗';
+    }
+  }, 5000);
+}
+function stopPolling() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+
+async function refreshState() {
+  try {
+    gameState = await apiFetch(`/api/game/${currentRoomCode}`);
+    renderGame();
+    if (!document.getElementById('tc-log').classList.contains('hidden')) loadLog();
+  } catch(e) {}
+}
+
+// ===================== HELPERS =====================
+function showScreen(id) {
+  document.querySelectorAll('[id^="s-"]').forEach(el => el.classList.add('hidden'));
+  document.getElementById(id)?.classList.remove('hidden');
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 4000);
+}
+
+let toastTimer = null;
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-white text-sm font-semibold shadow-lg max-w-[90vw] text-center ${type==='error'?'bg-red-600':'bg-green-600'}`;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = el.className + ' hidden'; }, 3000);
+}
+
+function fmt(n) {
+  return Number(n).toLocaleString('th-TH');
+}
+
+async function apiFetch(url, opts={}) {
+  const res = await fetch(url, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', ...(opts.headers||{}) }
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+name = "bank-simulator"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "monopoly-bank-db"
+database_id = "2424a2cf-914a-4158-a79a-813ad70b84d2"

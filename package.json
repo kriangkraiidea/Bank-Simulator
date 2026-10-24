@@ -1,0 +1,14 @@
+{
+  "name": "bank-simulator",
+  "version": "1.0.0",
+  "description": "Digital banking system for Monopoly / เศรษฐี board game",
+  "scripts": {
+    "dev": "wrangler pages dev public --d1=DB",
+    "db:init": "wrangler d1 execute monopoly-bank-db --remote --file=./schema.sql",
+    "db:init:local": "wrangler d1 execute monopoly-bank-db --local --file=./schema.sql",
+    "deploy": "wrangler pages deploy public --project-name=bank-simulator"
+  },
+  "devDependencies": {
+    "wrangler": "^3.101.0"
+  }
+}
