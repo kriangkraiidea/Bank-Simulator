@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS games (
   password TEXT,
   allow_spectator INTEGER NOT NULL DEFAULT 1,
   hide_others_balance INTEGER NOT NULL DEFAULT 1,
+  is_ended INTEGER NOT NULL DEFAULT 0,
+  ended_at TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );
@@ -21,6 +23,8 @@ CREATE TABLE IF NOT EXISTS players (
   color_index INTEGER NOT NULL DEFAULT 0,
   balance INTEGER NOT NULL DEFAULT 0,
   bankrupt INTEGER NOT NULL DEFAULT 0,
+  bankrupt_order INTEGER,
+  bankrupt_at TEXT,
   avatar_url TEXT,
   claimed_session TEXT,
   claimed_at TEXT,

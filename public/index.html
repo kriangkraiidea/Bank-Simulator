@@ -159,12 +159,22 @@
 <div id="screen-welcome" class="flex-1 flex flex-col justify-between p-5 min-h-screen">
   <div>
     <!-- Brand Header -->
-    <div class="pt-6 pb-4 text-center">
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-xl shadow-emerald-900/40 mb-3 text-slate-950">
-        <svg class="w-10 h-10" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
+    <div class="pt-5 pb-3 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-xl shadow-emerald-900/40 mb-2.5 text-slate-950">
+        <svg class="w-8 h-8" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
       </div>
       <h1 class="text-2xl font-bold tracking-tight text-white">MONO BANK</h1>
       <p class="text-emerald-400 font-medium text-xs mt-0.5">เศรษฐี Mobile Banking</p>
+    </div>
+
+    <!-- App Description Banner -->
+    <div class="mb-4 p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-center shadow-inner">
+      <p class="text-xs text-slate-300 leading-relaxed">
+        🎲 <span class="font-bold text-white">ระบบธนาคารดิจิทัลสำหรับบอร์ดเกมและเกมเศรษฐี</span><br>
+        <span class="text-slate-400 text-[11px] mt-0.5 block">
+          จำลองการจ่ายเงินและโอนเงินระหว่างผู้เล่นผ่านมือถือแบบเรียลไทม์ แทนการใช้เงินกระดาษหรือชิป หมดปัญหาเงินไม่พอ เงินปลิวหาย หรือทอนเงินช้า
+        </span>
+      </p>
     </div>
 
     <!-- Create Room Button (Single Big Button) -->
@@ -308,15 +318,22 @@
 
 <!-- ========================= SCREEN: SELECT MY IDENTITY ========================= -->
 <div id="screen-select-user" class="hidden flex-1 p-5 min-h-screen">
-  <div class="text-center pt-3 mb-5">
+  <div class="flex items-center justify-between mb-3">
+    <button onclick="leaveRoomToWelcome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition active:scale-95">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      <span>กลับหน้าแรก</span>
+    </button>
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-emerald-400">
+      ห้อง: <span id="display-room-name-badge" class="font-bold">------</span>
+    </div>
+  </div>
+
+  <div class="text-center pt-2 mb-5">
     <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-xl mb-2">
       <svg class="w-6 h-6" viewBox="0 0 24 24"><use href="#icon-users"/></svg>
     </div>
     <h2 class="text-lg font-bold text-white">เลือกบัญชีผู้เล่นของคุณ</h2>
     <p class="text-xs text-slate-400 mt-0.5">ตัวละครที่มีผู้อื่นเลือกแล้ว จะไม่สามารถเลือกซ้ำได้</p>
-    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-emerald-400 mt-2">
-      ห้อง: <span id="display-room-name-badge" class="font-bold">------</span>
-    </div>
   </div>
 
   <div id="select-user-list" class="space-y-2.5 max-w-sm mx-auto"></div>
@@ -326,10 +343,53 @@
   </div>
 </div>
 
+<!-- ========================= SCREEN: GAME OVER SCOREBOARD ========================= -->
+<div id="screen-game-over" class="hidden flex-1 p-5 min-h-screen">
+  <div class="flex items-center justify-between mb-4">
+    <button onclick="leaveRoomToWelcome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition active:scale-95">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      <span>กลับหน้าล็อบบี้</span>
+    </button>
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-xs text-emerald-400 font-bold">
+      🏁 จบเกมแล้ว
+    </div>
+  </div>
+
+  <div class="text-center pt-2 mb-5">
+    <div class="w-16 h-16 rounded-3xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center mx-auto text-3xl mb-2.5 shadow-lg shadow-amber-500/20">
+      🏆
+    </div>
+    <h2 class="text-xl font-extrabold text-white">สกอร์บอร์ดสรุปผลการแข่งขัน</h2>
+    <p class="text-xs text-slate-400 mt-1" id="gameover-room-name-subtitle">ห้องเกม: —</p>
+  </div>
+
+  <!-- Winner Hero Banner -->
+  <div id="gameover-winner-banner" class="mb-5 p-5 rounded-3xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-teal-500/20 border border-amber-500/40 text-center relative overflow-hidden shadow-xl">
+    <div class="text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-1">👑 ผู้ชนะเลิศ (Survivor)</div>
+    <h3 id="gameover-winner-name" class="text-2xl font-black text-white">ผู้ชนะ</h3>
+    <div class="mt-2 inline-flex items-baseline gap-1 text-emerald-400 font-mono">
+      <span class="text-sm font-semibold">เงินคงเหลือสุทธิ: ฿</span>
+      <span id="gameover-winner-balance" class="text-2xl font-extrabold">0</span>
+    </div>
+  </div>
+
+  <!-- Detailed Rankings & Statistics List -->
+  <div class="space-y-3 mb-6">
+    <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider">อันดับผู้เล่นและสถิติการเงินละเอียด</h4>
+    <div id="gameover-scoreboard-list" class="space-y-3"></div>
+  </div>
+
+  <div class="text-center pb-6">
+    <button onclick="leaveRoomToWelcome()" class="w-full py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition active:scale-95 shadow">
+      ← กลับสู่หน้าล็อบบี้
+    </button>
+  </div>
+</div>
+
 <!-- ========================= MAIN APP SHELL (BANKING APP) ========================= -->
 <div id="screen-main-app" class="hidden flex-1 flex flex-col">
 
-  <!-- Top App Bar -->
+  <!-- Top App Bar (เอาปุ่มสลับตัวละครออกแล้ว) -->
   <header class="px-5 pt-3 pb-2 flex items-center justify-between sticky top-0 z-30 bg-[#0b1120]/95 backdrop-blur-md border-b border-slate-800/80">
     <div class="flex items-center gap-2.5 min-w-0 pr-2">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 shadow-md shadow-emerald-900/30 shrink-0">
@@ -353,10 +413,7 @@
       <button onclick="refreshGameState(true)" id="btn-sync" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs active:scale-95 transition" title="ซิงค์ข้อมูล">
         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-refresh"/></svg>
       </button>
-      <button onclick="switchUserPrompt()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs" title="สลับตัวละคร">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-users"/></svg>
-      </button>
-      <button onclick="confirmExitGame()" class="w-8 h-8 rounded-full bg-red-950/60 border border-red-800 flex items-center justify-center text-red-400 text-xs" title="ออกจากห้อง (คืนตัวละครให้ผู้อื่นเล่นได้)">
+      <button onclick="confirmExitGame()" class="w-8 h-8 rounded-full bg-red-950/60 border border-red-800 flex items-center justify-center text-red-400 text-xs" title="ออกจากตัวละคร (กลับหน้าเลือกผู้เล่น)">
         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-exit"/></svg>
       </button>
     </div>
@@ -1027,6 +1084,36 @@
   </div>
 </div>
 
+<!-- ========================= MODAL: END GAME CONFIRMATION ========================= -->
+<div id="modal-end-game-prompt" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+    <div class="text-center pb-1">
+      <div class="w-14 h-14 rounded-3xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-2 text-2xl shadow-lg shadow-amber-500/20">
+        🏆
+      </div>
+      <h3 class="font-bold text-lg text-white">เหลือผู้ชนะคนสุดท้ายแล้ว!</h3>
+      <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+        ผู้เล่นคนอื่นๆ ล้มละลายหมดแล้ว ผู้ชนะเลิศคือ: <br>
+        <span id="endgame-winner-name-tag" class="text-emerald-400 font-bold text-base mt-1 inline-block">—</span>
+      </p>
+    </div>
+
+    <div class="p-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-xs text-slate-300 leading-relaxed text-center">
+      ต้องการยืนยัน <b>จบเกม</b> และแสดง <b>สกอร์บอร์ดสรุปผลการแข่งขัน</b> หรือไม่?<br>
+      <span class="text-[10px] text-amber-300 mt-1 block">เมื่อจบเกมแล้ว ห้องจะถูกล็อกเพื่อแสดงสถิติเท่านั้น</span>
+    </div>
+
+    <div class="flex gap-2.5 pt-1">
+      <button onclick="closeEndGamePromptModal()" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">
+        เล่นต่อ / ยังไม่จบ
+      </button>
+      <button onclick="confirmAndExecuteEndGame()" id="btn-confirm-end-game" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+        🏆 ยืนยันจบเกม
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================= TOAST NOTIFICATION ========================= -->
 <div id="toast" class="hidden fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-white text-xs font-semibold shadow-2xl max-w-[90vw] text-center flex items-center gap-2 transition-all"></div>
 
@@ -1133,6 +1220,11 @@ async function resumeSession() {
     const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
     appState.gameState = data;
     appState.currentRoomName = data.game.roomName || data.game.room_code;
+    if (data.game?.isEnded) {
+      renderScoreboard(data.scoreboard || [], data.game);
+      navScreen('screen-game-over');
+      return;
+    }
     if (appState.myPlayerId && !data.players.some(p => p.id === appState.myPlayerId)) {
       appState.myPlayerId = null;
     }
@@ -1147,7 +1239,7 @@ async function resumeSession() {
 // NAVIGATION & SCREENS
 // ==========================================
 function navScreen(screenId) {
-  ['screen-welcome', 'screen-setup', 'screen-select-user', 'screen-main-app'].forEach(id => {
+  ['screen-welcome', 'screen-setup', 'screen-select-user', 'screen-main-app', 'screen-game-over'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.add('hidden');
   });
@@ -1248,9 +1340,11 @@ function renderLobbyGamesList(games) {
 
   games.forEach(g => {
     const isFull = g.active_players >= g.max_players;
+    const isEnded = g.is_ended === 1;
     const card = document.createElement('div');
     card.className = 'p-3.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-between transition shadow-sm';
     
+    const badgeEnded = isEnded ? `<span class="inline-flex items-center gap-0.5 text-[10px] text-amber-400 font-bold ml-1">🏁 จบเกมแล้ว</span>` : '';
     const badgePwd = g.has_password ? `<span class="inline-flex items-center gap-0.5 text-[10px] text-amber-400 font-bold ml-1"><svg class="w-3 h-3" viewBox="0 0 24 24"><use href="#icon-lock"/></svg> มีรหัส</span>` : '';
     const roomTitle = g.room_name || g.room_code;
 
@@ -1258,10 +1352,10 @@ function renderLobbyGamesList(games) {
       <div class="min-w-0 pr-2">
         <div class="flex items-center gap-1.5">
           <h4 class="font-bold text-sm text-white truncate max-w-[150px]">${escapeHtml(roomTitle)}</h4>
-          ${badgePwd}
+          ${badgeEnded || badgePwd}
         </div>
         <p class="text-[11px] text-slate-400 mt-0.5">
-          ผู้เล่น: <span class="font-semibold text-slate-200">${g.active_players || 0}/${g.max_players || 0} คน</span>
+          ${isEnded ? '<span class="text-amber-400 font-semibold">สรุปผลการแข่งขันแล้ว</span>' : `ผู้เล่น: <span class="font-semibold text-slate-200">${g.active_players || 0}/${g.max_players || 0} คน</span>`}
           ${g.hide_others_balance ? ' · ซ่อนยอด' : ''}
         </p>
       </div>
@@ -1269,14 +1363,20 @@ function renderLobbyGamesList(games) {
         <button onclick="promptDeleteRoom('${g.room_code}', '${escapeHtml(roomTitle)}')" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 active:scale-95 transition" title="ลบห้องนี้ (ต้องใส่รหัสผู้สร้างเว็บ)">
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        ${g.allow_spectator ? `
-          <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, true)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium" title="เข้าเป็นผู้ชม">
-            ดู
+        ${isEnded ? `
+          <button onclick="viewEndedGameScoreboard('${g.room_code}')" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold shadow-md shadow-amber-500/20 active:scale-95 transition">
+            ดูผลคะแนน
           </button>
-        ` : ''}
-        <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, false)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
-          ${isFull ? 'ดู/รอว่าง' : 'เข้าร่วม'}
-        </button>
+        ` : `
+          ${g.allow_spectator ? `
+            <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, true)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium" title="เข้าเป็นผู้ชม">
+              ดู
+            </button>
+          ` : ''}
+          <button onclick="requestJoinRoom('${g.room_code}', '${escapeHtml(roomTitle)}', ${g.has_password}, false)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
+            ${isFull ? 'ดู/รอว่าง' : 'เข้าร่วม'}
+          </button>
+        `}
       </div>
     `;
     container.appendChild(card);
@@ -1412,6 +1512,12 @@ async function joinRoomDirect(roomCode, password = '', isSpectator = false) {
     appState.currentRoomName = data.game.roomName || data.game.room_code;
     appState.gameState = data;
     appState.isSpectator = isSpectator;
+
+    if (data.game?.isEnded) {
+      renderScoreboard(data.scoreboard || [], data.game);
+      navScreen('screen-game-over');
+      return;
+    }
 
     if (isSpectator) {
       enterAsSpectator();
@@ -2598,7 +2704,25 @@ function renderFullPlayersTab() {
   container.innerHTML = '';
 
   const hideOthers = appState.gameState?.game?.hideOthersBalance;
-  const sorted = [...(appState.gameState?.players || [])].sort((a,b) => b.balance - a.balance);
+  const players = appState.gameState?.players || [];
+  const nonBankrupt = players.filter(p => !p.bankrupt);
+  const isEnded = appState.gameState?.game?.isEnded;
+
+  // Banner if only 1 winner remains and game is not ended
+  if (nonBankrupt.length === 1 && !isEnded && players.length >= 2) {
+    const banner = document.createElement('div');
+    banner.className = 'p-4 rounded-3xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-teal-500/20 border border-amber-500/50 text-center mb-3 shadow-lg';
+    banner.innerHTML = `
+      <div class="text-xs font-bold text-amber-300">🏆 เหลือผู้ชนะคนสุดท้ายแล้ว: ${escapeHtml(nonBankrupt[0].name)}</div>
+      <p class="text-[11px] text-slate-300 mt-1">ผู้เล่นคนอื่นล้มละลายหมดแล้ว สามารถกดยืนยันจบเกมเพื่อดูสกอร์บอร์ดได้ทันที</p>
+      <button onclick="promptEndGame('${escapeHtml(nonBankrupt[0].name)}')" class="mt-3 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-bold text-xs shadow-md active:scale-95 transition">
+        🏆 ยืนยันจบเกมและดูผลคะแนน
+      </button>
+    `;
+    container.appendChild(banner);
+  }
+
+  const sorted = [...players].sort((a,b) => b.balance - a.balance);
 
   sorted.forEach((p, idx) => {
     const pal = PLAYER_PALETTE[p.color_index] || PLAYER_PALETTE[0];
@@ -2655,15 +2779,223 @@ async function handleToggleBankrupt(pid) {
   if (!confirm(`ยืนยัน${action}ให้ ${p.name}?`)) return;
 
   try {
-    await apiRequest(`/api/game/${appState.currentRoomCode}/bankrupt`, {
+    const res = await apiRequest(`/api/game/${appState.currentRoomCode}/bankrupt`, {
       method: 'POST',
       body: JSON.stringify({ playerId: pid })
     });
     showToast(`อัปเดตสถานะ ${p.name} สำเร็จ`, 'info');
     await refreshGameState(false);
+
+    if (res.onlyOneRemaining && res.winner) {
+      promptEndGame(res.winner.name);
+    }
   } catch(e) {
     showToast(e.message, 'error');
   }
+}
+
+// ==========================================
+// END GAME & SCOREBOARD LOGIC
+// ==========================================
+function promptEndGame(winnerName = '') {
+  document.getElementById('endgame-winner-name-tag').textContent = winnerName || 'ผู้ชนะเลิศ';
+  document.getElementById('modal-end-game-prompt').classList.remove('hidden');
+}
+
+function closeEndGamePromptModal() {
+  document.getElementById('modal-end-game-prompt').classList.add('hidden');
+}
+
+async function confirmAndExecuteEndGame() {
+  const btn = document.getElementById('btn-confirm-end-game');
+  btn.disabled = true;
+  btn.textContent = 'กำลังประมวลผล...';
+
+  try {
+    await apiRequest(`/api/game/${appState.currentRoomCode}/end`, {
+      method: 'POST'
+    });
+    closeEndGamePromptModal();
+    showToast('จบเกมและบันทึกคะแนนเรียบร้อยแล้ว!', 'success');
+
+    const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
+    appState.gameState = data;
+    stopPolling();
+    renderScoreboard(data.scoreboard || [], data.game);
+    navScreen('screen-game-over');
+  } catch(e) {
+    showToast(e.message || 'เกิดข้อผิดพลาดในการจบเกม', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🏆 ยืนยันจบเกม';
+  }
+}
+
+async function viewEndedGameScoreboard(roomCode) {
+  try {
+    showToast('กำลังโหลดข้อมูลสกอร์บอร์ด...', 'info');
+    const data = await apiRequest(`/api/game/${roomCode}`);
+    appState.currentRoomCode = roomCode;
+    appState.currentRoomName = data.game?.roomName || roomCode;
+    appState.gameState = data;
+    stopPolling();
+    renderScoreboard(data.scoreboard || [], data.game);
+    navScreen('screen-game-over');
+  } catch(e) {
+    showToast(e.message || 'ไม่สามารถโหลดผลคะแนนได้', 'error');
+  }
+}
+
+function renderScoreboard(scoreboard = [], game = {}) {
+  const roomTitle = game.roomName || game.room_code || appState.currentRoomName || appState.currentRoomCode || 'ห้องเกม';
+  const subtitle = document.getElementById('gameover-room-name-subtitle');
+  if (subtitle) {
+    const endedTime = game.endedAt ? ` · จบเกมเมื่อ ${formatStatementTime(game.endedAt)}` : '';
+    subtitle.textContent = `ห้อง: ${roomTitle}${endedTime}`;
+  }
+
+  const listContainer = document.getElementById('gameover-scoreboard-list');
+  if (!listContainer) return;
+  listContainer.innerHTML = '';
+
+  if (!scoreboard || scoreboard.length === 0) {
+    listContainer.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">ยังไม่มีข้อมูลสถิติคะแนน</div>`;
+    return;
+  }
+
+  // Winner is #1
+  const winner = scoreboard[0];
+  if (winner) {
+    document.getElementById('gameover-winner-name').textContent = winner.name;
+    document.getElementById('gameover-winner-balance').textContent = fmt(winner.balance);
+  }
+
+  scoreboard.forEach((p, index) => {
+    const isWinner = p.rank === 1;
+    const pal = PLAYER_PALETTE[p.colorIndex] || PLAYER_PALETTE[0];
+
+    const card = document.createElement('div');
+    card.className = `p-4 rounded-3xl border transition shadow-lg ${
+      isWinner 
+        ? 'bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border-amber-500/50 shadow-amber-500/10' 
+        : 'bg-slate-900/90 border-slate-800'
+    }`;
+
+    // Rank badge
+    let rankBadge = '';
+    if (isWinner) {
+      rankBadge = `<span class="px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold text-[11px] shadow-md shadow-amber-500/20">👑 อันดับ 1 (ผู้ชนะ)</span>`;
+    } else {
+      const orderText = p.bankruptOrder ? `ล้มละลายคนที่ ${p.bankruptOrder}` : `อันดับ ${p.rank}`;
+      rankBadge = `<span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-bold text-[11px] border border-slate-700">อันดับ ${p.rank} (${orderText})</span>`;
+    }
+
+    const avatarHtml = p.avatarUrl
+      ? `<img src="${p.avatarUrl}" class="w-11 h-11 rounded-2xl object-cover shrink-0 border border-slate-700 shadow"/>`
+      : `<div class="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow" style="background-color: ${pal.hex};">${escapeHtml(p.name.slice(0, 1))}</div>`;
+
+    // Received breakdown list
+    const receivedFromOtherPlayers = Object.entries(p.receivedFromPlayers || {});
+    let receivedBreakdownHtml = '';
+    if (p.receivedFromBank > 0) {
+      receivedBreakdownHtml += `
+        <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/60">
+          <span class="text-slate-300">🏦 ได้จากธนาคารกลาง</span>
+          <span class="text-emerald-400 font-semibold font-mono">+฿${fmt(p.receivedFromBank)}</span>
+        </div>
+      `;
+    }
+    if (receivedFromOtherPlayers.length > 0) {
+      receivedFromOtherPlayers.forEach(([fromName, amt]) => {
+        receivedBreakdownHtml += `
+          <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/60">
+            <span class="text-slate-300">👤 ได้จาก ${escapeHtml(fromName)}</span>
+            <span class="text-emerald-400 font-semibold font-mono">+฿${fmt(amt)}</span>
+          </div>
+        `;
+      });
+    }
+    if (!receivedBreakdownHtml) {
+      receivedBreakdownHtml = `<div class="text-[11px] text-slate-500 py-1 italic">ไม่มีรายรับในระหว่างเกม</div>`;
+    }
+
+    // Paid breakdown list
+    const paidToOtherPlayers = Object.entries(p.paidToPlayers || {});
+    let paidBreakdownHtml = '';
+    if (p.paidToBank > 0) {
+      paidBreakdownHtml += `
+        <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/60">
+          <span class="text-slate-300">🏦 จ่ายให้ธนาคารกลาง</span>
+          <span class="text-rose-400 font-semibold font-mono">-฿${fmt(p.paidToBank)}</span>
+        </div>
+      `;
+    }
+    if (paidToOtherPlayers.length > 0) {
+      paidToOtherPlayers.forEach(([toName, amt]) => {
+        paidBreakdownHtml += `
+          <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/60">
+            <span class="text-slate-300">👤 จ่ายให้ ${escapeHtml(toName)}</span>
+            <span class="text-rose-400 font-semibold font-mono">-฿${fmt(amt)}</span>
+          </div>
+        `;
+      });
+    }
+    if (!paidBreakdownHtml) {
+      paidBreakdownHtml = `<div class="text-[11px] text-slate-500 py-1 italic">ไม่มีรายจ่ายในระหว่างเกม</div>`;
+    }
+
+    card.innerHTML = `
+      <!-- Card Header -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-3 min-w-0">
+          ${avatarHtml}
+          <div class="min-w-0">
+            <h4 class="font-bold text-base text-white truncate">${escapeHtml(p.name)}</h4>
+            <div class="mt-0.5">${rankBadge}</div>
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="text-[10px] text-slate-400 uppercase font-semibold">เงินคงเหลือ</p>
+          <p class="text-lg font-black font-mono ${p.balance > 0 ? 'text-emerald-400' : 'text-slate-400'}">฿${fmt(p.balance)}</p>
+        </div>
+      </div>
+
+      <!-- Financial Totals (Income vs Expense) -->
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <div class="p-2.5 rounded-2xl bg-emerald-950/20 border border-emerald-900/40 text-center">
+          <p class="text-[10px] text-emerald-400 font-semibold">📥 ได้รับทั้งหมด</p>
+          <p class="text-sm font-bold text-emerald-300 font-mono mt-0.5">+฿${fmt(p.totalIncome)}</p>
+        </div>
+        <div class="p-2.5 rounded-2xl bg-rose-950/20 border border-rose-900/40 text-center">
+          <p class="text-[10px] text-rose-400 font-semibold">📤 จ่ายออกทั้งหมด</p>
+          <p class="text-sm font-bold text-rose-300 font-mono mt-0.5">-฿${fmt(p.totalExpense)}</p>
+        </div>
+      </div>
+
+      <!-- Detailed Breakdown -->
+      <details class="group bg-slate-950/60 rounded-2xl border border-slate-800/80 p-3 text-xs">
+        <summary class="font-bold text-slate-300 cursor-pointer list-none flex items-center justify-between hover:text-white transition">
+          <span class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-400 transition-transform group-open:rotate-90" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+            ดูรายละเอียดที่มาของเงิน (รับ/จ่าย)
+          </span>
+          <span class="text-[10px] text-slate-500 font-normal group-open:hidden">กดเพื่อขยาย</span>
+        </summary>
+        <div class="mt-3 space-y-3 pt-2 border-t border-slate-800">
+          <div>
+            <p class="text-[11px] font-bold text-emerald-400 mb-1">รายละเอียดเงินที่ได้รับ (Income):</p>
+            <div class="space-y-0.5 pl-1">${receivedBreakdownHtml}</div>
+          </div>
+          <div>
+            <p class="text-[11px] font-bold text-rose-400 mb-1">รายละเอียดเงินที่จ่ายออก (Expenses):</p>
+            <div class="space-y-0.5 pl-1">${paidBreakdownHtml}</div>
+          </div>
+        </div>
+      </details>
+    `;
+
+    listContainer.appendChild(card);
+  });
 }
 
 // ==========================================
@@ -2690,33 +3022,46 @@ function toggleBalanceVisibility() {
   renderMainAppUI();
 }
 
-function switchUserPrompt() {
-  showUserSelectionScreen();
+async function confirmExitGame() {
+  if (!confirm('คุณต้องการออกจากตัวละครนี้หรือไม่? (ตัวละครของคุณจะถูกปลดล็อคให้ผู้เล่นอื่นเลือกเล่นแทนได้)')) {
+    return;
+  }
+  try {
+    if (appState.myPlayerId) {
+      await apiRequest(`/api/game/${appState.currentRoomCode}/claim`, {
+        method: 'POST',
+        body: JSON.stringify({
+          playerId: appState.myPlayerId,
+          sessionId: appState.sessionId,
+          action: 'release'
+        })
+      });
+    }
+  } catch(e) {}
+
+  localStorage.removeItem('monobank_session');
+  stopPolling();
+  appState.myPlayerId = null;
+
+  try {
+    const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
+    appState.gameState = data;
+    appState.currentRoomName = data.game.roomName || data.game.room_code;
+    showUserSelectionScreen();
+  } catch(e) {
+    leaveRoomToWelcome();
+  }
 }
 
-async function confirmExitGame() {
-  if (confirm('คุณต้องการออกจากห้องเกมนี้หรือไม่? (ตัวละครของคุณจะถูกปลดล็อคให้ผู้เล่นอื่นเลือกเล่นแทนได้)')) {
-    try {
-      if (appState.myPlayerId) {
-        await apiRequest(`/api/game/${appState.currentRoomCode}/claim`, {
-          method: 'POST',
-          body: JSON.stringify({
-            playerId: appState.myPlayerId,
-            sessionId: appState.sessionId,
-            action: 'release'
-          })
-        });
-      }
-    } catch(e) {}
-
-    localStorage.removeItem('monobank_session');
-    stopPolling();
-    appState.currentRoomCode = '';
-    appState.currentRoomName = '';
-    appState.myPlayerId = null;
-    appState.gameState = null;
-    navScreen('screen-welcome');
-  }
+function leaveRoomToWelcome() {
+  stopPolling();
+  localStorage.removeItem('monobank_session');
+  appState.currentRoomCode = '';
+  appState.currentRoomName = '';
+  appState.myPlayerId = null;
+  appState.gameState = null;
+  navScreen('screen-welcome');
+  loadActiveLobbyGames();
 }
 
 // ==========================================
@@ -2745,6 +3090,14 @@ async function refreshGameState(showIndicator = false) {
     const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
     appState.gameState = data;
     appState.currentRoomName = data.game.roomName || data.game.room_code;
+
+    if (data.game?.isEnded) {
+      stopPolling();
+      renderScoreboard(data.scoreboard || [], data.game);
+      navScreen('screen-game-over');
+      return;
+    }
+
     renderMainAppUI();
     if (showIndicator) showToast('ซิงค์ข้อมูลล่าสุดแล้ว', 'info');
   } catch(e) {

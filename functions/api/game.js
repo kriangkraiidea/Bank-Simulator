@@ -18,6 +18,8 @@ export async function onRequestGet({ env }) {
         CASE WHEN g.password IS NOT NULL AND g.password != '' THEN 1 ELSE 0 END as has_password,
         COALESCE(g.allow_spectator, 1) as allow_spectator,
         COALESCE(g.hide_others_balance, 1) as hide_others_balance,
+        COALESCE(g.is_ended, 0) as is_ended,
+        g.ended_at,
         g.created_at,
         COUNT(p.id) as max_players,
         SUM(CASE WHEN p.claimed_session IS NOT NULL AND p.claimed_session != '' THEN 1 ELSE 0 END) as active_players
@@ -169,7 +171,9 @@ async function autoMigrateSchema(db) {
       'room_name TEXT',
       'password TEXT',
       'allow_spectator INTEGER DEFAULT 1',
-      'hide_others_balance INTEGER DEFAULT 1'
+      'hide_others_balance INTEGER DEFAULT 1',
+      'is_ended INTEGER DEFAULT 0',
+      'ended_at TEXT'
     ];
     for (const col of gameColumns) {
       try {
@@ -180,7 +184,9 @@ async function autoMigrateSchema(db) {
     const playerColumns = [
       'avatar_url TEXT',
       'claimed_session TEXT',
-      'claimed_at TEXT'
+      'claimed_at TEXT',
+      'bankrupt_order INTEGER',
+      'bankrupt_at TEXT'
     ];
     for (const col of playerColumns) {
       try {
