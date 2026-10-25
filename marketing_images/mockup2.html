@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mockup 2 - E-Slip & Statement</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Chakra+Petch:wght@500;700&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      font-family: 'Prompt', sans-serif;
+      background: radial-gradient(circle at 50% 20%, #151e33 0%, #070d1a 45%, #03060d 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 60px 40px 45px;
+      position: relative;
+    }
+
+    .glow-1 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
+      top: 250px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      filter: blur(50px);
+    }
+    .glow-2 {
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+      bottom: 120px;
+      left: 50px;
+      pointer-events: none;
+      filter: blur(60px);
+    }
+
+    .header-box {
+      text-align: center;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15);
+    }
+    .main-title {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.25;
+      background: linear-gradient(135deg, #ffffff 30%, #bae6fd 80%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .sub-title {
+      font-size: 20px;
+      font-weight: 400;
+      color: #94a3b8;
+    }
+
+    .phone-container {
+      position: relative;
+      z-index: 10;
+      margin-top: 15px;
+    }
+    .phone-frame {
+      width: 440px;
+      height: 870px;
+      background: #0b1120;
+      border-radius: 54px;
+      border: 10px solid #1e293b;
+      box-shadow: 
+        0 0 0 2px #334155,
+        0 40px 100px -15px rgba(0, 0, 0, 0.9),
+        0 0 60px rgba(56, 189, 248, 0.25);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dynamic-island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 30px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+    }
+    .island-lens {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #111;
+      border: 1px solid #222;
+      box-shadow: inset 0 0 2px #00f;
+    }
+    .island-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #0369a1;
+      border: 1.5px solid #38bdf8;
+    }
+
+    .status-bar {
+      height: 48px;
+      padding: 12px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .app-screen {
+      flex: 1;
+      padding: 16px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #070d17;
+      position: relative;
+    }
+
+    /* Ambient background app (blurred) */
+    .bg-blurred-card {
+      position: absolute;
+      top: 10px;
+      left: 18px;
+      right: 18px;
+      height: 140px;
+      background: linear-gradient(135deg, #064e3b, #047857);
+      border-radius: 20px;
+      opacity: 0.25;
+      filter: blur(10px);
+    }
+
+    /* Modern E-Slip Card */
+    .slip-card {
+      width: 100%;
+      max-width: 380px;
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 28px;
+      padding: 22px 20px 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 10;
+      position: relative;
+    }
+
+    .slip-header {
+      text-align: center;
+    }
+    .slip-success-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 900;
+      margin: 0 auto 10px;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+    }
+    .slip-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .slip-time {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* Big Amount Display */
+    .slip-amount-box {
+      text-align: center;
+      padding: 12px;
+      background: #1e293b;
+      border-radius: 18px;
+      border: 1px dashed #334155;
+    }
+    .slip-amount-lbl {
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .slip-amount-num {
+      font-size: 32px;
+      font-weight: 800;
+      color: #38bdf8;
+      font-family: 'Chakra Petch', sans-serif;
+      margin-top: 2px;
+    }
+
+    /* Transfer Parties */
+    .transfer-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 4px 6px;
+    }
+    .party-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .party-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .party-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .party-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .party-role {
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    .flow-arrow {
+      margin: -2px 0 -2px 14px;
+      color: #38bdf8;
+      font-size: 14px;
+    }
+
+    /* Slip Meta */
+    .slip-meta-table {
+      border-top: 1px solid #1e293b;
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+    .meta-row .label { color: #64748b; }
+    .meta-row .val { color: #e2e8f0; font-weight: 600; }
+    .meta-row .reason-tag {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    /* Slip Action Button */
+    .slip-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #022c22;
+      border: none;
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: 'Prompt', sans-serif;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      text-align: center;
+    }
+
+    /* Floating Side Badges on Canvas */
+    .float-badge-1 {
+      position: absolute;
+      top: 360px;
+      left: 30px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      z-index: 20;
+    }
+    .float-badge-2 {
+      position: absolute;
+      bottom: 220px;
+      right: 30px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      z-index: 20;
+    }
+    .float-text .h { font-size: 14px; font-weight: 700; color: #fff; }
+    .float-text .d { font-size: 11px; color: #94a3b8; }
+
+    .footer-bar {
+      z-index: 10;
+      width: 100%;
+      max-width: 650px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 100px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    .footer-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .footer-url {
+      color: #38bdf8;
+      font-weight: 800;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <!-- Header -->
+  <div class="header-box">
+    <div class="badge-pill">
+      <span>🧾</span>
+      <span>E-SLIP & STATEMENT ประวัติการเงิน</span>
+    </div>
+    <h1 class="main-title">โอนเงินปุ๊บ สลิปเด้งปั๊บ<br>ตรวจสอบได้ทุกบาท ไม่ต้องเถียงกัน</h1>
+    <p class="sub-title">บันทึกเลขอ้างอิง วันเวลา ผู้รับ-ผู้โอน และหมายเหตุอย่างละเอียด</p>
+  </div>
+
+  <!-- Floating Feature Badges -->
+  <div class="float-badge-1">
+    <span style="font-size: 26px;">🧾</span>
+    <div class="float-text">
+      <div class="h">สลิปการโอนเงิน</div>
+      <div class="d">บันทึกเวลาเป๊ะ DD/MM/YYYY</div>
+    </div>
+  </div>
+
+  <div class="float-badge-2">
+    <span style="font-size: 26px;">📊</span>
+    <div class="float-text">
+      <div class="h">Export CSV ได้</div>
+      <div class="d">ดาวน์โหลดดูใน Excel ครบ</div>
+    </div>
+  </div>
+
+  <!-- Phone Mockup -->
+  <div class="phone-container">
+    <div class="phone-frame">
+      <div class="dynamic-island">
+        <div class="island-lens"></div>
+        <div class="island-dot"></div>
+      </div>
+      
+      <div class="status-bar">
+        <span>09:41</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <span>5G</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <div class="app-screen">
+        <div class="bg-blurred-card"></div>
+
+        <!-- The Electronic Slip -->
+        <div class="slip-card">
+          <div class="slip-header">
+            <div class="slip-success-icon">✓</div>
+            <div class="slip-title">โอนเงินสำเร็จ</div>
+            <div class="slip-time">25 ต.ค. 2026 · 14:35:12 น.</div>
+          </div>
+
+          <div class="slip-amount-box">
+            <div class="slip-amount-lbl">จำนวนเงินที่โอน</div>
+            <div class="slip-amount-num">฿ 3,500</div>
+          </div>
+
+          <!-- Flow -->
+          <div class="transfer-flow">
+            <div class="party-row">
+              <div class="party-info">
+                <div class="party-avatar" style="background:#10b981;">ก</div>
+                <div>
+                  <div class="party-name">เกรียงไกร (คุณ)</div>
+                  <div class="party-role">ผู้โอนเงิน</div>
+                </div>
+              </div>
+              <span style="font-size:11px; color:#10b981; font-weight:700;">-฿3,500</span>
+            </div>
+
+            <div class="flow-arrow">│<br>▼</div>
+
+            <div class="party-row">
+              <div class="party-info">
+                <div class="party-avatar" style="background:#3b82f6;">น</div>
+                <div>
+                  <div class="party-name">นพดล (ผู้เล่น 2)</div>
+                  <div class="party-role">ผู้รับเงิน</div>
+                </div>
+              </div>
+              <span style="font-size:11px; color:#38bdf8; font-weight:700;">+฿3,500</span>
+            </div>
+          </div>
+
+          <!-- Slip Meta -->
+          <div class="slip-meta-table">
+            <div class="meta-row">
+              <span class="label">หมายเหตุการโอน:</span>
+              <span class="reason-tag">🏠 ค่าเช่าที่ดินสีลม (บ้าน 2 หลัง)</span>
+            </div>
+            <div class="meta-row">
+              <span class="label">ห้องเกม:</span>
+              <span class="val">ตี้เกมเศรษฐี 🎲</span>
+            </div>
+            <div class="meta-row">
+              <span class="label">เลขอ้างอิง:</span>
+              <span class="val" style="font-family:monospace; color:#38bdf8;">TX-84920193</span>
+            </div>
+          </div>
+
+          <div class="slip-btn">
+            ✓ กลับสู่หน้าหลัก
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Banner -->
+  <div class="footer-bar">
+    <span style="font-size: 20px;">🌐</span>
+    <span class="footer-text">เล่นฟรี ไม่ต้องโหลดแอพ : <span class="footer-url">bank-simulator.pages.dev</span></span>
+  </div>
+</body>
+</html>

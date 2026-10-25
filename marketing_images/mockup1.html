@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mockup 1 - Dashboard & Debit Card</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Chakra+Petch:wght@500;700&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      font-family: 'Prompt', sans-serif;
+      background: radial-gradient(circle at 50% 20%, #0f2420 0%, #061118 45%, #03070b 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 60px 40px 45px;
+      position: relative;
+    }
+
+    /* Ambient Glow Effects */
+    .glow-1 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%);
+      top: 250px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      filter: blur(50px);
+    }
+    .glow-2 {
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
+      bottom: 120px;
+      right: 50px;
+      pointer-events: none;
+      filter: blur(60px);
+    }
+
+    /* Top Marketing Header */
+    .header-box {
+      text-align: center;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #34d399;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+    }
+    .main-title {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.25;
+      background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 80%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .sub-title {
+      font-size: 20px;
+      font-weight: 400;
+      color: #94a3b8;
+    }
+
+    /* Smartphone Frame */
+    .phone-container {
+      position: relative;
+      z-index: 10;
+      margin-top: 15px;
+    }
+    .phone-frame {
+      width: 440px;
+      height: 870px;
+      background: #0b1120;
+      border-radius: 54px;
+      border: 10px solid #1e293b;
+      box-shadow: 
+        0 0 0 2px #334155,
+        0 40px 100px -15px rgba(0, 0, 0, 0.9),
+        0 0 60px rgba(16, 185, 129, 0.25);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 30px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+    }
+    .island-lens {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #111;
+      border: 1px solid #222;
+      box-shadow: inset 0 0 2px #00f;
+    }
+    .island-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #064e3b;
+      border: 1.5px solid #10b981;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 48px;
+      padding: 12px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* App Content inside Phone */
+    .app-screen {
+      flex: 1;
+      padding: 14px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #070d17;
+      overflow: hidden;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981, #14b8a6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #022c22;
+      font-weight: 900;
+      font-size: 17px;
+    }
+    .brand-text h1 {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+    .brand-text span {
+      font-size: 10px;
+      color: #34d399;
+      font-weight: 600;
+    }
+    .room-badge {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .room-badge b { color: #38bdf8; }
+
+    /* Debit Card */
+    .debit-card {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #047857 70%, #0f766e 100%);
+      border-radius: 22px;
+      padding: 18px;
+      color: #fff;
+      box-shadow: 0 12px 30px -5px rgba(5, 150, 105, 0.4);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .card-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #10b981;
+      color: #064e3b;
+      font-weight: 800;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    .user-info .name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .user-info .tag {
+      font-size: 10px;
+      color: #a7f3d0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chip-icon {
+      width: 32px;
+      height: 24px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #fef08a, #ca8a04);
+      border: 1px solid #eab308;
+    }
+    .card-balance-box {
+      margin: 10px 0 14px;
+    }
+    .card-balance-box .lbl {
+      font-size: 10px;
+      color: #a7f3d0;
+      letter-spacing: 0.5px;
+    }
+    .card-balance-box .amount {
+      font-size: 29px;
+      font-weight: 800;
+      font-family: 'Chakra Petch', sans-serif;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 11px;
+      color: #d1fae5;
+    }
+    .card-number {
+      font-family: monospace;
+      letter-spacing: 2px;
+      font-size: 12px;
+    }
+
+    /* Quick Action Grid */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .grid-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 10px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+    }
+    .grid-btn .icon {
+      font-size: 20px;
+    }
+    .grid-btn span {
+      font-size: 10px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    /* Central Bank Vault Banner */
+    .vault-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 13px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .vault-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .vault-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .vault-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .vault-sub {
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .vault-bal {
+      font-size: 16px;
+      font-weight: 800;
+      color: #34d399;
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    /* Room Players Preview */
+    .players-strip {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 11px 13px;
+    }
+    .strip-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    .players-list {
+      display: flex;
+      gap: 8px;
+    }
+    .p-item {
+      flex: 1;
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 6px 4px;
+      text-align: center;
+    }
+    .p-item .p-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin: 0 auto 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .p-item .p-name {
+      font-size: 9px;
+      font-weight: 600;
+      color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .p-item .p-money {
+      font-size: 9px;
+      font-weight: 700;
+      color: #34d399;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      height: 60px;
+      background: #090e17;
+      border-top: 1px solid #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 10px;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .nav-item.active {
+      color: #10b981;
+    }
+    .nav-item .nav-icon {
+      font-size: 17px;
+    }
+
+    /* Floating Side Badges on Canvas */
+    .float-badge-1 {
+      position: absolute;
+      top: 360px;
+      left: 30px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      z-index: 20;
+    }
+    .float-badge-2 {
+      position: absolute;
+      bottom: 220px;
+      right: 30px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      z-index: 20;
+    }
+    .float-text .h { font-size: 14px; font-weight: 700; color: #fff; }
+    .float-text .d { font-size: 11px; color: #94a3b8; }
+
+    /* Footer Banner */
+    .footer-bar {
+      z-index: 10;
+      width: 100%;
+      max-width: 650px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 100px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    .footer-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .footer-url {
+      color: #34d399;
+      font-weight: 800;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <!-- Header -->
+  <div class="header-box">
+    <div class="badge-pill">
+      <span>🎲</span>
+      <span>MONO BANK : เศรษฐี DIGITAL BANKING</span>
+    </div>
+    <h1 class="main-title">เล่นเกมเศรษฐีผ่านมือถือ<br>ไม่ต้องใช้เงินกระดาษ</h1>
+    <p class="sub-title">จัดการเงินในเกมแบบเรียลไทม์ โอนเงินไว มีสลิปให้ทันที</p>
+  </div>
+
+  <!-- Floating Feature Badges -->
+  <div class="float-badge-1">
+    <span style="font-size: 26px;">⚡</span>
+    <div class="float-text">
+      <div class="h">โอนไว เรียลไทม์</div>
+      <div class="d">อัปเดตยอดทุกเครื่องทันที</div>
+    </div>
+  </div>
+
+  <div class="float-badge-2">
+    <span style="font-size: 26px;">🔒</span>
+    <div class="float-text">
+      <div class="h">หมดปัญหาโกงเงิน</div>
+      <div class="d">บันทึกทุกรายการในห้อง</div>
+    </div>
+  </div>
+
+  <!-- Phone Mockup -->
+  <div class="phone-container">
+    <div class="phone-frame">
+      <div class="dynamic-island">
+        <div class="island-lens"></div>
+        <div class="island-dot"></div>
+      </div>
+      
+      <div class="status-bar">
+        <span>09:41</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <span>5G</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <div class="app-screen">
+        <div class="app-header">
+          <div class="brand-logo">
+            <div class="logo-icon">🏦</div>
+            <div class="brand-text">
+              <h1>MONO BANK</h1>
+              <span>● เชื่อมต่อเรียลไทม์</span>
+            </div>
+          </div>
+          <div class="room-badge">ห้อง: <b>ตี้เกมเศรษฐี 🎲</b></div>
+        </div>
+
+        <!-- Debit Card -->
+        <div class="debit-card">
+          <div class="card-top">
+            <div class="card-user">
+              <div class="user-avatar">ก</div>
+              <div class="user-info">
+                <div class="name">เกรียงไกร (คุณ)</div>
+                <div class="tag">● ผู้เล่นอันดับ 1</div>
+              </div>
+            </div>
+            <div class="chip-icon"></div>
+          </div>
+          <div class="card-balance-box">
+            <div class="lbl">ยอดเงินคงเหลือสุทธิ</div>
+            <div class="amount">฿ 28,500</div>
+          </div>
+          <div class="card-bottom">
+            <span class="card-number">•••• •••• •••• 1288</span>
+            <span style="font-weight: 700; color:#fff;">EXP 12/28</span>
+          </div>
+        </div>
+
+        <!-- 4 Quick Actions -->
+        <div class="quick-grid">
+          <div class="grid-btn">
+            <div class="icon">💸</div>
+            <span>โอนเงิน</span>
+          </div>
+          <div class="grid-btn">
+            <div class="icon">📥</div>
+            <span>เบิกธนาคาร</span>
+          </div>
+          <div class="grid-btn">
+            <div class="icon">📤</div>
+            <span>จ่ายธนาคาร</span>
+          </div>
+          <div class="grid-btn">
+            <div class="icon">🧮</div>
+            <span>คิดเลข</span>
+          </div>
+        </div>
+
+        <!-- Central Bank Vault -->
+        <div class="vault-card">
+          <div class="vault-left">
+            <div class="vault-icon">🏛️</div>
+            <div>
+              <div class="vault-title">คลังธนาคารกลาง</div>
+              <div class="vault-sub">ผ่าน GO / เสียภาษี / ที่ดิน</div>
+            </div>
+          </div>
+          <div class="vault-bal">฿ ∞ ไม่จำกัด</div>
+        </div>
+
+        <!-- Players Strip -->
+        <div class="players-strip">
+          <div class="strip-header">
+            <span>ผู้เล่นในห้อง (4 คน)</span>
+            <span style="color:#38bdf8;">รอบที่ 3</span>
+          </div>
+          <div class="players-list">
+            <div class="p-item">
+              <div class="p-avatar" style="background:#10b981;">ก</div>
+              <div class="p-name">เกรียงไกร</div>
+              <div class="p-money">฿28.5k</div>
+            </div>
+            <div class="p-item">
+              <div class="p-avatar" style="background:#3b82f6;">น</div>
+              <div class="p-name">นพดล</div>
+              <div class="p-money">฿14.2k</div>
+            </div>
+            <div class="p-item">
+              <div class="p-avatar" style="background:#f59e0b;">ส</div>
+              <div class="p-name">สมหญิง</div>
+              <div class="p-money">฿9.5k</div>
+            </div>
+            <div class="p-item">
+              <div class="p-avatar" style="background:#ef4444;">ว</div>
+              <div class="p-name">วรพล</div>
+              <div class="p-money">฿3.1k</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <div class="nav-item active">
+          <span class="nav-icon">🏠</span>
+          <span>หน้าหลัก</span>
+        </div>
+        <div class="nav-item">
+          <span class="nav-icon">💸</span>
+          <span>โอนเงิน</span>
+        </div>
+        <div class="nav-item">
+          <span class="nav-icon">🏛️</span>
+          <span>ธนาคาร</span>
+        </div>
+        <div class="nav-item">
+          <span class="nav-icon">📜</span>
+          <span>สเตทเม้นต์</span>
+        </div>
+        <div class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span>ผู้เล่น</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Banner -->
+  <div class="footer-bar">
+    <span style="font-size: 20px;">🌐</span>
+    <span class="footer-text">เล่นฟรี ไม่ต้องโหลดแอพ : <span class="footer-url">bank-simulator.pages.dev</span></span>
+  </div>
+</body>
+</html>
