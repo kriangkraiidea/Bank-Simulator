@@ -512,7 +512,10 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-2 shrink-0">
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button onclick="openDiceRollerModal()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 hover:border-amber-500/50 flex items-center justify-center text-amber-400 text-sm active:scale-95 transition" title="ทอยลูกเต๋าจำลอง">
+        <span>🎲</span>
+      </button>
       <button onclick="toggleSoundEnabled()" id="btn-sound-toggle" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 hover:border-emerald-500/50 flex items-center justify-center text-xs active:scale-95 transition" title="เปิด/ปิดเสียงเอฟเฟกต์">
         <span id="sound-icon">🔊</span>
       </button>
@@ -726,9 +729,9 @@
     </button>
   </main>
 
-  <!-- TAB CONTENT 3: CALCULATOR (เครื่องคิดเลขส่งยอดได้) -->
-  <main id="tab-content-calc" class="hidden p-5 space-y-4 flex-1">
-    <div class="flex items-center justify-between pb-1">
+  <!-- TAB CONTENT 3: CALCULATOR (เครื่องคิดเลขส่งยอดได้ พอดีกับจอมือถือ) -->
+  <main id="tab-content-calc" class="hidden p-4 space-y-2.5 flex-1">
+    <div class="flex items-center justify-between pb-0.5">
       <button onclick="switchTab('home')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-slate-900 border border-slate-800 transition active:scale-95">
         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
         <span>หน้าหลัก</span>
@@ -741,48 +744,48 @@
     </div>
 
     <!-- Calculator Display Screen -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-right shadow-inner">
-      <div id="calc-expression" class="text-xs font-mono text-slate-400 h-5 overflow-x-auto hide-scrollbar">0</div>
-      <div id="calc-display" class="text-3xl font-extrabold text-emerald-400 font-mono tracking-tight overflow-x-auto hide-scrollbar pt-1">0</div>
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 text-right shadow-inner">
+      <div id="calc-expression" class="text-[11px] font-mono text-slate-400 h-4 overflow-x-auto hide-scrollbar">0</div>
+      <div id="calc-display" class="text-2xl font-black text-emerald-400 font-mono tracking-tight overflow-x-auto hide-scrollbar pt-0.5">0</div>
     </div>
 
-    <!-- Calculator Keypad (Large touch buttons with prominent operators) -->
-    <div class="grid grid-cols-4 gap-2.5 text-base font-semibold select-none">
-      <button onclick="calcClear()" class="calc-btn py-4 rounded-2xl bg-slate-800/90 text-amber-400 border border-slate-700 text-xl font-black">C</button>
-      <button onclick="calcBackspace()" class="calc-btn py-4 rounded-2xl bg-slate-800/90 text-slate-300 border border-slate-700 text-xl font-bold">⌫</button>
-      <button onclick="calcOp('%')" class="calc-btn py-4 rounded-2xl bg-slate-800/90 text-slate-300 border border-slate-700 text-xl font-black">%</button>
-      <button onclick="calcOp('/')" class="calc-btn py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-3xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">÷</button>
+    <!-- Calculator Keypad (Mobile optimized: Clear operators, compact fit) -->
+    <div class="grid grid-cols-4 gap-1.5 select-none">
+      <button onclick="calcClear()" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800/90 text-amber-400 border border-slate-700 text-lg font-black">C</button>
+      <button onclick="calcBackspace()" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800/90 text-slate-300 border border-slate-700 text-lg font-bold">⌫</button>
+      <button onclick="calcOp('%')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800/90 text-slate-300 border border-slate-700 text-lg font-black">%</button>
+      <button onclick="calcOp('/')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-2xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">÷</button>
 
-      <button onclick="calcNum('7')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">7</button>
-      <button onclick="calcNum('8')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">8</button>
-      <button onclick="calcNum('9')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">9</button>
-      <button onclick="calcOp('*')" class="calc-btn py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-3xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">×</button>
+      <button onclick="calcNum('7')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">7</button>
+      <button onclick="calcNum('8')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">8</button>
+      <button onclick="calcNum('9')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">9</button>
+      <button onclick="calcOp('*')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-2xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">×</button>
 
-      <button onclick="calcNum('4')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">4</button>
-      <button onclick="calcNum('5')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">5</button>
-      <button onclick="calcNum('6')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">6</button>
-      <button onclick="calcOp('-')" class="calc-btn py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-3xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">−</button>
+      <button onclick="calcNum('4')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">4</button>
+      <button onclick="calcNum('5')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">5</button>
+      <button onclick="calcNum('6')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">6</button>
+      <button onclick="calcOp('-')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-2xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">−</button>
 
-      <button onclick="calcNum('1')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">1</button>
-      <button onclick="calcNum('2')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">2</button>
-      <button onclick="calcNum('3')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">3</button>
-      <button onclick="calcOp('+')" class="calc-btn py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-3xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">+</button>
+      <button onclick="calcNum('1')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">1</button>
+      <button onclick="calcNum('2')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">2</button>
+      <button onclick="calcNum('3')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">3</button>
+      <button onclick="calcOp('+')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-2xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">+</button>
 
-      <button onclick="calcNum('0')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">0</button>
-      <button onclick="calcNum('00')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">00</button>
-      <button onclick="calcNum('.')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">.</button>
-      <button onclick="calcEquals()" class="calc-btn py-4 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-3xl font-black shadow-lg shadow-emerald-400/30 flex items-center justify-center">=</button>
+      <button onclick="calcNum('0')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">0</button>
+      <button onclick="calcNum('00')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-base font-bold">00</button>
+      <button onclick="calcNum('.')" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">.</button>
+      <button onclick="calcEquals()" class="calc-btn py-2.5 sm:py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-2xl font-black shadow-md shadow-emerald-400/30 flex items-center justify-center">=</button>
     </div>
 
     <!-- Apply Amount Buttons -->
-    <div class="grid grid-cols-2 gap-2.5 pt-2">
-      <button onclick="applyCalcToTransfer()" class="py-3 px-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow transition active:scale-95 flex items-center justify-center gap-1.5">
-        <svg class="w-4 h-4" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
-        <span>โอนให้ผู้เล่น (ใช้ยอดนี้)</span>
+    <div class="grid grid-cols-2 gap-2 pt-0.5">
+      <button onclick="applyCalcToTransfer()" class="py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow transition active:scale-95 flex items-center justify-center gap-1.5">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
+        <span>โอนให้ผู้เล่น</span>
       </button>
-      <button onclick="applyCalcToBank()" class="py-3 px-3 rounded-2xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs shadow transition active:scale-95 flex items-center justify-center gap-1.5">
-        <svg class="w-4 h-4" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
-        <span>จ่าย/รับธนาคาร (ใช้ยอดนี้)</span>
+      <button onclick="applyCalcToBank()" class="py-2.5 px-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs shadow transition active:scale-95 flex items-center justify-center gap-1.5">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
+        <span>จ่าย/รับธนาคาร</span>
       </button>
     </div>
   </main>
@@ -896,27 +899,29 @@
       </div>
     </div>
 
+    <!-- Emoji Reaction Bar (ย้ายมาไว้หน้าผู้เล่น ไม่ให้รกหน้าจอ) -->
+    <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 shadow-sm">
+      <div class="flex items-center justify-between text-xs">
+        <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+          <span>💬</span>
+          <span>ส่ง Reaction ข้ามเครื่อง</span>
+        </span>
+        <span class="text-[10px] text-slate-400">แสดงผลบนจอทุกคนในห้อง</span>
+      </div>
+      <div class="grid grid-cols-6 gap-1.5 pt-0.5">
+        <button type="button" onclick="sendEmojiReaction('🤣')" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center text-xl transition active:scale-125" title="ขำ">🤣</button>
+        <button type="button" onclick="sendEmojiReaction('😭')" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center text-xl transition active:scale-125" title="ร้องไห้">😭</button>
+        <button type="button" onclick="sendEmojiReaction('💸')" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center text-xl transition active:scale-125" title="เงินปลิว">💸</button>
+        <button type="button" onclick="sendEmojiReaction('💀')" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center text-xl transition active:scale-125" title="ล้มละลาย">💀</button>
+        <button type="button" onclick="sendEmojiReaction('🚓')" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center text-xl transition active:scale-125" title="เข้าคุก">🚓</button>
+        <button type="button" onclick="sendEmojiReaction('👑')" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center text-xl transition active:scale-125" title="เศรษฐี">👑</button>
+      </div>
+    </div>
+
     <div id="full-players-rank-list" class="space-y-3"></div>
   </main>
 
-  <!-- Floating Reaction Bar & Floating Dice Action Button (above bottom nav) -->
-  <div id="screen-floating-actions" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto px-4 pointer-events-none z-30 flex items-center justify-between">
-    <!-- Floating Emoji Reaction Bar -->
-    <div id="floating-reaction-bar" class="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-full bg-slate-900/95 border border-slate-700/80 backdrop-blur-md shadow-2xl">
-      <button onclick="sendEmojiReaction('🤣')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="ขำ">🤣</button>
-      <button onclick="sendEmojiReaction('😭')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="ร้องไห้">😭</button>
-      <button onclick="sendEmojiReaction('💸')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="เงินปลิว">💸</button>
-      <button onclick="sendEmojiReaction('💀')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="ล้มละลาย">💀</button>
-      <button onclick="sendEmojiReaction('🚓')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="เข้าคุก">🚓</button>
-      <button onclick="sendEmojiReaction('👑')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="เศรษฐี">👑</button>
-    </div>
 
-    <!-- Floating Dice Roller Button -->
-    <button onclick="openDiceRollerModal()" class="pointer-events-auto flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs shadow-xl shadow-amber-500/30 transition active:scale-95" title="ทอยลูกเต๋าจำลอง">
-      <span class="text-base">🎲</span>
-      <span>ทอยเต๋า</span>
-    </button>
-  </div>
 
   <!-- Bottom Navigation Bar (5 Sleek Items) -->
   <nav id="main-bottom-nav" class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 grid grid-cols-5 py-2 px-1 text-center">
@@ -3998,6 +4003,7 @@ function toggleSetupPresetsSection() {
 }
 
 function switchSetupPresetTab(tab) {
+  editingPresetIndex = null;
   currentSetupPresetTab = tab;
   const btnR = document.getElementById('setup-preset-tab-receive');
   const btnP = document.getElementById('setup-preset-tab-pay');
@@ -4011,6 +4017,8 @@ function switchSetupPresetTab(tab) {
   renderSetupPresetsList();
 }
 
+let editingPresetIndex = null;
+
 function renderSetupPresetsList() {
   const container = document.getElementById('setup-presets-list');
   if (!container) return;
@@ -4023,16 +4031,77 @@ function renderSetupPresetsList() {
 
   list.forEach((item, idx) => {
     const row = document.createElement('div');
-    row.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800 text-xs';
-    row.innerHTML = `
-      <div class="flex items-center gap-2 min-w-0">
-        <span class="font-medium text-white truncate">${escapeHtml(item.reason || item.label)}</span>
-        <span class="text-emerald-400 font-bold font-mono">฿${fmt(item.amount)}</span>
-      </div>
-      <button type="button" onclick="removeSetupPresetItem(${idx})" class="w-6 h-6 rounded-lg text-slate-400 hover:text-red-400 text-sm leading-none flex items-center justify-center">✕</button>
-    `;
+    if (editingPresetIndex === idx) {
+      row.className = 'flex items-center gap-1.5 p-1.5 rounded-xl bg-slate-800 border border-emerald-500/80 text-xs shadow-md';
+      row.innerHTML = `
+        <input id="edit-preset-label-${idx}" type="text" value="${escapeHtml(item.reason || item.label)}" class="flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-emerald-500 font-medium"/>
+        <div class="relative w-20">
+          <span class="absolute left-1.5 top-1 text-slate-500 text-[10px] font-bold">฿</span>
+          <input id="edit-preset-amount-${idx}" type="number" value="${item.amount}" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-4 pr-1.5 py-1 text-xs text-white font-mono focus:outline-none focus:border-emerald-500 font-bold"/>
+        </div>
+        <button type="button" onclick="saveEditSetupPresetItem(${idx})" class="px-2 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shrink-0 shadow-sm transition active:scale-95" title="บันทึกการแก้ไข">✓</button>
+        <button type="button" onclick="cancelEditSetupPresetItem()" class="px-2 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs shrink-0 transition" title="ยกเลิก">✕</button>
+      `;
+    } else {
+      row.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800 text-xs hover:border-slate-700 transition';
+      row.innerHTML = `
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="font-medium text-white truncate">${escapeHtml(item.reason || item.label)}</span>
+          <span class="text-emerald-400 font-bold font-mono">฿${fmt(item.amount)}</span>
+        </div>
+        <div class="flex items-center gap-1 shrink-0">
+          <button type="button" onclick="startEditSetupPresetItem(${idx})" class="w-7 h-7 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 flex items-center justify-center text-xs transition" title="แก้ไขรายการ">✏️</button>
+          <button type="button" onclick="removeSetupPresetItem(${idx})" class="w-7 h-7 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 flex items-center justify-center text-sm leading-none transition" title="ลบรายการ">✕</button>
+        </div>
+      `;
+    }
     container.appendChild(row);
   });
+}
+
+function startEditSetupPresetItem(idx) {
+  editingPresetIndex = idx;
+  renderSetupPresetsList();
+  setTimeout(() => {
+    const inp = document.getElementById(`edit-preset-label-${idx}`);
+    if (inp) {
+      inp.focus();
+      inp.select();
+    }
+  }, 50);
+}
+
+function cancelEditSetupPresetItem() {
+  editingPresetIndex = null;
+  renderSetupPresetsList();
+}
+
+function saveEditSetupPresetItem(idx) {
+  const labelInp = document.getElementById(`edit-preset-label-${idx}`);
+  const amountInp = document.getElementById(`edit-preset-amount-${idx}`);
+  if (!labelInp || !amountInp) return;
+  const label = (labelInp.value || '').trim();
+  const amount = parseInt(amountInp.value);
+
+  if (!label) {
+    showToast('กรุณาระบุชื่อรายการ', 'warning');
+    return;
+  }
+  if (!amount || amount <= 0) {
+    showToast('กรุณาระบุจำนวนเงิน', 'warning');
+    return;
+  }
+
+  const sign = currentSetupPresetTab === 'receive' ? '+' : '-';
+  setupBankPresets[currentSetupPresetTab][idx] = {
+    label: `${label} ${sign}฿${fmt(amount)}`,
+    amount,
+    reason: label
+  };
+
+  editingPresetIndex = null;
+  renderSetupPresetsList();
+  showToast('บันทึกการแก้ไขแล้ว', 'success');
 }
 
 function addCustomPresetItem() {
@@ -4059,11 +4128,13 @@ function addCustomPresetItem() {
 
   labelInp.value = '';
   amountInp.value = '';
+  editingPresetIndex = null;
   renderSetupPresetsList();
   showToast('เพิ่มรายการด่วนแล้ว', 'info');
 }
 
 function removeSetupPresetItem(idx) {
+  editingPresetIndex = null;
   setupBankPresets[currentSetupPresetTab].splice(idx, 1);
   renderSetupPresetsList();
 }
