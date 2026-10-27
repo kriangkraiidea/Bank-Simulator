@@ -49,7 +49,8 @@ export async function onRequestPost({ request, env }) {
       bankMoney = 0,
       password = '',
       allowSpectator = true,
-      hideOthersBalance = true
+      hideOthersBalance = true,
+      bankPresets = null
     } = body;
 
     if (!Array.isArray(players) || players.length < 2 || players.length > 8) {
@@ -80,12 +81,13 @@ export async function onRequestPost({ request, env }) {
     const roomCode = genCode();
     const gameId = crypto.randomUUID();
     const bankBalance = bankMoney === 0 ? null : bankMoney;
+    const bankPresetsStr = bankPresets ? JSON.stringify(bankPresets) : null;
 
     await env.DB.prepare(`
       INSERT INTO games (
         id, room_code, room_name, bank_balance, starting_money,
-        password, allow_spectator, hide_others_balance
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        password, allow_spectator, hide_others_balance, bank_presets
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       gameId,
       roomCode,
@@ -94,7 +96,8 @@ export async function onRequestPost({ request, env }) {
       startingMoney,
       (password || '').trim() || null,
       allowSpectator ? 1 : 0,
-      hideOthersBalance ? 1 : 0
+      hideOthersBalance ? 1 : 0,
+      bankPresetsStr
     ).run();
 
     for (const [i, player] of players.entries()) {
@@ -173,7 +176,8 @@ async function autoMigrateSchema(db) {
       'allow_spectator INTEGER DEFAULT 1',
       'hide_others_balance INTEGER DEFAULT 1',
       'is_ended INTEGER DEFAULT 0',
-      'ended_at TEXT'
+      'ended_at TEXT',
+      'bank_presets TEXT'
     ];
     for (const col of gameColumns) {
       try {
@@ -193,6 +197,31 @@ async function autoMigrateSchema(db) {
         await db.prepare(`ALTER TABLE players ADD COLUMN ${col}`).run();
       } catch (_) {}
     }
+
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS payment_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        game_id TEXT NOT NULL,
+        from_player_id INTEGER NOT NULL,
+        to_player_id INTEGER NOT NULL,
+        amount INTEGER NOT NULL,
+        reason TEXT,
+        status TEXT NOT NULL DEFAULT 'pending',
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+      )
+    `).run();
+
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS reactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        game_id TEXT NOT NULL,
+        player_name TEXT NOT NULL,
+        emoji TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+      )
+    `).run();
   } catch (_) {}
 }
 

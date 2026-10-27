@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS games (
   hide_others_balance INTEGER NOT NULL DEFAULT 1,
   is_ended INTEGER NOT NULL DEFAULT 0,
   ended_at TEXT,
+  bank_presets TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );
@@ -45,7 +46,30 @@ CREATE TABLE IF NOT EXISTS transactions (
   FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS payment_requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  game_id TEXT NOT NULL,
+  from_player_id INTEGER NOT NULL,
+  to_player_id INTEGER NOT NULL,
+  amount INTEGER NOT NULL,
+  reason TEXT,
+  status TEXT NOT NULL DEFAULT 'pending', -- 'pending' | 'accepted' | 'rejected'
+  created_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS reactions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  game_id TEXT NOT NULL,
+  player_name TEXT NOT NULL,
+  emoji TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_games_room_code ON games(room_code);
 CREATE INDEX IF NOT EXISTS idx_players_game_id ON players(game_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_game_id ON transactions(game_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_created ON transactions(game_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_payment_requests_game_status ON payment_requests(game_id, status);
+CREATE INDEX IF NOT EXISTS idx_reactions_game ON reactions(game_id, created_at DESC);

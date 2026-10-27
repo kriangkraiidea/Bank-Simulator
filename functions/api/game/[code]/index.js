@@ -17,6 +17,7 @@ export async function onRequestGet({ params, env }) {
         COALESCE(hide_others_balance, 1) as hide_others_balance,
         COALESCE(is_ended, 0) as is_ended,
         ended_at,
+        bank_presets,
         created_at, 
         updated_at
       FROM games 
@@ -24,6 +25,13 @@ export async function onRequestGet({ params, env }) {
     `).bind(code).first();
 
     if (!game) return json({ error: 'ไม่พบห้องเกม หรือห้องถูกปิดแล้ว' }, 404);
+
+    let bankPresets = null;
+    if (game.bank_presets) {
+      try {
+        bankPresets = JSON.parse(game.bank_presets);
+      } catch(_) {}
+    }
 
     const { results: players } = await env.DB.prepare(`
       SELECT 
@@ -50,6 +58,33 @@ export async function onRequestGet({ params, env }) {
       LIMIT 60
     `).bind(game.id).all();
 
+    let pendingPaymentRequests = [];
+    try {
+      const { results: reqs } = await env.DB.prepare(`
+        SELECT pr.id, pr.from_player_id, pr.to_player_id, pr.amount, pr.reason, pr.status, pr.created_at,
+               p_from.name as from_name, p_to.name as to_name,
+               p_to.name as requester_name, p_from.name as debtor_name,
+               pr.from_player_id as target_player_id
+        FROM payment_requests pr
+        LEFT JOIN players p_from ON p_from.id = pr.from_player_id
+        LEFT JOIN players p_to ON p_to.id = pr.to_player_id
+        WHERE pr.game_id = ? AND pr.status = 'pending'
+        ORDER BY pr.id DESC LIMIT 10
+      `).bind(game.id).all();
+      pendingPaymentRequests = reqs || [];
+    } catch(_) {}
+
+    let recentReactions = [];
+    try {
+      const { results: rxns } = await env.DB.prepare(`
+        SELECT id, player_name, emoji, created_at
+        FROM reactions
+        WHERE game_id = ? AND created_at >= datetime('now', '-8 seconds')
+        ORDER BY id DESC LIMIT 20
+      `).bind(game.id).all();
+      recentReactions = rxns || [];
+    } catch(_) {}
+
     let scoreboard = null;
     if (game.is_ended === 1) {
       const { results: allTx } = await env.DB.prepare(`
@@ -71,10 +106,13 @@ export async function onRequestGet({ params, env }) {
         hideOthersBalance: game.hide_others_balance === 1,
         isEnded: game.is_ended === 1,
         endedAt: game.ended_at,
+        bankPresets: bankPresets,
       },
       players: players || [],
       recentLog: recentLog || [],
       scoreboard,
+      pendingPaymentRequests,
+      recentReactions,
     });
   } catch (e) {
     return json({ error: e.message }, 500);

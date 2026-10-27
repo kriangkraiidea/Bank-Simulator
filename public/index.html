@@ -4,7 +4,595 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <title>MONO BANK - เศรษฐี Mobile Banking</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com">
+// ==========================================
+// AUDIO SYNTHESIZER SOUND SYSTEM (Web Audio API)
+// ==========================================
+let audioCtx = null;
+let soundEnabled = localStorage.getItem('monobank_sound_enabled') !== 'false';
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) audioCtx = new AudioContext();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function updateSoundToggleBtn() {
+  const icon = document.getElementById('sound-icon');
+  if (icon) icon.textContent = soundEnabled ? '🔊' : '🔇';
+}
+
+function toggleSoundEnabled() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('monobank_sound_enabled', soundEnabled ? 'true' : 'false');
+  updateSoundToggleBtn();
+  if (soundEnabled) {
+    playSfx('pop');
+    showToast('เปิดเสียงเอฟเฟกต์แล้ว 🔊', 'info');
+  } else {
+    showToast('ปิดเสียงเอฟเฟกต์แล้ว 🔇', 'info');
+  }
+}
+
+function playSfx(type) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    if (type === 'cash') {
+      // Cha-ching: Two bright resonant chimes
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc1.type = 'triangle';
+      osc2.type = 'sine';
+      osc1.frequency.setValueAtTime(987.77, now); // B5
+      osc1.frequency.exponentialRampToValueAtTime(1318.51, now + 0.12); // E6
+      osc2.frequency.setValueAtTime(1975.53, now + 0.12); // B6
+      osc2.frequency.exponentialRampToValueAtTime(2637.02, now + 0.35); // E7
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+      osc1.start(now);
+      osc2.start(now + 0.1);
+      osc1.stop(now + 0.5);
+      osc2.stop(now + 0.5);
+    } else if (type === 'pay') {
+      // Whoosh / bass drop
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else if (type === 'pop') {
+      // Gentle click/pop
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.06);
+    } else if (type === 'dice') {
+      // Rattle burst
+      for (let i = 0; i < 4; i++) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150 + Math.random() * 200, now + i * 0.04);
+        gain.gain.setValueAtTime(0.08, now + i * 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.03);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.04);
+        osc.stop(now + i * 0.04 + 0.04);
+      }
+    } else if (type === 'fanfare') {
+      // Arpeggio for double / victory: C5, E5, G5, C6
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.28);
+      });
+    } else if (type === 'request') {
+      // Bell chime: Ding-dong
+      [784, 1046].forEach((f, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, now + idx * 0.12);
+        gain.gain.setValueAtTime(0.2, now + idx * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.12);
+        osc.stop(now + idx * 0.12 + 0.4);
+      });
+    } else if (type === 'bankruptcy') {
+      // Deep funeral bell
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(110, now);
+      osc.frequency.exponentialRampToValueAtTime(55, now + 0.8);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 1.0);
+    }
+  } catch(e) {}
+}
+
+// ==========================================
+// EMOJI REACTION SYSTEM
+// ==========================================
+let seenReactionIds = new Set();
+
+async function sendEmojiReaction(emoji) {
+  playSfx('pop');
+  const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
+  const myName = me ? me.name : 'ผู้ชม';
+  spawnFloatingEmoji(emoji, myName);
+  if (!appState.currentRoomCode) return;
+  try {
+    await apiRequest(`/api/game/${appState.currentRoomCode}/reaction`, {
+      method: 'POST',
+      body: JSON.stringify({
+        playerId: appState.myPlayerId,
+        playerName: myName,
+        emoji
+      })
+    });
+  } catch(e) {}
+}
+
+function spawnFloatingEmoji(emoji, senderName = '') {
+  const container = document.getElementById('emoji-floating-layer');
+  if (!container) return;
+  const item = document.createElement('div');
+  item.className = 'floating-emoji-item flex flex-col items-center';
+  const randomX = Math.floor(15 + Math.random() * 70); // 15% to 85%
+  item.style.left = `${randomX}%`;
+  item.style.bottom = '80px';
+  item.innerHTML = `
+    <span class="text-4xl filter drop-shadow-md select-none">${escapeHtml(emoji)}</span>
+    ${senderName ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-900/90 text-white border border-slate-700 shadow-sm whitespace-nowrap mt-1">${escapeHtml(senderName)}</span>` : ''}
+  `;
+  container.appendChild(item);
+  setTimeout(() => { item.remove(); }, 2800);
+}
+
+function handleIncomingReactions(reactions) {
+  if (!Array.isArray(reactions)) return;
+  reactions.forEach(r => {
+    if (seenReactionIds.has(r.id)) return;
+    seenReactionIds.add(r.id);
+    // If it was sent by someone else, play pop and show floating emoji
+    if (r.player_id !== appState.myPlayerId) {
+      spawnFloatingEmoji(r.emoji, r.player_name);
+      playSfx('pop');
+    }
+  });
+}
+
+// ==========================================
+// VIRTUAL DICE ROLLER
+// ==========================================
+let currentDiceCount = 2; // Default is 2 dice per user request
+let isRollingDice = false;
+
+function openDiceRollerModal() {
+  getAudioContext();
+  const modal = document.getElementById('modal-dice-roller');
+  modal.classList.remove('hidden');
+  renderDiceDisplay([1, 1]);
+  document.getElementById('dice-total-display').textContent = currentDiceCount === 1 ? '1' : '2';
+  document.getElementById('dice-double-alert').classList.add('hidden');
+}
+
+function closeDiceRollerModal() {
+  document.getElementById('modal-dice-roller').classList.add('hidden');
+}
+
+function setDiceCount(count) {
+  currentDiceCount = count;
+  const btn1 = document.getElementById('btn-dice-count-1');
+  const btn2 = document.getElementById('btn-dice-count-2');
+  const d2 = document.getElementById('dice-container-2');
+  if (count === 1) {
+    btn1.className = 'py-2 rounded-xl font-bold transition bg-amber-500 text-slate-950 shadow-md';
+    btn2.className = 'py-2 rounded-xl font-bold transition text-slate-400';
+    d2.classList.add('hidden');
+  } else {
+    btn2.className = 'py-2 rounded-xl font-bold transition bg-amber-500 text-slate-950 shadow-md';
+    btn1.className = 'py-2 rounded-xl font-bold transition text-slate-400';
+    d2.classList.remove('hidden');
+  }
+  document.getElementById('dice-double-alert').classList.add('hidden');
+  document.getElementById('dice-total-display').textContent = '--';
+}
+
+function getPipPattern(val) {
+  if (val === 1) return [{ r: 2, c: 2, red: true }];
+  if (val === 2) return [{ r: 1, c: 1 }, { r: 3, c: 3 }];
+  if (val === 3) return [{ r: 1, c: 1 }, { r: 2, c: 2, red: true }, { r: 3, c: 3 }];
+  if (val === 4) return [{ r: 1, c: 1 }, { r: 1, c: 3 }, { r: 3, c: 1 }, { r: 3, c: 3 }];
+  if (val === 5) return [{ r: 1, c: 1 }, { r: 1, c: 3 }, { r: 2, c: 2, red: true }, { r: 3, c: 1 }, { r: 3, c: 3 }];
+  if (val === 6) return [{ r: 1, c: 1 }, { r: 1, c: 3 }, { r: 2, c: 1 }, { r: 2, c: 3 }, { r: 3, c: 1 }, { r: 3, c: 3 }];
+  return [];
+}
+
+function renderSingleDie(containerId, value) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  const pips = getPipPattern(value);
+  for (let r = 1; r <= 3; r++) {
+    for (let c = 1; c <= 3; c++) {
+      const match = pips.find(item => item.r === r && item.c === c);
+      if (match) {
+        const dot = document.createElement('div');
+        dot.className = `dice-dot ${match.red ? 'dot-red' : ''}`;
+        container.appendChild(dot);
+      } else {
+        const empty = document.createElement('div');
+        container.appendChild(empty);
+      }
+    }
+  }
+}
+
+function renderDiceDisplay(values) {
+  renderSingleDie('dice-container-1', values[0]);
+  if (currentDiceCount === 2) {
+    renderSingleDie('dice-container-2', values[1]);
+  }
+}
+
+async function rollVirtualDice() {
+  if (isRollingDice) return;
+  isRollingDice = true;
+  getAudioContext();
+  playSfx('dice');
+
+  const btn = document.getElementById('btn-roll-dice');
+  const d1 = document.getElementById('dice-container-1');
+  const d2 = document.getElementById('dice-container-2');
+  const doubleAlert = document.getElementById('dice-double-alert');
+  const totalDisplay = document.getElementById('dice-total-display');
+  
+  btn.disabled = true;
+  doubleAlert.classList.add('hidden');
+  d1.classList.add('dice-rolling');
+  if (currentDiceCount === 2) d2.classList.add('dice-rolling');
+
+  let ticks = 0;
+  const interval = setInterval(() => {
+    ticks++;
+    const v1 = Math.floor(Math.random() * 6) + 1;
+    const v2 = Math.floor(Math.random() * 6) + 1;
+    renderDiceDisplay([v1, v2]);
+    totalDisplay.textContent = currentDiceCount === 1 ? v1 : (v1 + v2);
+    if (ticks % 3 === 0) playSfx('pop');
+
+    if (ticks >= 12) {
+      clearInterval(interval);
+      d1.classList.remove('dice-rolling');
+      if (currentDiceCount === 2) d2.classList.remove('dice-rolling');
+
+      const final1 = Math.floor(Math.random() * 6) + 1;
+      const final2 = Math.floor(Math.random() * 6) + 1;
+      renderDiceDisplay([final1, final2]);
+
+      const isDouble = (currentDiceCount === 2 && final1 === final2);
+      const total = currentDiceCount === 1 ? final1 : (final1 + final2);
+      totalDisplay.textContent = total;
+
+      if (isDouble) {
+        doubleAlert.textContent = `🎉 ได้เลขเบิ้ล (${final1} + ${final2})! ทอยต่อได้อีกรอบ!`;
+        doubleAlert.classList.remove('hidden');
+        playSfx('fanfare');
+      } else {
+        playSfx('pop');
+      }
+
+      btn.disabled = false;
+      isRollingDice = false;
+
+      // Broadcast if checked
+      const shouldBroadcast = document.getElementById('dice-broadcast-checkbox').checked;
+      if (shouldBroadcast && appState.currentRoomCode) {
+        const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
+        const myName = me ? me.name : 'ผู้เล่น';
+        apiRequest(`/api/game/${appState.currentRoomCode}/dice`, {
+          method: 'POST',
+          body: JSON.stringify({
+            playerName: myName,
+            dice1: final1,
+            dice2: currentDiceCount === 2 ? final2 : null,
+            total,
+            isDouble
+          })
+        }).then(() => {
+          refreshGameState(false);
+        }).catch(() => {});
+      }
+    }
+  }, 60);
+}
+
+// ==========================================
+// REQUEST TO PAY (เรียกเก็บเงิน)
+// ==========================================
+let currentActiveIncomingRequestId = null;
+
+function openRequestPaymentModal(targetId = null) {
+  getAudioContext();
+  const modal = document.getElementById('modal-request-payment');
+  const sel = document.getElementById('request-target-player');
+  sel.innerHTML = '';
+
+  const activePlayers = (appState.gameState?.players || []).filter(p => p.id !== appState.myPlayerId && !p.bankrupt);
+  if (activePlayers.length === 0) {
+    showToast('ไม่มีผู้เล่นอื่นที่สามารถเรียกเก็บเงินได้', 'warning');
+    return;
+  }
+
+  activePlayers.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.name}`;
+    if (targetId && p.id === targetId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  document.getElementById('input-request-amount').value = '';
+  document.getElementById('input-request-reason').value = '';
+  modal.classList.remove('hidden');
+}
+
+function closeRequestPaymentModal() {
+  document.getElementById('modal-request-payment').classList.add('hidden');
+}
+
+function addRequestAmount(val) {
+  const inp = document.getElementById('input-request-amount');
+  inp.value = (parseInt(inp.value) || 0) + val;
+}
+
+async function confirmAndSendPaymentRequest() {
+  const targetPlayerId = parseInt(document.getElementById('request-target-player').value);
+  const amount = parseInt(document.getElementById('input-request-amount').value);
+  const reason = (document.getElementById('input-request-reason').value || '').trim() || 'เรียกเก็บเงิน';
+
+  if (!amount || amount <= 0) {
+    showToast('กรุณาระบุจำนวนเงินที่ถูกต้อง', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit-request-pay');
+  btn.disabled = true;
+  btn.textContent = 'กำลังส่งคำขอ...';
+
+  try {
+    await apiRequest(`/api/game/${appState.currentRoomCode}/payment-request`, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'request',
+        requesterId: appState.myPlayerId,
+        targetPlayerId,
+        amount,
+        reason
+      })
+    });
+    closeRequestPaymentModal();
+    playSfx('pop');
+    showToast('ส่งคำขอเรียกเก็บเงินเรียบร้อยแล้ว รออีกฝ่ายยืนยัน', 'success');
+  } catch(e) {
+    showToast(e.message || 'ส่งคำขอไม่สำเร็จ', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔔 ส่งคำขอเรียกเก็บเงิน';
+  }
+}
+
+function handleIncomingPaymentRequests(requests) {
+  if (!Array.isArray(requests) || !appState.myPlayerId) return;
+  const myReq = requests.find(r => (r.target_player_id === appState.myPlayerId || r.from_player_id === appState.myPlayerId) && r.status === 'pending');
+  const modal = document.getElementById('modal-incoming-payment-request');
+
+  if (myReq) {
+    if (currentActiveIncomingRequestId !== myReq.id) {
+      currentActiveIncomingRequestId = myReq.id;
+      playSfx('request');
+      document.getElementById('incoming-req-from').textContent = myReq.requester_name || myReq.to_name || 'ผู้เล่น';
+      document.getElementById('incoming-req-reason').textContent = myReq.reason || 'เรียกเก็บเงิน';
+      document.getElementById('incoming-req-amount').textContent = fmt(myReq.amount);
+
+      const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
+      document.getElementById('incoming-req-my-balance').textContent = `฿${fmt(me?.balance || 0)}`;
+
+      modal.classList.remove('hidden');
+    }
+  } else {
+    if (currentActiveIncomingRequestId) {
+      currentActiveIncomingRequestId = null;
+      modal.classList.add('hidden');
+    }
+  }
+}
+
+async function respondToPaymentRequest(decision) {
+  if (!currentActiveIncomingRequestId || !appState.currentRoomCode) return;
+  const reqId = currentActiveIncomingRequestId;
+  const btnAccept = document.getElementById('btn-accept-payment-req');
+  btnAccept.disabled = true;
+
+  try {
+    const data = await apiRequest(`/api/game/${appState.currentRoomCode}/payment-request`, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'respond',
+        requestId: reqId,
+        decision,
+        playerId: appState.myPlayerId
+      })
+    });
+
+    currentActiveIncomingRequestId = null;
+    document.getElementById('modal-incoming-payment-request').classList.add('hidden');
+
+    if (decision === 'accept') {
+      playSfx('cash');
+      showToast('ยินยอมจ่ายเงินและโอนสำเร็จแล้ว!', 'success');
+      if (data.slip) {
+        showElectronicSlip(data.slip);
+      }
+    } else {
+      playSfx('pay');
+      showToast('ปฏิเสธคำขอเรียกเก็บเงินแล้ว', 'info');
+    }
+    refreshGameState(false);
+  } catch(e) {
+    showToast(e.message || 'ทำรายการไม่สำเร็จ', 'error');
+  } finally {
+    btnAccept.disabled = false;
+  }
+}
+
+// ==========================================
+// SETUP SCREEN: CUSTOM BANK PRESETS
+// ==========================================
+const DEFAULT_BANK_PRESETS = {
+  receive: [
+    { label: '🚀 ผ่านจุด GO +฿2,000', amount: 2000, reason: '🚀 ผ่านจุดเริ่มต้น (GO)' },
+    { label: '🏆 เงินปันผล/รางวัล +฿1,000', amount: 1000, reason: '🏆 เงินปันผล/รางวัล' }
+  ],
+  pay: [
+    { label: '💼 เสียภาษี -฿2,000', amount: 2000, reason: '💼 เสียภาษี' },
+    { label: '⛓️ ประกันตัวจากคุก -฿500', amount: 500, reason: '⛓️ ประกันตัวจากคุก' }
+  ]
+};
+
+let setupBankPresets = JSON.parse(JSON.stringify(DEFAULT_BANK_PRESETS));
+let currentSetupPresetTab = 'receive';
+let isSetupPresetsExpanded = false;
+
+function toggleSetupPresetsSection() {
+  isSetupPresetsExpanded = !isSetupPresetsExpanded;
+  const content = document.getElementById('setup-presets-content');
+  const arrow = document.getElementById('setup-presets-arrow');
+  if (isSetupPresetsExpanded) {
+    content.classList.remove('hidden');
+    arrow.textContent = '▲';
+    renderSetupPresetsList();
+  } else {
+    content.classList.add('hidden');
+    arrow.textContent = '▼';
+  }
+}
+
+function switchSetupPresetTab(tab) {
+  currentSetupPresetTab = tab;
+  const btnR = document.getElementById('setup-preset-tab-receive');
+  const btnP = document.getElementById('setup-preset-tab-pay');
+  if (tab === 'receive') {
+    btnR.className = 'py-1.5 rounded-lg font-semibold bg-emerald-500 text-slate-950 transition';
+    btnP.className = 'py-1.5 rounded-lg font-semibold text-slate-400 transition';
+  } else {
+    btnP.className = 'py-1.5 rounded-lg font-semibold bg-emerald-500 text-slate-950 transition';
+    btnR.className = 'py-1.5 rounded-lg font-semibold text-slate-400 transition';
+  }
+  renderSetupPresetsList();
+}
+
+function renderSetupPresetsList() {
+  const container = document.getElementById('setup-presets-list');
+  if (!container) return;
+  container.innerHTML = '';
+  const list = setupBankPresets[currentSetupPresetTab] || [];
+  if (list.length === 0) {
+    container.innerHTML = `<div class="text-[11px] text-slate-500 py-2 text-center">ยังไม่มีรายการด่วน</div>`;
+    return;
+  }
+
+  list.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800 text-xs';
+    row.innerHTML = `
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="font-medium text-white truncate">${escapeHtml(item.reason || item.label)}</span>
+        <span class="text-emerald-400 font-bold font-mono">฿${fmt(item.amount)}</span>
+      </div>
+      <button type="button" onclick="removeSetupPresetItem(${idx})" class="w-6 h-6 rounded-lg text-slate-400 hover:text-red-400 text-sm leading-none flex items-center justify-center">✕</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function addCustomPresetItem() {
+  const labelInp = document.getElementById('setup-new-preset-label');
+  const amountInp = document.getElementById('setup-new-preset-amount');
+  const label = (labelInp.value || '').trim();
+  const amount = parseInt(amountInp.value);
+
+  if (!label) {
+    showToast('กรุณาระบุชื่อรายการ', 'warning');
+    return;
+  }
+  if (!amount || amount <= 0) {
+    showToast('กรุณาระบุจำนวนเงิน', 'warning');
+    return;
+  }
+
+  const sign = currentSetupPresetTab === 'receive' ? '+' : '-';
+  setupBankPresets[currentSetupPresetTab].push({
+    label: `${label} ${sign}฿${fmt(amount)}`,
+    amount,
+    reason: label
+  });
+
+  labelInp.value = '';
+  amountInp.value = '';
+  renderSetupPresetsList();
+  showToast('เพิ่มรายการด่วนแล้ว', 'info');
+}
+
+function removeSetupPresetItem(idx) {
+  setupBankPresets[currentSetupPresetTab].splice(idx, 1);
+  renderSetupPresetsList();
+}
+
+</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -65,6 +653,66 @@
     .calc-btn:active {
       transform: scale(0.95);
       background-color: #334155;
+    }
+    @keyframes floatUpFade {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.6) rotate(-10deg);
+      }
+      15% {
+        opacity: 1;
+        transform: translateY(0px) scale(1.2) rotate(5deg);
+      }
+      80% {
+        opacity: 0.9;
+        transform: translateY(-160px) scale(1) rotate(-5deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-240px) scale(0.8) rotate(15deg);
+      }
+    }
+    .floating-emoji-item {
+      position: absolute;
+      animation: floatUpFade 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    @keyframes diceTumble {
+      0% { transform: rotate(0deg) scale(1); }
+      20% { transform: rotate(-25deg) scale(1.15) translateY(-8px); }
+      40% { transform: rotate(30deg) scale(0.9) translateY(4px); }
+      60% { transform: rotate(-15deg) scale(1.1) translateY(-4px); }
+      80% { transform: rotate(10deg) scale(0.95) translateY(2px); }
+      100% { transform: rotate(0deg) scale(1) translateY(0); }
+    }
+    .dice-rolling {
+      animation: diceTumble 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+    .dice-box {
+      width: 76px;
+      height: 76px;
+      background: linear-gradient(145deg, #ffffff, #f1f5f9);
+      border-radius: 18px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.2), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+      border: 2px solid #e2e8f0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      padding: 10px;
+      gap: 3px;
+    }
+    .dice-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #0f172a;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+      margin: auto;
+    }
+    .dice-dot.dot-red {
+      background: #ef4444;
+      box-shadow: inset 0 1px 2px rgba(185,28,28,0.7);
     }
   </style>
 </head>
@@ -308,6 +956,46 @@
       </div>
     </div>
 
+        <!-- Central Bank Presets Customization -->
+    <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-3">
+      <div class="flex items-center justify-between cursor-pointer" onclick="toggleSetupPresetsSection()">
+        <div>
+          <p class="text-xs font-semibold text-white flex items-center gap-1.5">
+            <span>⚙️ ปรับแต่งรายการด่วนธนาคารกลาง</span>
+          </p>
+          <p class="text-[10px] text-slate-400">กำหนดรายการรับ/จ่ายเงินธนาคารเริ่มต้นของห้องนี้</p>
+        </div>
+        <span id="setup-presets-arrow" class="text-xs text-slate-400 transition-transform">▼</span>
+      </div>
+
+      <div id="setup-presets-content" class="hidden space-y-3 pt-2 border-t border-slate-700/60">
+        <!-- Sub Tabs: Receive vs Pay -->
+        <div class="grid grid-cols-2 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+          <button type="button" onclick="switchSetupPresetTab('receive')" id="setup-preset-tab-receive" class="py-1.5 rounded-lg font-semibold bg-emerald-500 text-slate-950 transition">
+            📥 ฝั่งรับเงิน (เบิก)
+          </button>
+          <button type="button" onclick="switchSetupPresetTab('pay')" id="setup-preset-tab-pay" class="py-1.5 rounded-lg font-semibold text-slate-400 transition">
+            📤 ฝั่งจ่ายเงิน (ชำระ)
+          </button>
+        </div>
+
+        <!-- Presets List -->
+        <div id="setup-presets-list" class="space-y-1.5 max-h-40 overflow-y-auto hide-scrollbar"></div>
+
+        <!-- Add New Preset Form -->
+        <div class="flex items-center gap-2 pt-1 border-t border-slate-700/50">
+          <input id="setup-new-preset-label" type="text" placeholder="ชื่อรายการ เช่น ค่าที่ดิน" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"/>
+          <div class="relative w-24">
+            <span class="absolute left-2 top-1.5 text-slate-500 text-xs font-bold">฿</span>
+            <input id="setup-new-preset-amount" type="number" placeholder="2000" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-5 pr-2 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"/>
+          </div>
+          <button type="button" onclick="addCustomPresetItem()" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shrink-0 active:scale-95 transition">
+            + เพิ่ม
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div id="setup-error" class="hidden p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-400 text-xs text-center"></div>
 
     <button id="btn-create-game" onclick="handleCreateGame()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 transition active:scale-[0.98]">
@@ -407,6 +1095,9 @@
     </div>
 
     <div class="flex items-center gap-2 shrink-0">
+      <button onclick="toggleSoundEnabled()" id="btn-sound-toggle" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 hover:border-emerald-500/50 flex items-center justify-center text-xs active:scale-95 transition" title="เปิด/ปิดเสียงเอฟเฟกต์">
+        <span id="sound-icon">🔊</span>
+      </button>
       <button onclick="openDonateModal()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 hover:border-amber-500/50 flex items-center justify-center text-amber-400 text-xs active:scale-95 transition" title="สนับสนุนผู้พัฒนา (Donate)">
         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="currentColor"/></svg>
       </button>
@@ -463,38 +1154,49 @@
       </div>
     </div>
 
-    <!-- Quick Action Grid (Bank App Style: โอนเงิน, เบิกธนาคาร, จ่ายธนาคาร, คิดเลข) -->
-    <div id="home-quick-actions" class="grid grid-cols-4 gap-2">
+    <!-- Quick Action Grid (Bank App Style: โอนเงิน, เรียกเก็บ, เบิกธนาคาร, จ่ายธนาคาร, คิดเลข) -->
+    <div id="home-quick-actions" class="grid grid-cols-5 gap-1.5">
       <!-- 1. โอนเงิน (ซ่อนเมื่อล้มละลาย) -->
-      <button id="home-action-transfer" onclick="handleTransferButtonClick()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
+      <button id="home-action-transfer" onclick="handleTransferButtonClick()" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
         <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
         </div>
-        <span class="text-[11px] font-medium text-slate-200">โอนเงิน</span>
+        <span class="text-[10px] font-medium text-slate-200">โอนเงิน</span>
       </button>
 
-      <!-- 2. เบิกธนาคาร -->
-      <button onclick="openBankModalWithTab('receive')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-teal-500/50 active:scale-95 transition">
+      <!-- 2. เรียกเก็บ -->
+      <button onclick="openRequestPaymentModal()" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-violet-500/50 active:scale-95 transition">
+        <div class="w-10 h-10 rounded-2xl bg-violet-500/15 text-violet-400 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </div>
+        <span class="text-[10px] font-medium text-slate-200">เรียกเก็บ</span>
+      </button>
+
+      <!-- 3. เบิกธนาคาร -->
+      <button onclick="openBankModalWithTab('receive')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-teal-500/50 active:scale-95 transition">
         <div class="w-10 h-10 rounded-2xl bg-teal-500/15 text-teal-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-receive"/></svg>
         </div>
-        <span class="text-[11px] font-medium text-slate-200">เบิกธนาคาร</span>
+        <span class="text-[10px] font-medium text-slate-200">เบิกธนาคาร</span>
       </button>
 
-      <!-- 3. จ่ายธนาคาร -->
-      <button onclick="openBankModalWithTab('pay')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 active:scale-95 transition">
+      <!-- 4. จ่ายธนาคาร -->
+      <button onclick="openBankModalWithTab('pay')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 active:scale-95 transition">
         <div class="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
         </div>
-        <span class="text-[11px] font-medium text-slate-200">จ่ายธนาคาร</span>
+        <span class="text-[10px] font-medium text-slate-200">จ่ายธนาคาร</span>
       </button>
 
-      <!-- 4. คิดเลข -->
-      <button onclick="switchTab('calc')" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-blue-500/50 active:scale-95 transition">
+      <!-- 5. คิดเลข -->
+      <button onclick="switchTab('calc')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-blue-500/50 active:scale-95 transition">
         <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-calc"/></svg>
         </div>
-        <span class="text-[11px] font-medium text-slate-200">คิดเลข</span>
+        <span class="text-[10px] font-medium text-slate-200">คิดเลข</span>
       </button>
     </div>
 
@@ -626,32 +1328,32 @@
       <div id="calc-display" class="text-3xl font-extrabold text-emerald-400 font-mono tracking-tight overflow-x-auto hide-scrollbar pt-1">0</div>
     </div>
 
-    <!-- Calculator Keypad -->
-    <div class="grid grid-cols-4 gap-2 text-sm font-semibold">
-      <button onclick="calcClear()" class="calc-btn py-3.5 rounded-xl bg-slate-800/80 text-amber-400 border border-slate-700">C</button>
-      <button onclick="calcBackspace()" class="calc-btn py-3.5 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700">⌫</button>
-      <button onclick="calcOp('%')" class="calc-btn py-3.5 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700">%</button>
-      <button onclick="calcOp('/')" class="calc-btn py-3.5 rounded-xl bg-emerald-600 text-white">÷</button>
+    <!-- Calculator Keypad (Large touch buttons with prominent operators) -->
+    <div class="grid grid-cols-4 gap-2.5 text-base font-semibold select-none">
+      <button onclick="calcClear()" class="calc-btn py-4 rounded-2xl bg-slate-800/90 text-amber-400 border border-slate-700 text-xl font-black">C</button>
+      <button onclick="calcBackspace()" class="calc-btn py-4 rounded-2xl bg-slate-800/90 text-slate-300 border border-slate-700 text-xl font-bold">⌫</button>
+      <button onclick="calcOp('%')" class="calc-btn py-4 rounded-2xl bg-slate-800/90 text-slate-300 border border-slate-700 text-xl font-black">%</button>
+      <button onclick="calcOp('/')" class="calc-btn py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-3xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">÷</button>
 
-      <button onclick="calcNum('7')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">7</button>
-      <button onclick="calcNum('8')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">8</button>
-      <button onclick="calcNum('9')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">9</button>
-      <button onclick="calcOp('*')" class="calc-btn py-3.5 rounded-xl bg-emerald-600 text-white">×</button>
+      <button onclick="calcNum('7')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">7</button>
+      <button onclick="calcNum('8')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">8</button>
+      <button onclick="calcNum('9')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">9</button>
+      <button onclick="calcOp('*')" class="calc-btn py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-3xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">×</button>
 
-      <button onclick="calcNum('4')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">4</button>
-      <button onclick="calcNum('5')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">5</button>
-      <button onclick="calcNum('6')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">6</button>
-      <button onclick="calcOp('-')" class="calc-btn py-3.5 rounded-xl bg-emerald-600 text-white">−</button>
+      <button onclick="calcNum('4')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">4</button>
+      <button onclick="calcNum('5')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">5</button>
+      <button onclick="calcNum('6')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">6</button>
+      <button onclick="calcOp('-')" class="calc-btn py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-3xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">−</button>
 
-      <button onclick="calcNum('1')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">1</button>
-      <button onclick="calcNum('2')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">2</button>
-      <button onclick="calcNum('3')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">3</button>
-      <button onclick="calcOp('+')" class="calc-btn py-3.5 rounded-xl bg-emerald-600 text-white">+</button>
+      <button onclick="calcNum('1')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">1</button>
+      <button onclick="calcNum('2')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">2</button>
+      <button onclick="calcNum('3')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">3</button>
+      <button onclick="calcOp('+')" class="calc-btn py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-3xl font-black shadow-md shadow-emerald-900/30 flex items-center justify-center">+</button>
 
-      <button onclick="calcNum('0')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">0</button>
-      <button onclick="calcNum('00')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">00</button>
-      <button onclick="calcNum('.')" class="calc-btn py-3.5 rounded-xl bg-slate-800 text-white border border-slate-700/60">.</button>
-      <button onclick="calcEquals()" class="calc-btn py-3.5 rounded-xl bg-emerald-500 text-slate-950 font-bold">=</button>
+      <button onclick="calcNum('0')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">0</button>
+      <button onclick="calcNum('00')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-xl font-bold">00</button>
+      <button onclick="calcNum('.')" class="calc-btn py-4 rounded-2xl bg-slate-800 text-white border border-slate-700/60 text-2xl font-bold">.</button>
+      <button onclick="calcEquals()" class="calc-btn py-4 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-3xl font-black shadow-lg shadow-emerald-400/30 flex items-center justify-center">=</button>
     </div>
 
     <!-- Apply Amount Buttons -->
@@ -778,6 +1480,25 @@
 
     <div id="full-players-rank-list" class="space-y-3"></div>
   </main>
+
+  <!-- Floating Reaction Bar & Floating Dice Action Button (above bottom nav) -->
+  <div id="screen-floating-actions" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto px-4 pointer-events-none z-30 flex items-center justify-between">
+    <!-- Floating Emoji Reaction Bar -->
+    <div id="floating-reaction-bar" class="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-full bg-slate-900/95 border border-slate-700/80 backdrop-blur-md shadow-2xl">
+      <button onclick="sendEmojiReaction('🤣')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="ขำ">🤣</button>
+      <button onclick="sendEmojiReaction('😭')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="ร้องไห้">😭</button>
+      <button onclick="sendEmojiReaction('💸')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="เงินปลิว">💸</button>
+      <button onclick="sendEmojiReaction('💀')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="ล้มละลาย">💀</button>
+      <button onclick="sendEmojiReaction('🚓')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="เข้าคุก">🚓</button>
+      <button onclick="sendEmojiReaction('👑')" class="w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-base transition active:scale-125" title="เศรษฐี">👑</button>
+    </div>
+
+    <!-- Floating Dice Roller Button -->
+    <button onclick="openDiceRollerModal()" class="pointer-events-auto flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs shadow-xl shadow-amber-500/30 transition active:scale-95" title="ทอยลูกเต๋าจำลอง">
+      <span class="text-base">🎲</span>
+      <span>ทอยเต๋า</span>
+    </button>
+  </div>
 
   <!-- Bottom Navigation Bar (5 Sleek Items) -->
   <nav id="main-bottom-nav" class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 grid grid-cols-5 py-2 px-1 text-center">
@@ -1113,6 +1834,162 @@
     </div>
   </div>
 </div>
+
+<!-- ========================= MODAL: REQUEST PAYMENT (เรียกเก็บเงิน) ========================= -->
+<div id="modal-request-payment" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end sm:items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+    <div class="flex items-center justify-between pb-1">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-2xl bg-violet-500/20 text-violet-400 flex items-center justify-center">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-base text-white">เรียกเก็บเงิน (PromptPay)</h3>
+          <p class="text-[11px] text-slate-400">ส่งแจ้งเตือนทวงเงินให้เพื่อนกดยินยอมจ่าย</p>
+        </div>
+      </div>
+      <button onclick="closeRequestPaymentModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm">✕</button>
+    </div>
+
+    <!-- Target debtor select -->
+    <div>
+      <label class="text-xs text-slate-400 block mb-1">เลือกผู้เล่นที่ต้องการเรียกเก็บ</label>
+      <select id="request-target-player" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-violet-500 focus:outline-none"></select>
+    </div>
+
+    <!-- Amount input with quick pills -->
+    <div>
+      <label class="text-xs text-slate-400 block mb-1">จำนวนเงินที่เรียกเก็บ (฿)</label>
+      <div class="relative flex items-center bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2">
+        <span class="text-xl font-bold text-violet-400 mr-2">฿</span>
+        <input id="input-request-amount" type="number" min="1" placeholder="0" class="w-full bg-transparent text-xl font-bold text-white focus:outline-none placeholder:text-slate-600"/>
+        <button onclick="document.getElementById('input-request-amount').value=''" class="text-slate-500 hover:text-slate-300 text-xs px-1">✕</button>
+      </div>
+      <div class="grid grid-cols-4 gap-1.5 pt-2">
+        <button type="button" onclick="addRequestAmount(100)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">+100</button>
+        <button type="button" onclick="addRequestAmount(500)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">+500</button>
+        <button type="button" onclick="addRequestAmount(1000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">+1,000</button>
+        <button type="button" onclick="addRequestAmount(2000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">+2,000</button>
+      </div>
+    </div>
+
+    <!-- Reason input & quick tags -->
+    <div>
+      <label class="text-xs text-slate-400 block mb-1">เหตุผลในการเรียกเก็บ</label>
+      <input id="input-request-reason" type="text" placeholder="เช่น ค่าตกที่ดิน, ค่าเช่าโรงแรม" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:border-violet-500 focus:outline-none"/>
+      <div class="flex flex-wrap gap-1.5 pt-2">
+        <button type="button" onclick="document.getElementById('input-request-reason').value='🏘️ ค่าเช่าที่ดิน'" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">🏘️ ค่าเช่าที่ดิน</button>
+        <button type="button" onclick="document.getElementById('input-request-reason').value='🏨 ค่าโรงแรม'" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">🏨 ค่าโรงแรม</button>
+        <button type="button" onclick="document.getElementById('input-request-reason').value='🛣️ ค่าผ่านทาง'" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">🛣️ ค่าผ่านทาง</button>
+        <button type="button" onclick="document.getElementById('input-request-reason').value='💰 คืนเงินกู้'" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">💰 คืนเงินกู้</button>
+      </div>
+    </div>
+
+    <button onclick="confirmAndSendPaymentRequest()" id="btn-submit-request-pay" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-400 hover:to-purple-500 text-white font-bold text-sm shadow-lg shadow-violet-600/30 transition active:scale-95">
+      🔔 ส่งคำขอเรียกเก็บเงิน
+    </button>
+  </div>
+</div>
+
+<!-- ========================= MODAL: INCOMING PAYMENT REQUEST (บิลเรียกเก็บเงินเข้า) ========================= -->
+<div id="modal-incoming-payment-request" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-900 border-2 border-violet-500/80 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+    <div class="text-center pb-1">
+      <div class="w-14 h-14 rounded-3xl bg-violet-500/20 text-violet-400 flex items-center justify-center mx-auto mb-2 text-2xl shadow-lg shadow-violet-500/30 animate-pulse">
+        🔔
+      </div>
+      <div class="text-[11px] font-bold uppercase tracking-wider text-violet-400">คำขอเรียกเก็บเงินใหม่</div>
+      <h3 class="font-extrabold text-lg text-white mt-1">มีคนส่งบิลเรียกเก็บเงินถึงคุณ!</h3>
+    </div>
+
+    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 space-y-2.5">
+      <div class="flex items-center justify-between text-xs">
+        <span class="text-slate-400">ผู้เรียกเก็บ:</span>
+        <span id="incoming-req-from" class="font-bold text-white">—</span>
+      </div>
+      <div class="flex items-center justify-between text-xs">
+        <span class="text-slate-400">หมายเหตุ:</span>
+        <span id="incoming-req-reason" class="text-slate-300 font-medium">—</span>
+      </div>
+      <div class="pt-2 border-t border-slate-700 flex items-baseline justify-between">
+        <span class="text-xs text-slate-400">ยอดเงินที่เรียกเก็บ:</span>
+        <div class="text-2xl font-black text-amber-400 font-mono">฿<span id="incoming-req-amount">0</span></div>
+      </div>
+    </div>
+
+    <div class="text-[11px] text-slate-400 text-center">
+      ยอดเงินคงเหลือของคุณ: <span id="incoming-req-my-balance" class="text-emerald-400 font-bold font-mono">฿0</span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2.5 pt-1">
+      <button onclick="respondToPaymentRequest('reject')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-red-400 font-bold text-xs border border-red-900/50 transition active:scale-95">
+        ✕ ปฏิเสธ
+      </button>
+      <button onclick="respondToPaymentRequest('accept')" id="btn-accept-payment-req" class="py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/25 transition active:scale-95">
+        ✓ ยินยอมจ่ายเงิน
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= MODAL: VIRTUAL DICE ROLLER (ลูกเต๋าจำลอง 1-2 ลูก) ========================= -->
+<div id="modal-dice-roller" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+    <div class="flex items-center justify-between pb-1">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+          🎲
+        </div>
+        <div>
+          <h3 class="font-bold text-base text-white">ระบบทอยลูกเต๋าจำลอง</h3>
+          <p class="text-[11px] text-slate-400">สุ่มลูกเต๋าเสมือนจริง พร้อมตรวจจับเลขเบิ้ล</p>
+        </div>
+      </div>
+      <button onclick="closeDiceRollerModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm">✕</button>
+    </div>
+
+    <!-- 1 vs 2 Dice Selector (Default = 2 dice) -->
+    <div class="grid grid-cols-2 p-1 rounded-2xl bg-slate-800/90 border border-slate-700 text-xs">
+      <button type="button" onclick="setDiceCount(1)" id="btn-dice-count-1" class="py-2 rounded-xl font-bold transition text-slate-400">
+        🎲 ลูกเต๋า 1 ลูก
+      </button>
+      <button type="button" onclick="setDiceCount(2)" id="btn-dice-count-2" class="py-2 rounded-xl font-bold transition bg-amber-500 text-slate-950 shadow-md">
+        🎲🎲 ลูกเต๋า 2 ลูก (ค่าเริ่มต้น)
+      </button>
+    </div>
+
+    <!-- Dice Display Stage -->
+    <div class="p-6 rounded-2xl bg-gradient-to-b from-slate-950 to-slate-900 border border-slate-800 flex items-center justify-center gap-5 min-h-[120px]">
+      <div id="dice-container-1" class="dice-box"></div>
+      <div id="dice-container-2" class="dice-box"></div>
+    </div>
+
+    <!-- Total Score & Double Banner -->
+    <div class="text-center space-y-1">
+      <div class="text-xs text-slate-400 font-medium">ผลรวมแต้ม</div>
+      <div class="text-4xl font-black text-amber-400 font-mono tracking-tight" id="dice-total-display">--</div>
+      <div id="dice-double-alert" class="hidden mt-2 p-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold animate-pulse">
+        🎉 ได้เลขเบิ้ล! ได้สิทธิ์ทอยต่ออีกรอบ!
+      </div>
+    </div>
+
+    <!-- Broadcast Option -->
+    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs">
+      <div>
+        <p class="font-medium text-slate-300">แจ้งผลลงห้องเกม</p>
+        <p class="text-[10px] text-slate-400">บันทึกผลแต้มลง Statement ให้ทุกคนเห็น</p>
+      </div>
+      <input id="dice-broadcast-checkbox" type="checkbox" checked class="w-4 h-4 accent-amber-500 cursor-pointer"/>
+    </div>
+
+    <button onclick="rollVirtualDice()" id="btn-roll-dice" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-base shadow-lg shadow-amber-500/25 transition active:scale-95">
+      🎲 กดเพื่อทอยลูกเต๋า
+    </button>
+  </div>
+</div>
+
+<!-- Floating Emoji Animation Layer -->
+<div id="emoji-floating-layer" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
 
 <!-- ========================= TOAST NOTIFICATION ========================= -->
 <div id="toast" class="hidden fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-white text-xs font-semibold shadow-2xl max-w-[90vw] text-center flex items-center gap-2 transition-all"></div>
@@ -1541,6 +2418,19 @@ function openSetupScreen() {
   if (savedSetup) {
     try {
       const cfg = JSON.parse(savedSetup);
+      if (cfg.bankPresets) {
+        setupBankPresets = cfg.bankPresets;
+      } else {
+        setupBankPresets = JSON.parse(JSON.stringify(DEFAULT_BANK_PRESETS));
+      }
+    } catch(e) {}
+  } else {
+    setupBankPresets = JSON.parse(JSON.stringify(DEFAULT_BANK_PRESETS));
+  }
+  renderSetupPresetsList();
+  if (savedSetup) {
+    try {
+      const cfg = JSON.parse(savedSetup);
       document.getElementById('setup-room-name').value = cfg.roomName || '';
       document.getElementById('setup-start-money').value = cfg.startingMoney || 15000;
       document.getElementById('setup-bank-limit').value = cfg.bankLimit || 0;
@@ -1746,7 +2636,8 @@ async function handleCreateGame() {
       bankLimit: bankMoney,
       hideOthersBalance,
       allowSpectator,
-      password
+      password,
+      bankPresets: setupBankPresets
     }));
   } catch(e) {}
 
@@ -1763,7 +2654,8 @@ async function handleCreateGame() {
         bankMoney,
         password,
         allowSpectator,
-        hideOthersBalance
+        hideOthersBalance,
+        bankPresets: setupBankPresets
       })
     });
     appState.currentRoomCode = data.roomCode;
@@ -2499,24 +3391,25 @@ function renderBankPresetsAndTags() {
 
   const isReceive = appState.bankTabMode === 'receive';
 
-  // Presets (Removed Luck Card and Mortgaged land from receive presets, removed buy land and build house from pay presets)
-  const presets = isReceive ? [
-    { label: '🚀 ผ่านจุด GO +฿2,000', amount: 2000, reason: '🚀 ผ่านจุดเริ่มต้น (GO)' },
-    { label: '🏆 เงินปันผล/รางวัล +฿1,000', amount: 1000, reason: '🏆 เงินปันผล/รางวัล' },
-  ] : [
-    { label: '💼 เสียภาษี -฿2,000', amount: 2000, reason: '💼 เสียภาษี' },
-    { label: '⛓️ ประกันตัวจากคุก -฿500', amount: 500, reason: '⛓️ ประกันตัวจากคุก' },
-  ];
+  let customPresets = appState.gameState?.game?.bank_presets;
+  if (typeof customPresets === 'string') {
+    try { customPresets = JSON.parse(customPresets); } catch(e) { customPresets = null; }
+  }
 
-  presets.forEach(pr => {
+  const activePresets = (customPresets && Array.isArray(customPresets[appState.bankTabMode]))
+    ? customPresets[appState.bankTabMode]
+    : (isReceive ? DEFAULT_BANK_PRESETS.receive : DEFAULT_BANK_PRESETS.pay);
+
+  activePresets.forEach(pr => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/70 text-left text-xs font-semibold text-slate-200 transition active:scale-95';
     btn.onclick = () => {
       document.getElementById('input-bank-amount').value = pr.amount;
-      document.getElementById('input-bank-reason').value = pr.reason;
+      document.getElementById('input-bank-reason').value = pr.reason || pr.label;
+      playSfx('pop');
     };
-    btn.textContent = pr.label;
+    btn.textContent = pr.label || `${pr.reason} ฿${fmt(pr.amount)}`;
     presetsContainer.appendChild(btn);
   });
 
@@ -2759,6 +3652,10 @@ function renderFullPlayersTab() {
       </div>
       <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800 text-xs">
         ${!isMe && !p.bankrupt ? `
+          <button onclick="openRequestPaymentModal(${p.id})" class="px-2.5 py-1 rounded-lg bg-violet-500/20 text-violet-300 font-medium hover:bg-violet-500/30 flex items-center gap-1 active:scale-95 transition">
+            <span>🔔</span>
+            <span>ทวงเงิน</span>
+          </button>
           <button onclick="appState.selectedRecipientId=${p.id};switchTab('transfer');" class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-medium hover:bg-emerald-500/30 flex items-center gap-1">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
             <span>โอนเงินให้</span>
@@ -3099,6 +3996,12 @@ async function refreshGameState(showIndicator = false) {
     }
 
     renderMainAppUI();
+    if (data.pendingPaymentRequests) {
+      handleIncomingPaymentRequests(data.pendingPaymentRequests);
+    }
+    if (data.recentReactions) {
+      handleIncomingReactions(data.recentReactions);
+    }
     if (showIndicator) showToast('ซิงค์ข้อมูลล่าสุดแล้ว', 'info');
   } catch(e) {
     // silent catch
