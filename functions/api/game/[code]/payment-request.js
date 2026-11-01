@@ -52,15 +52,14 @@ export async function onRequestPost({ params, request, env }) {
         VALUES (?, ?, ?, ?, ?, 'pending')
       `).bind(game.id, fromPlayerId, toPlayerId, amount, reason).run();
 
-      // Insert notification in transaction log
+      // Insert notification in transaction log (system notification without amount movement)
       await env.DB.prepare(`
         INSERT INTO transactions (game_id, type, icon, from_label, to_label, amount, reason, round)
-        VALUES (?, 'system', '🔔', ?, ?, ?, ?, ?)
+        VALUES (?, 'system', '🔔', ?, ?, NULL, ?, ?)
       `).bind(
         game.id,
         creditor.name,
         debtor.name,
-        amount,
         `ส่งคำขอเรียกเก็บเงิน ฿${Number(amount).toLocaleString('th-TH')} (เหตุผล: ${reason})`,
         game.round
       ).run();
@@ -108,12 +107,11 @@ export async function onRequestPost({ params, request, env }) {
 
         await env.DB.prepare(`
           INSERT INTO transactions (game_id, type, icon, from_label, to_label, amount, reason, round)
-          VALUES (?, 'system', '❌', ?, ?, ?, ?, ?)
+          VALUES (?, 'system', '❌', ?, ?, NULL, ?, ?)
         `).bind(
           game.id,
           pReq.from_name,
           pReq.to_name,
-          pReq.amount,
           `ปฏิเสธคำขอเรียกเก็บเงิน ฿${Number(pReq.amount).toLocaleString('th-TH')} (เหตุผลเดิม: ${pReq.reason})`,
           game.round
         ).run();

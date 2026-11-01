@@ -575,8 +575,8 @@
       </div>
     </div>
 
-    <!-- Quick Action Grid (Bank App Style: โอนเงิน, เรียกเก็บ, เบิกธนาคาร, จ่ายธนาคาร, คิดเลข) -->
-    <div id="home-quick-actions" class="grid grid-cols-5 gap-1.5">
+    <!-- Quick Action Grid (Bank App Style: โอนเงิน, เบิกธนาคาร, จ่ายธนาคาร, คิดเลข) -->
+    <div id="home-quick-actions" class="grid grid-cols-4 gap-2">
       <!-- 1. โอนเงิน (ซ่อนเมื่อล้มละลาย) -->
       <button id="home-action-transfer" onclick="handleTransferButtonClick()" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 active:scale-95 transition">
         <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shadow-inner">
@@ -585,18 +585,7 @@
         <span class="text-[10px] font-medium text-slate-200">โอนเงิน</span>
       </button>
 
-      <!-- 2. เรียกเก็บ -->
-      <button onclick="openRequestPaymentModal()" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-violet-500/50 active:scale-95 transition">
-        <div class="w-10 h-10 rounded-2xl bg-violet-500/15 text-violet-400 flex items-center justify-center shadow-inner">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-        </div>
-        <span class="text-[10px] font-medium text-slate-200">เรียกเก็บ</span>
-      </button>
-
-      <!-- 3. เบิกธนาคาร -->
+      <!-- 2. เบิกธนาคาร -->
       <button onclick="openBankModalWithTab('receive')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-teal-500/50 active:scale-95 transition">
         <div class="w-10 h-10 rounded-2xl bg-teal-500/15 text-teal-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-receive"/></svg>
@@ -604,7 +593,7 @@
         <span class="text-[10px] font-medium text-slate-200">เบิกธนาคาร</span>
       </button>
 
-      <!-- 4. จ่ายธนาคาร -->
+      <!-- 3. จ่ายธนาคาร -->
       <button onclick="openBankModalWithTab('pay')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 active:scale-95 transition">
         <div class="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
@@ -612,7 +601,7 @@
         <span class="text-[10px] font-medium text-slate-200">จ่ายธนาคาร</span>
       </button>
 
-      <!-- 5. คิดเลข -->
+      <!-- 4. คิดเลข -->
       <button onclick="switchTab('calc')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-blue-500/50 active:scale-95 transition">
         <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-400 flex items-center justify-center shadow-inner">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><use href="#icon-calc"/></svg>
@@ -621,27 +610,10 @@
       </button>
     </div>
 
-    <!-- Central Bank Vault Card -->
-    <div class="bank-central-card rounded-2xl p-4 text-white flex items-center justify-between border border-indigo-400/20">
-      <div>
-        <div class="flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-indigo-300" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
-          <span class="text-xs text-indigo-200 font-medium">คลังเงินธนาคารกลาง (Game Vault)</span>
-        </div>
-        <div class="text-xl font-bold mt-1 text-white flex items-baseline gap-1">
-          <span class="text-sm font-normal text-indigo-300">฿</span>
-          <span id="home-bank-balance">∞ ไม่จำกัด</span>
-        </div>
-      </div>
-      <button onclick="openBankModalWithTab('receive')" class="px-3.5 py-2 rounded-xl bg-indigo-500/30 hover:bg-indigo-500/40 border border-indigo-300/30 text-xs font-semibold text-white transition active:scale-95">
-        ทำรายการ
-      </button>
-    </div>
-
     <!-- Quick Payees Carousel -->
     <div>
       <div class="flex items-center justify-between mb-2">
-        <h4 class="text-xs font-semibold text-slate-300">เพื่อนในห้อง (แตะเพื่อโอนเงิน)</h4>
+        <h4 class="text-xs font-semibold text-slate-300">เพื่อนในห้อง (แตะเพื่อโอนหรือเรียกเก็บเงิน)</h4>
         <span id="privacy-indicator-badge" class="text-[10px] text-slate-400">ซ่อนยอดเงินผู้อื่น</span>
       </div>
       <div id="quick-payees-carousel" class="flex gap-3 overflow-x-auto hide-scrollbar pb-1"></div>
@@ -659,74 +631,88 @@
   </main>
 
   <!-- TAB CONTENT 2: TRANSFER -->
-  <main id="tab-content-transfer" class="hidden p-5 space-y-4 flex-1">
-    <div class="text-center pb-1">
+  <main id="tab-content-transfer" class="hidden p-5 space-y-3.5 flex-1">
+    <div class="text-center pb-0.5">
       <h3 class="text-base font-bold text-white">โอนเงินระหว่างผู้เล่น</h3>
-      <p class="text-xs text-slate-400">เลือกผู้รับ ระบุจำนวนเงิน และยืนยัน</p>
+      <p class="text-[11px] text-slate-400">เลือกผู้รับ ระบุจำนวนเงิน และยืนยัน</p>
     </div>
 
-    <!-- From Card Info -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div id="transfer-from-avatar-box" class="w-10 h-10 rounded-xl bg-slate-800 overflow-hidden flex items-center justify-center text-xl"></div>
-        <div>
-          <p class="text-[10px] text-slate-400">จากบัญชีผู้โอน</p>
-          <p id="transfer-from-name" class="font-bold text-sm text-white">คุณ</p>
+    <!-- Unified Routing Card (ผู้โอน ➔ ผู้รับ) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-inner">
+      <!-- Left: Sender (You) -->
+      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+        <div id="transfer-from-avatar-box" class="w-10 h-10 rounded-xl bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center text-lg font-bold border border-white/10"></div>
+        <div class="min-w-0">
+          <p class="text-[10px] text-slate-400 leading-tight">จากผู้โอน</p>
+          <p id="transfer-from-name" class="font-bold text-xs text-white truncate">คุณ</p>
+          <p id="transfer-from-balance" class="text-[11px] font-mono font-bold text-emerald-400">฿15,000</p>
         </div>
       </div>
-      <div class="text-right">
-        <p class="text-[10px] text-slate-400">คงเหลือ</p>
-        <p id="transfer-from-balance" class="font-bold text-sm text-emerald-400">฿15,000</p>
+
+      <!-- Center: Direction Arrow -->
+      <div class="flex flex-col items-center justify-center px-1 shrink-0">
+        <div class="w-7 h-7 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xs font-bold shadow">
+          ➔
+        </div>
+      </div>
+
+      <!-- Right: Recipient Selector -->
+      <div class="flex items-center gap-2 min-w-0 flex-1 justify-end">
+        <div class="min-w-0 text-right">
+          <label for="transfer-recipient-select" class="text-[10px] text-slate-400 leading-tight block">ไปยังผู้รับ</label>
+          <select id="transfer-recipient-select" onchange="handleRecipientSelectChange(this.value)" class="bg-slate-800 border border-slate-700 text-white font-bold text-xs rounded-xl px-2 py-1.5 focus:border-emerald-500 focus:outline-none max-w-[125px] truncate text-right cursor-pointer">
+          </select>
+          <p id="transfer-to-balance-display" class="text-[10px] text-slate-400 font-mono"></p>
+        </div>
+        <div id="transfer-to-avatar-box" class="w-10 h-10 rounded-xl bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center text-lg font-bold border border-white/10"></div>
       </div>
     </div>
 
-    <!-- Choose Recipient -->
-    <div>
-      <label class="text-xs text-slate-300 font-semibold mb-2 block">เลือกบัญชีผู้รับเงิน</label>
-      <div id="transfer-recipients-grid" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto hide-scrollbar"></div>
-    </div>
-
-    <!-- Amount Input with Quick Pills (+10, etc.) -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+    <!-- Amount Input with Quick Pills (10, 50, 100, 500, 1000, 5000, 10000) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
       <label class="text-xs text-slate-400 block font-medium">ระบุจำนวนเงินที่ต้องการโอน (บาท)</label>
       <div class="relative flex items-center">
         <span class="text-2xl font-bold text-emerald-400 mr-2">฿</span>
-        <input id="input-transfer-amount" type="number" min="1" placeholder="0" class="w-full bg-transparent text-3xl font-bold text-white focus:outline-none placeholder:text-slate-600"/>
-        <button onclick="clearTransferAmount()" class="text-slate-500 hover:text-slate-300 text-sm px-2">✕</button>
+        <input id="input-transfer-amount" type="number" min="1" placeholder="0" class="w-full bg-transparent text-2xl font-bold text-white focus:outline-none placeholder:text-slate-600"/>
+        <button type="button" onclick="clearTransferAmount()" class="text-slate-500 hover:text-slate-300 text-sm px-2">✕</button>
       </div>
 
-      <!-- Quick Amount Buttons -->
+      <!-- Quick Amount Buttons (10, 50, 100, 500, 1000, 5000, 10000, หมดตัว) -->
       <div class="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800/80">
-        <button onclick="addTransferAmount(10)" class="py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition active:scale-95">+10</button>
-        <button onclick="addTransferAmount(100)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+100</button>
-        <button onclick="addTransferAmount(500)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+500</button>
-        <button onclick="addTransferAmount(1000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+1,000</button>
-        <button onclick="addTransferAmount(2000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+2,000</button>
-        <button onclick="addTransferAmount(5000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+5,000</button>
-        <button onclick="addTransferAmount(10000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">+10,000</button>
-        <button onclick="setAllMyBalance()" class="py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition">หมดตัว</button>
+        <button type="button" onclick="addTransferAmount(10)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition active:scale-95">+10</button>
+        <button type="button" onclick="addTransferAmount(50)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition active:scale-95">+50</button>
+        <button type="button" onclick="addTransferAmount(100)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition active:scale-95">+100</button>
+        <button type="button" onclick="addTransferAmount(500)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition active:scale-95">+500</button>
+        <button type="button" onclick="addTransferAmount(1000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition active:scale-95">+1,000</button>
+        <button type="button" onclick="addTransferAmount(5000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition active:scale-95">+5,000</button>
+        <button type="button" onclick="addTransferAmount(10000)" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition active:scale-95">+10,000</button>
+        <button type="button" onclick="setAllMyBalance()" class="py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition active:scale-95">หมดตัว</button>
       </div>
     </div>
 
     <!-- Reason / Memo -->
-    <div class="space-y-2">
+    <div class="space-y-1.5">
       <label class="text-xs text-slate-300 font-medium block">บันทึกช่วยจำ / หมายเหตุ</label>
-      <input id="input-transfer-reason" type="text" placeholder="ระบุเหตุผล เช่น ค่าเช่าที่ดิน" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-emerald-500 focus:outline-none"/>
+      <input id="input-transfer-reason" type="text" placeholder="ระบุเหตุผล เช่น ค่าเช่า" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white placeholder:text-slate-600 focus:border-emerald-500 focus:outline-none"/>
 
-      <div class="flex flex-wrap gap-1.5 pt-1">
-        <button onclick="setQuickReason('🏠 ค่าเช่าที่ดิน')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🏠 ค่าเช่า</button>
-        <button onclick="setQuickReason('🚀 ผ่านจุดเริ่มต้น GO')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🚀 ผ่าน GO</button>
-        <button onclick="setQuickReason('🏘️ ซื้อที่ดินต่อ')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🏘️ ซื้อที่ดินต่อ</button>
-        <button onclick="setQuickReason('🏨 ค้างแรมโรงแรม')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🏨 ค่าโรงแรม</button>
-        <button onclick="setQuickReason('💎 การ์ดสมบัติ')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">💎 การ์ดสมบัติ</button>
-        <button onclick="setQuickReason('🃏 การ์ดโอกาส')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60">🃏 การ์ดโอกาส</button>
+      <div class="flex flex-wrap gap-1.5 pt-0.5">
+        <button type="button" onclick="setQuickReason('🏠 ค่าเช่า')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition active:scale-95">🏠 ค่าเช่า</button>
+        <button type="button" onclick="setQuickReason('🏘️ ซื้อที่ดินต่อ')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition active:scale-95">🏘️ ซื้อที่ดินต่อ</button>
+        <button type="button" onclick="setQuickReason('↩️ โอนผิดโอนคืน')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition active:scale-95">↩️ โอนผิดโอนคืน</button>
+        <button type="button" onclick="setQuickReason('🃏 คำสั่งการ์ดพิเศษ')" class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition active:scale-95">🃏 คำสั่งการ์ดพิเศษ</button>
       </div>
     </div>
 
-    <!-- Proceed Button -->
-    <button onclick="prepareTransferReview()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition mt-2">
-      ตรวจสอบข้อมูลการโอน →
-    </button>
+    <!-- Action Buttons: เรียกเก็บเงิน & ตรวจสอบโอนเงิน -->
+    <div class="grid grid-cols-2 gap-2.5 pt-1">
+      <button type="button" onclick="openRequestPaymentForRecipient()" class="py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-violet-500/40 text-violet-300 font-bold text-sm shadow-md active:scale-[0.98] transition flex items-center justify-center gap-1.5">
+        <svg class="w-4 h-4 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span>เรียกเก็บเงิน</span>
+      </button>
+      <button type="button" onclick="prepareTransferReview()" class="py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition flex items-center justify-center gap-1">
+        <span>ตรวจสอบโอนเงิน →</span>
+      </button>
+    </div>
   </main>
 
   <!-- TAB CONTENT 3: CALCULATOR (เครื่องคิดเลขส่งยอดได้ พอดีกับจอมือถือ) -->
@@ -798,6 +784,23 @@
         <span id="bank-tab-heading">ธุรกรรมธนาคารกลาง</span>
       </h3>
       <p id="bank-tab-subheading" class="text-xs text-slate-400">เบิกเงินรางวัล หรือชำระเงินให้กับธนาคารเกม</p>
+    </div>
+
+    <!-- Central Bank Vault Card -->
+    <div class="bank-central-card rounded-2xl p-4 text-white flex items-center justify-between border border-indigo-400/20 shadow-md">
+      <div>
+        <div class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-indigo-300" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
+          <span class="text-xs text-indigo-200 font-medium">คลังเงินธนาคารกลาง (Game Vault)</span>
+        </div>
+        <div class="text-xl font-bold mt-1 text-white flex items-baseline gap-1">
+          <span class="text-sm font-normal text-indigo-300">฿</span>
+          <span id="home-bank-balance">∞ ไม่จำกัด</span>
+        </div>
+      </div>
+      <div class="px-3 py-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[11px] font-semibold">
+        🏦 คลังกลาง
+      </div>
     </div>
 
     <!-- Direction Tabs -->
@@ -2584,21 +2587,31 @@ function renderTransferTab() {
   const pal = myPlayer ? (PLAYER_PALETTE[myPlayer.color_index] || PLAYER_PALETTE[0]) : { hex: '#64748b' };
 
   const avatarBox = document.getElementById('transfer-from-avatar-box');
-  if (myPlayer?.avatar_url) {
-    avatarBox.innerHTML = `<img src="${myPlayer.avatar_url}" class="w-full h-full object-cover rounded-xl"/>`;
-  } else {
-    avatarBox.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white font-bold text-sm rounded-xl" style="background-color: ${pal.hex};">${escapeHtml((myPlayer?.name || '').slice(0, 1))}</div>`;
+  if (avatarBox) {
+    if (myPlayer?.avatar_url) {
+      avatarBox.innerHTML = `<img src="${myPlayer.avatar_url}" class="w-full h-full object-cover rounded-xl"/>`;
+    } else {
+      avatarBox.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white font-bold text-sm rounded-xl" style="background-color: ${pal.hex};">${escapeHtml((myPlayer?.name || '').slice(0, 1))}</div>`;
+    }
   }
 
-  document.getElementById('transfer-from-name').textContent = myPlayer ? myPlayer.name : 'ไม่ได้เลือกบัญชี';
-  document.getElementById('transfer-from-balance').textContent = myPlayer ? `฿${fmt(myPlayer.balance)}` : '฿0';
+  const fromName = document.getElementById('transfer-from-name');
+  if (fromName) fromName.textContent = myPlayer ? myPlayer.name : 'ไม่ได้เลือกบัญชี';
+  const fromBal = document.getElementById('transfer-from-balance');
+  if (fromBal) fromBal.textContent = myPlayer ? `฿${fmt(myPlayer.balance)}` : '฿0';
 
-  const grid = document.getElementById('transfer-recipients-grid');
-  grid.innerHTML = '';
+  const select = document.getElementById('transfer-recipient-select');
+  if (!select) return;
+  select.innerHTML = '';
 
   const candidates = (appState.gameState?.players || []).filter(p => p.id !== appState.myPlayerId && !p.bankrupt);
   if (candidates.length === 0) {
-    grid.innerHTML = `<div class="col-span-2 p-3 text-xs text-slate-500 text-center">ไม่มีผู้เล่นอื่นที่พร้อมรับเงิน</div>`;
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'ไม่มีผู้เล่นอื่น';
+    select.appendChild(opt);
+    appState.selectedRecipientId = null;
+    updateTransferRecipientUI();
     return;
   }
 
@@ -2606,38 +2619,59 @@ function renderTransferTab() {
     appState.selectedRecipientId = candidates[0].id;
   }
 
+  candidates.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name;
+    if (p.id === appState.selectedRecipientId) opt.selected = true;
+    select.appendChild(opt);
+  });
+
+  updateTransferRecipientUI();
+}
+
+function handleRecipientSelectChange(val) {
+  appState.selectedRecipientId = parseInt(val) || null;
+  updateTransferRecipientUI();
+}
+
+function updateTransferRecipientUI() {
+  const candidates = (appState.gameState?.players || []).filter(p => p.id !== appState.myPlayerId && !p.bankrupt);
+  const selected = candidates.find(c => c.id === appState.selectedRecipientId);
+  const avatarBox = document.getElementById('transfer-to-avatar-box');
+  const balDisplay = document.getElementById('transfer-to-balance-display');
   const hideOthers = appState.gameState?.game?.hideOthersBalance;
 
-  candidates.forEach(p => {
-    const pPal = PLAYER_PALETTE[p.color_index] || PLAYER_PALETTE[0];
-    const isSelected = p.id === appState.selectedRecipientId;
-    const btn = document.createElement('button');
-    btn.className = `p-2.5 rounded-2xl border text-left transition flex items-center gap-2.5 ${
-      isSelected
-        ? 'bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-900/20'
-        : 'bg-slate-900 border-slate-800 hover:border-slate-700'
-    }`;
-    btn.onclick = () => {
-      appState.selectedRecipientId = p.id;
-      renderTransferTab();
-    };
+  if (selected && avatarBox) {
+    const pPal = PLAYER_PALETTE[selected.color_index] || PLAYER_PALETTE[0];
+    if (selected.avatar_url) {
+      avatarBox.innerHTML = `<img src="${selected.avatar_url}" class="w-full h-full object-cover rounded-xl"/>`;
+    } else {
+      avatarBox.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white font-bold text-sm rounded-xl" style="background-color: ${pPal.hex};">${escapeHtml(selected.name.slice(0, 1))}</div>`;
+    }
+    if (balDisplay) {
+      balDisplay.textContent = hideOthers ? '฿••••••' : `฿${fmt(selected.balance)}`;
+    }
+  } else if (avatarBox) {
+    avatarBox.innerHTML = `<div class="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500 text-xs font-bold">?</div>`;
+    if (balDisplay) balDisplay.textContent = '';
+  }
+}
 
-    const avatarHtml = p.avatar_url
-      ? `<img src="${p.avatar_url}" class="w-8 h-8 rounded-lg object-cover shrink-0"/>`
-      : `<div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0" style="background-color: ${pPal.hex};">${escapeHtml(p.name.slice(0, 1))}</div>`;
+function openRequestPaymentForRecipient() {
+  const targetId = appState.selectedRecipientId;
+  openRequestPaymentModal(targetId);
 
-    const displayBal = hideOthers ? '฿••••••' : `฿${fmt(p.balance)}`;
-
-    btn.innerHTML = `
-      ${avatarHtml}
-      <div class="min-w-0">
-        <p class="font-bold text-xs text-white truncate">${escapeHtml(p.name)}</p>
-        <p class="text-[10px] text-emerald-400 font-medium">${displayBal}</p>
-      </div>
-      ${isSelected ? `<span class="ml-auto text-emerald-400 font-bold text-xs pr-1">✓</span>` : ''}
-    `;
-    grid.appendChild(btn);
-  });
+  const transferAmt = document.getElementById('input-transfer-amount')?.value;
+  const transferReason = document.getElementById('input-transfer-reason')?.value;
+  if (transferAmt && parseInt(transferAmt) > 0) {
+    const reqAmtInp = document.getElementById('input-request-amount');
+    if (reqAmtInp) reqAmtInp.value = transferAmt;
+  }
+  if (transferReason && transferReason.trim()) {
+    const reqReasonInp = document.getElementById('input-request-reason');
+    if (reqReasonInp) reqReasonInp.value = transferReason.trim();
+  }
 }
 
 function addTransferAmount(n) {
@@ -3689,10 +3723,10 @@ function handleIncomingMoneyAlerts(recentLog) {
   if (newTxs.length === 0) return;
 
   for (const tx of newTxs) {
-    const isMoneyIn = (tx.to_label === myName && tx.from_label !== myName && tx.amount > 0)
-      || (tx.type === 'bank' && tx.icon === '📥' && tx.to_label === myName && tx.amount > 0);
+    const isTransferIn = (tx.type === 'transfer' && tx.to_label === myName && tx.from_label !== myName && tx.amount > 0);
+    const isBankIn = (tx.type === 'bank' && tx.icon === '📥' && tx.to_label === myName && tx.amount > 0);
 
-    if (isMoneyIn) {
+    if (isTransferIn || isBankIn) {
       showIncomingMoneyAlert(tx);
     }
   }
