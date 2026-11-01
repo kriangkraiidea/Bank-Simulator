@@ -1359,7 +1359,7 @@
 
 <!-- ========================= MODAL: VIRTUAL DICE ROLLER (ลูกเต๋าจำลอง 1-2 ลูก) ========================= -->
 <div id="modal-dice-roller" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl text-white space-y-4">
     <div class="flex items-center justify-between pb-1">
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
@@ -1401,8 +1401,8 @@
     <!-- Broadcast Option -->
     <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs">
       <div>
-        <p class="font-medium text-slate-300">แจ้งผลลงห้องเกม</p>
-        <p class="text-[10px] text-slate-400">บันทึกผลแต้มลง Statement ให้ทุกคนเห็น</p>
+        <p class="font-medium text-slate-300">แชร์ผลแต้มให้เพื่อนในห้อง</p>
+        <p class="text-[10px] text-slate-400">บันทึกลงในประวัติลูกเต๋าของห้อง</p>
       </div>
       <input id="dice-broadcast-checkbox" type="checkbox" checked class="w-4 h-4 accent-amber-500 cursor-pointer"/>
     </div>
@@ -1410,11 +1410,45 @@
     <button onclick="rollVirtualDice()" id="btn-roll-dice" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-base shadow-lg shadow-amber-500/25 transition active:scale-95">
       🎲 กดเพื่อทอยลูกเต๋า
     </button>
+
+    <!-- Dice Roll History in Room -->
+    <div class="pt-3 border-t border-slate-800">
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+        <span class="font-semibold flex items-center gap-1.5">
+          <span>📜</span>
+          <span>ประวัติการทอยในห้อง</span>
+        </span>
+        <span class="text-[10px] text-slate-500">ล่าสุด 20 ครั้ง</span>
+      </div>
+      <div id="dice-roll-history" class="space-y-1.5 max-h-36 overflow-y-auto pr-1 text-xs">
+        <div class="p-3 text-center text-xs text-slate-500">ยังไม่มีประวัติการทอยลูกเต๋าในห้องนี้</div>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Floating Emoji Animation Layer -->
 <div id="emoji-floating-layer" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+
+<!-- ========================= INCOMING MONEY NOTIFICATION BANNER ========================= -->
+<div id="incoming-money-banner" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-[60] w-full max-w-sm px-4 pointer-events-auto transition-all duration-300 transform">
+  <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500 shadow-2xl shadow-emerald-500/40 rounded-3xl p-4 flex items-center justify-between gap-3 text-white">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-2xl shrink-0 animate-bounce">
+        💰
+      </div>
+      <div class="min-w-0">
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs font-black text-emerald-400 uppercase tracking-wider">เงินเข้าบัญชี!</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">สำเร็จ</span>
+        </div>
+        <div id="incoming-money-amount" class="text-xl font-black text-white font-mono leading-tight">+฿0</div>
+        <div id="incoming-money-from" class="text-[11px] text-slate-300 truncate">จาก: ...</div>
+      </div>
+    </div>
+    <button onclick="dismissIncomingMoneyAlert()" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs shrink-0">✕</button>
+  </div>
+</div>
 
 <!-- ========================= TOAST NOTIFICATION ========================= -->
 <div id="toast" class="hidden fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-white text-xs font-semibold shadow-2xl max-w-[90vw] text-center flex items-center gap-2 transition-all"></div>
@@ -1457,6 +1491,7 @@ let appState = {
   calcPrev: '',
   calcOp: null,
   calcNewNumber: true,
+  lastSeenTxId: null,
 };
 
 function getOrCreateSessionId() {
@@ -2135,24 +2170,24 @@ function renderUserSelectionList() {
   const players = appState.gameState?.players || [];
   players.forEach(p => {
     const pal = PLAYER_PALETTE[p.color_index] || PLAYER_PALETTE[0];
-    const isClaimedByMe = (p.claimed_session === appState.sessionId) || (mySavedPlayerId === p.id);
-    const isClaimedByOther = p.is_claimed && !isClaimedByMe;
+    const isClaimedByMe = (p.claimed_session === appState.sessionId) || (mySavedPlayerId === p.id && (!p.is_online || p.claimed_session === appState.sessionId));
+    const isOnlineOther = p.is_online && !isClaimedByMe;
+    const isOfflineClaimed = !p.is_online && p.is_claimed && !isClaimedByMe;
 
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = `w-full p-4 rounded-2xl border text-left transition flex items-center justify-between shadow-md ${
-      isClaimedByMe
-        ? 'bg-emerald-950/40 border-emerald-500 shadow-emerald-900/20 active:scale-[0.98]'
-        : isClaimedByOther
-        ? 'bg-slate-900/80 border-amber-900/40 hover:border-amber-500/60 active:scale-[0.98]'
-        : 'bg-slate-900 border-slate-800 hover:border-emerald-500/60 active:scale-[0.98]'
-    }`;
 
     if (isClaimedByMe) {
+      btn.className = 'w-full p-4 rounded-2xl border text-left transition flex items-center justify-between shadow-md bg-emerald-950/40 border-emerald-500 shadow-emerald-900/20 active:scale-[0.98]';
       btn.onclick = () => handleSelectPlayer(p.id, true);
-    } else if (isClaimedByOther) {
+    } else if (isOnlineOther) {
+      btn.className = 'w-full p-4 rounded-2xl border text-left transition flex items-center justify-between shadow-md opacity-60 bg-slate-900/40 border-slate-800/80 cursor-not-allowed';
+      btn.onclick = () => showToast(`ผู้เล่น "${p.name}" กำลังออนไลน์อยู่ในเกม ไม่สามารถเข้าเล่นแทนได้`, 'warning');
+    } else if (isOfflineClaimed) {
+      btn.className = 'w-full p-4 rounded-2xl border text-left transition flex items-center justify-between shadow-md bg-slate-900/80 border-amber-900/40 hover:border-amber-500/60 active:scale-[0.98]';
       btn.onclick = () => confirmReclaimPlayer(p.id, p.name);
     } else {
+      btn.className = 'w-full p-4 rounded-2xl border text-left transition flex items-center justify-between shadow-md bg-slate-900 border-slate-800 hover:border-emerald-500/60 active:scale-[0.98]';
       btn.onclick = () => handleSelectPlayer(p.id, false);
     }
 
@@ -2163,10 +2198,21 @@ function renderUserSelectionList() {
     let statusHtml = '';
     if (isClaimedByMe) {
       statusHtml = `<span class="px-2.5 py-1 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs shadow-md">เข้าเล่นต่อ →</span>`;
-    } else if (isClaimedByOther) {
+    } else if (isOnlineOther) {
+      statusHtml = `<span class="px-2 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 font-bold text-[11px] flex items-center gap-1">🔒 กำลังเล่น</span>`;
+    } else if (isOfflineClaimed) {
       statusHtml = `<span class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-[11px] hover:bg-amber-500/30">กู้คืนตัวละคร ↻</span>`;
     } else {
       statusHtml = `<span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs">เลือกเล่น →</span>`;
+    }
+
+    let badgeHtml = '';
+    if (isClaimedByMe) {
+      badgeHtml = `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold">★ ตัวละครของคุณ</span>`;
+    } else if (isOnlineOther) {
+      badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-300 font-medium border border-red-500/30">🔴 ออนไลน์อยู่</span>`;
+    } else if (isOfflineClaimed) {
+      badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium border border-slate-700">⚪ ออฟไลน์</span>`;
     }
 
     btn.innerHTML = `
@@ -2175,8 +2221,7 @@ function renderUserSelectionList() {
         <div>
           <div class="flex items-center gap-1.5">
             <p class="font-bold text-base text-white leading-tight">${escapeHtml(p.name)}</p>
-            ${isClaimedByMe ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold">★ ตัวละครของคุณ</span>` : ''}
-            ${!isClaimedByMe && isClaimedByOther ? `<span class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-medium border border-amber-500/30">กำลังเล่น</span>` : ''}
+            ${badgeHtml}
           </div>
           <p class="text-[11px] text-slate-400">บัญชี: 089-${p.id}</p>
         </div>
@@ -2190,7 +2235,7 @@ function renderUserSelectionList() {
 }
 
 function confirmReclaimPlayer(playerId, playerName) {
-  const ok = confirm(`ตัวละคร "${playerName}" มีประวัติผู้เล่นอยู่ในระบบ\n\nหากคุณคือผู้เล่นเดิมที่หลุดออกมา หรือต้องการเข้าเล่นต่อจากเครื่องนี้ ให้กด "ตกลง" เพื่อกู้คืนและเข้าเล่นต่อ`);
+  const ok = confirm(`ตัวละคร "${playerName}" ออฟไลน์อยู่ในขณะนี้\n\nหากคุณคือเจ้าของตัวละครเดิมที่หลุดออกจากเกม หรือต้องการเข้าเล่นต่อ ให้กด "ตกลง" เพื่อกู้คืนตัวละคร`);
   if (ok) {
     handleSelectPlayer(playerId, true);
   }
@@ -2227,10 +2272,12 @@ async function handleSelectPlayer(playerId, force = false) {
       confirmReclaimPlayer(playerId, e.playerName || 'ผู้เล่น');
       return;
     }
-    showToast(e.message || 'ไม่สามารถเลือกผู้เล่นนี้ได้ (อาจมีผู้อื่นเข้าใช้งานแล้ว)', 'error');
-    const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
-    appState.gameState = data;
-    renderUserSelectionList();
+    showToast(e.message || 'ไม่สามารถเลือกผู้เล่นนี้ได้ (อาจมีผู้อื่นเข้าใช้งานอยู่)', 'error');
+    try {
+      const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
+      appState.gameState = data;
+      renderUserSelectionList();
+    } catch (_) {}
   }
 }
 
@@ -2249,6 +2296,9 @@ function openMainApp() {
   navScreen('screen-main-app');
   document.getElementById('app-bar-room-name').textContent = appState.currentRoomName || appState.currentRoomCode;
   switchTab('home');
+  if (appState.gameState?.recentLog) {
+    appState.lastSeenTxId = appState.gameState.recentLog.reduce((max, tx) => Math.max(max, tx.id || 0), 0);
+  }
   renderMainAppUI();
   startPolling();
 }
@@ -3030,7 +3080,7 @@ function renderStatementTab() {
   const myPlayer = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
   const myName = myPlayer?.name;
 
-  let list = appState.gameState?.recentLog || [];
+  let list = (appState.gameState?.recentLog || []).filter(e => e.icon !== '🎲');
 
   if (appState.statementFilter === 'in') {
     list = list.filter(e => e.to_label === myName || (e.type === 'bank' && e.icon === '📥'));
@@ -3051,7 +3101,7 @@ function renderStatementTab() {
 async function handleExportCsvStatement() {
   try {
     const data = await apiRequest(`/api/game/${appState.currentRoomCode}/log?limit=500`);
-    const logs = data.transactions || [];
+    const logs = (data.transactions || []).filter(e => e.icon !== '🎲');
     const rows = ['\uFEFFลำดับ,วันที่เวลา (DD/MM/YYYY HH:MM),ประเภท,จาก,ไปยัง,จำนวนเงิน(บาท),บันทึก'];
     logs.forEach((e, i) => {
       const timeFmt = formatStatementTime(e.created_at);
@@ -3422,6 +3472,8 @@ async function confirmExitGame() {
   }
   stopPolling();
   appState.myPlayerId = null;
+  appState.lastSeenTxId = null;
+  dismissIncomingMoneyAlert();
 
   try {
     const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
@@ -3440,6 +3492,8 @@ function leaveRoomToWelcome() {
   appState.currentRoomName = '';
   appState.myPlayerId = null;
   appState.gameState = null;
+  appState.lastSeenTxId = null;
+  dismissIncomingMoneyAlert();
   navScreen('screen-welcome');
   loadActiveLobbyGames();
 }
@@ -3483,6 +3537,12 @@ async function refreshGameState(showIndicator = false) {
     }
 
     renderMainAppUI();
+    if (data.recentLog) {
+      handleIncomingMoneyAlerts(data.recentLog);
+    }
+    if (data.diceLogs) {
+      renderDiceRollHistory(data.diceLogs);
+    }
     if (data.pendingPaymentRequests) {
       handleIncomingPaymentRequests(data.pendingPaymentRequests);
     }
@@ -3574,6 +3634,71 @@ function showToast(msg, type = 'success') {
   t.classList.remove('hidden');
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.add('hidden'), 2800);
+}
+
+// ==========================================
+// INCOMING MONEY ALERTS (แจ้งเตือนเงินเข้า)
+// ==========================================
+let incomingMoneyTimer = null;
+
+function showIncomingMoneyAlert(tx) {
+  playSfx('cash');
+  const banner = document.getElementById('incoming-money-banner');
+  if (!banner) return;
+
+  const amtEl = document.getElementById('incoming-money-amount');
+  const fromEl = document.getElementById('incoming-money-from');
+  if (amtEl) amtEl.textContent = `+฿${fmt(tx.amount)}`;
+  if (fromEl) {
+    const reasonText = tx.reason ? ` (${escapeHtml(tx.reason)})` : '';
+    fromEl.innerHTML = `จาก: <strong class="text-white">${escapeHtml(tx.from_label)}</strong>${reasonText}`;
+  }
+
+  banner.classList.remove('hidden');
+
+  clearTimeout(incomingMoneyTimer);
+  incomingMoneyTimer = setTimeout(() => {
+    dismissIncomingMoneyAlert();
+  }, 5000);
+}
+
+function dismissIncomingMoneyAlert() {
+  const banner = document.getElementById('incoming-money-banner');
+  if (!banner) return;
+  banner.classList.add('hidden');
+  clearTimeout(incomingMoneyTimer);
+}
+
+function handleIncomingMoneyAlerts(recentLog) {
+  if (!Array.isArray(recentLog) || recentLog.length === 0) return;
+  const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
+  const myName = me?.name;
+  if (!myName) return;
+
+  // On first load after entering room, record the highest ID seen to avoid alerting on history
+  if (appState.lastSeenTxId === null) {
+    appState.lastSeenTxId = recentLog.reduce((max, tx) => Math.max(max, tx.id || 0), 0);
+    return;
+  }
+
+  // Filter for new incoming transactions with id > lastSeenTxId
+  const newTxs = recentLog
+    .filter(tx => tx.id && tx.id > appState.lastSeenTxId)
+    .sort((a, b) => (a.id || 0) - (b.id || 0));
+
+  if (newTxs.length === 0) return;
+
+  for (const tx of newTxs) {
+    const isMoneyIn = (tx.to_label === myName && tx.from_label !== myName && tx.amount > 0)
+      || (tx.type === 'bank' && tx.icon === '📥' && tx.to_label === myName && tx.amount > 0);
+
+    if (isMoneyIn) {
+      showIncomingMoneyAlert(tx);
+    }
+  }
+
+  const maxNewId = newTxs.reduce((max, tx) => Math.max(max, tx.id || 0), appState.lastSeenTxId);
+  appState.lastSeenTxId = maxNewId;
 }
 
 
@@ -3789,10 +3914,50 @@ function openDiceRollerModal() {
   renderDiceDisplay([1, 1]);
   document.getElementById('dice-total-display').textContent = currentDiceCount === 1 ? '1' : '2';
   document.getElementById('dice-double-alert').classList.add('hidden');
+  renderDiceRollHistory();
 }
 
 function closeDiceRollerModal() {
   document.getElementById('modal-dice-roller').classList.add('hidden');
+}
+
+function renderDiceRollHistory(diceLogs = null) {
+  const container = document.getElementById('dice-roll-history');
+  if (!container) return;
+
+  const logs = diceLogs || appState.gameState?.diceLogs || [];
+  if (logs.length === 0) {
+    container.innerHTML = `<div class="p-3 text-center text-xs text-slate-500">ยังไม่มีประวัติการทอยลูกเต๋าในห้องนี้</div>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  logs.forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs';
+    
+    const is2Dice = r.dice2 !== null && r.dice2 !== undefined;
+    const timeStr = formatStatementTime(r.created_at);
+    const doubleBadge = r.is_double ? '<span class="text-amber-400 font-bold ml-1">🎉 เบิ้ล!</span>' : '';
+    const formulaText = is2Dice ? `ทอยได้ ${r.dice1} + ${r.dice2}` : `ทอยได้ ${r.dice1}`;
+
+    item.innerHTML = `
+      <div class="flex items-center gap-2 min-w-0 pr-1">
+        <span class="text-sm shrink-0">${is2Dice ? '🎲🎲' : '🎲'}</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-white truncate max-w-[100px]">${escapeHtml(r.player_name)}</span>
+            <span class="text-[10px] text-slate-400 shrink-0">${formulaText}${doubleBadge}</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-right shrink-0">
+        <div class="text-amber-400 font-black font-mono text-xs">${r.total} แต้ม</div>
+        <div class="text-[9px] text-slate-500 font-mono">${timeStr}</div>
+      </div>
+    `;
+    container.appendChild(item);
+  });
 }
 
 function setDiceCount(count) {
@@ -3905,6 +4070,21 @@ async function rollVirtualDice() {
       if (shouldBroadcast && appState.currentRoomCode) {
         const me = appState.gameState?.players?.find(p => p.id === appState.myPlayerId);
         const myName = me ? me.name : 'ผู้เล่น';
+
+        if (appState.gameState) {
+          if (!appState.gameState.diceLogs) appState.gameState.diceLogs = [];
+          appState.gameState.diceLogs.unshift({
+            id: 'temp_' + Date.now(),
+            player_name: myName,
+            dice1: final1,
+            dice2: currentDiceCount === 2 ? final2 : null,
+            total,
+            is_double: isDouble ? 1 : 0,
+            created_at: new Date().toISOString()
+          });
+          renderDiceRollHistory();
+        }
+
         apiRequest(`/api/game/${appState.currentRoomCode}/dice`, {
           method: 'POST',
           body: JSON.stringify({

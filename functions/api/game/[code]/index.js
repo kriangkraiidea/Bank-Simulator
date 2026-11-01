@@ -61,13 +61,13 @@ export async function onRequestGet({ params, request, env }) {
         claimed_at,
         CASE 
           WHEN claimed_session IS NOT NULL AND claimed_session != '' 
-               AND (claimed_at IS NULL OR claimed_at >= datetime('now', '-75 seconds'))
+               AND (claimed_at IS NULL OR claimed_at >= datetime('now', '-45 seconds'))
           THEN 1 
           ELSE 0 
         END as is_claimed,
         CASE 
           WHEN claimed_session IS NOT NULL AND claimed_session != '' 
-               AND (claimed_at IS NOT NULL AND claimed_at >= datetime('now', '-75 seconds'))
+               AND (claimed_at IS NOT NULL AND claimed_at >= datetime('now', '-45 seconds'))
           THEN 1 
           ELSE 0 
         END as is_online
@@ -82,6 +82,18 @@ export async function onRequestGet({ params, request, env }) {
       ORDER BY id DESC 
       LIMIT 60
     `).bind(game.id).all();
+
+    let diceLogs = [];
+    try {
+      const { results: dLogs } = await env.DB.prepare(`
+        SELECT id, player_name, dice1, dice2, total, is_double, created_at
+        FROM dice_rolls
+        WHERE game_id = ?
+        ORDER BY id DESC
+        LIMIT 20
+      `).bind(game.id).all();
+      diceLogs = dLogs || [];
+    } catch (_) {}
 
     let pendingPaymentRequests = [];
     try {
@@ -135,6 +147,7 @@ export async function onRequestGet({ params, request, env }) {
       },
       players: players || [],
       recentLog: recentLog || [],
+      diceLogs: diceLogs || [],
       scoreboard,
       pendingPaymentRequests,
       recentReactions,
@@ -173,6 +186,11 @@ export async function onRequestDelete({ params, request, env }) {
     }
 
     // Cascade delete
+    try {
+      await env.DB.prepare(`DELETE FROM dice_rolls WHERE game_id = ?`).bind(game.id).run();
+      await env.DB.prepare(`DELETE FROM payment_requests WHERE game_id = ?`).bind(game.id).run();
+      await env.DB.prepare(`DELETE FROM reactions WHERE game_id = ?`).bind(game.id).run();
+    } catch (_) {}
     await env.DB.prepare(`DELETE FROM transactions WHERE game_id = ?`).bind(game.id).run();
     await env.DB.prepare(`DELETE FROM players WHERE game_id = ?`).bind(game.id).run();
     await env.DB.prepare(`DELETE FROM games WHERE id = ?`).bind(game.id).run();

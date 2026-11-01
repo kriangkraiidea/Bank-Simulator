@@ -39,19 +39,31 @@ export async function onRequestPost({ params, request, env }) {
 
     // If claimed by another session
     if (player.claimed_session && player.claimed_session !== sessionId) {
-      let isStale = true;
+      let isOnline = false;
       if (player.claimed_at) {
         // SQLite datetime format: YYYY-MM-DD HH:MM:SS
         const lastClaimed = new Date(player.claimed_at.replace(' ', 'T') + 'Z').getTime();
-        if (!isNaN(lastClaimed) && (Date.now() - lastClaimed) < 60000) {
-          isStale = false;
+        // Active window: within 45 seconds (client heartbeats every 4s)
+        if (!isNaN(lastClaimed) && (Date.now() - lastClaimed) < 45000) {
+          isOnline = true;
         }
       }
 
-      // If not forced and not stale, require confirmation
-      if (!force && !isStale) {
+      // If actively online: STRICTLY REJECT! Nobody can hijack or steal an active character!
+      if (isOnline) {
         return json({
-          error: `บัญชี "${player.name}" มีผู้อื่นเข้าใช้งานอยู่`,
+          error: `ผู้เล่น "${player.name}" กำลังออนไลน์อยู่ในเกม ไม่สามารถเข้าเล่นแทนได้`,
+          isOnline: true,
+          canReclaim: false,
+          playerName: player.name
+        }, 403);
+      }
+
+      // If offline / disconnected (> 45s) and not forced yet, require user confirmation
+      if (!force) {
+        return json({
+          error: `ตัวละคร "${player.name}" มีผู้เล่นเคยใช้งาน (ปัจจุบันออฟไลน์)`,
+          isOnline: false,
           canReclaim: true,
           playerName: player.name
         }, 409);

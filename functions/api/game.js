@@ -222,6 +222,24 @@ async function autoMigrateSchema(db) {
         FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
       )
     `).run();
+
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS dice_rolls (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        game_id TEXT NOT NULL,
+        player_name TEXT NOT NULL,
+        dice1 INTEGER NOT NULL,
+        dice2 INTEGER,
+        total INTEGER NOT NULL,
+        is_double INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+      )
+    `).run();
+
+    try {
+      await db.prepare(`CREATE INDEX IF NOT EXISTS idx_dice_rolls_game ON dice_rolls(game_id, created_at DESC)`).run();
+    } catch (_) {}
   } catch (_) {}
 }
 

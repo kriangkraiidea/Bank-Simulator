@@ -67,9 +67,22 @@ CREATE TABLE IF NOT EXISTS reactions (
   FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS dice_rolls (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  game_id TEXT NOT NULL,
+  player_name TEXT NOT NULL,
+  dice1 INTEGER NOT NULL,
+  dice2 INTEGER,
+  total INTEGER NOT NULL,
+  is_double INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_games_room_code ON games(room_code);
 CREATE INDEX IF NOT EXISTS idx_players_game_id ON players(game_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_game_id ON transactions(game_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_created ON transactions(game_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_payment_requests_game_status ON payment_requests(game_id, status);
 CREATE INDEX IF NOT EXISTS idx_reactions_game ON reactions(game_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dice_rolls_game ON dice_rolls(game_id, created_at DESC);
