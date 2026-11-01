@@ -1,7 +1,10 @@
 // GET /api/game/:code — Get full game state
-export async function onRequestGet({ params, env }) {
+export async function onRequestGet({ params, request, env }) {
   try {
     const code = params.code.toUpperCase();
+    const url = new URL(request.url);
+    const pid = url.searchParams.get('playerId');
+    const sid = url.searchParams.get('sessionId');
 
     const game = await env.DB.prepare(`
       SELECT 
@@ -26,6 +29,16 @@ export async function onRequestGet({ params, env }) {
 
     if (!game) return json({ error: 'ไม่พบห้องเกม หรือห้องถูกปิดแล้ว' }, 404);
 
+    // Heartbeat: If an active player is polling, refresh their claimed_at
+    if (pid && sid) {
+      try {
+        await env.DB.prepare(`
+          UPDATE players SET claimed_at = datetime('now')
+          WHERE id = ? AND game_id = ? AND claimed_session = ?
+        `).bind(parseInt(pid), game.id, sid).run();
+      } catch (_) {}
+    }
+
     let bankPresets = null;
     if (game.bank_presets) {
       try {
@@ -45,7 +58,19 @@ export async function onRequestGet({ params, env }) {
         bankrupt_at,
         avatar_url,
         claimed_session,
-        CASE WHEN claimed_session IS NOT NULL AND claimed_session != '' THEN 1 ELSE 0 END as is_claimed
+        claimed_at,
+        CASE 
+          WHEN claimed_session IS NOT NULL AND claimed_session != '' 
+               AND (claimed_at IS NULL OR claimed_at >= datetime('now', '-75 seconds'))
+          THEN 1 
+          ELSE 0 
+        END as is_claimed,
+        CASE 
+          WHEN claimed_session IS NOT NULL AND claimed_session != '' 
+               AND (claimed_at IS NOT NULL AND claimed_at >= datetime('now', '-75 seconds'))
+          THEN 1 
+          ELSE 0 
+        END as is_online
       FROM players 
       WHERE game_id = ? 
       ORDER BY id ASC

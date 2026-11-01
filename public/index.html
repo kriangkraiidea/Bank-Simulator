@@ -970,8 +970,9 @@
 </div>
 
 <!-- ========================= MODAL: TRANSFER REVIEW ========================= -->
-<div id="modal-transfer-review" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end sm:items-center justify-center p-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+<div id="modal-transfer-review" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end sm:items-center justify-center p-4" onclick="if(event.target === this) closeReviewModal();">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4 relative">
+    <button type="button" onclick="closeReviewModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm absolute top-4 right-4">✕</button>
     <div class="text-center pb-1">
       <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-2">
         <svg class="w-6 h-6" viewBox="0 0 24 24"><use href="#icon-transfer"/></svg>
@@ -1020,8 +1021,9 @@
 </div>
 
 <!-- ========================= MODAL: BANK REVIEW ========================= -->
-<div id="modal-bank-review" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end sm:items-center justify-center p-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4">
+<div id="modal-bank-review" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end sm:items-center justify-center p-4" onclick="if(event.target === this) closeBankReviewModal();">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-white space-y-4 relative">
+    <button type="button" onclick="closeBankReviewModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm absolute top-4 right-4">✕</button>
     <div class="text-center pb-1">
       <div class="w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center mx-auto mb-2">
         <svg class="w-6 h-6" viewBox="0 0 24 24"><use href="#icon-bank"/></svg>
@@ -1517,7 +1519,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function resumeSession() {
   try {
-    const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
+    let query = '';
+    if (appState.myPlayerId && appState.sessionId) {
+      query = `?playerId=${appState.myPlayerId}&sessionId=${encodeURIComponent(appState.sessionId)}`;
+    }
+    const data = await apiRequest(`/api/game/${appState.currentRoomCode}${query}`);
     appState.gameState = data;
     appState.currentRoomName = data.game.roomName || data.game.room_code;
     if (data.game?.isEnded) {
@@ -1530,8 +1536,18 @@ async function resumeSession() {
     }
     openMainApp();
   } catch(e) {
-    localStorage.removeItem('monobank_session');
-    navScreen('screen-welcome');
+    if (e.status === 404) {
+      localStorage.removeItem('monobank_session');
+      navScreen('screen-welcome');
+      showToast('ห้องเกมเดิมถูกปิดหรือลบไปแล้ว', 'warning');
+    } else {
+      showToast('เชื่อมต่อห้องเกมไม่สำเร็จ: ' + (e.message || 'สัญญาณเน็ตขัดข้อง'), 'error');
+      if (appState.currentRoomCode) {
+        showUserSelectionScreen();
+      } else {
+        navScreen('screen-welcome');
+      }
+    }
   }
 }
 
@@ -2114,28 +2130,44 @@ function renderUserSelectionList() {
   const list = document.getElementById('select-user-list');
   list.innerHTML = '';
 
+  const mySavedPlayerId = parseInt(localStorage.getItem(`monobank_room_${appState.currentRoomCode}_player`)) || null;
+
   const players = appState.gameState?.players || [];
   players.forEach(p => {
     const pal = PLAYER_PALETTE[p.color_index] || PLAYER_PALETTE[0];
-    const isClaimedByOther = p.is_claimed && p.claimed_session && p.claimed_session !== appState.sessionId;
-    const isClaimedByMe = p.claimed_session === appState.sessionId;
+    const isClaimedByMe = (p.claimed_session === appState.sessionId) || (mySavedPlayerId === p.id);
+    const isClaimedByOther = p.is_claimed && !isClaimedByMe;
 
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = `w-full p-4 rounded-2xl border text-left transition flex items-center justify-between shadow-md ${
-      isClaimedByOther
-        ? 'bg-slate-900/40 border-slate-800/60 opacity-50 cursor-not-allowed'
-        : isClaimedByMe
+      isClaimedByMe
         ? 'bg-emerald-950/40 border-emerald-500 shadow-emerald-900/20 active:scale-[0.98]'
+        : isClaimedByOther
+        ? 'bg-slate-900/80 border-amber-900/40 hover:border-amber-500/60 active:scale-[0.98]'
         : 'bg-slate-900 border-slate-800 hover:border-emerald-500/60 active:scale-[0.98]'
     }`;
 
-    if (!isClaimedByOther) {
-      btn.onclick = () => handleSelectPlayer(p.id);
+    if (isClaimedByMe) {
+      btn.onclick = () => handleSelectPlayer(p.id, true);
+    } else if (isClaimedByOther) {
+      btn.onclick = () => confirmReclaimPlayer(p.id, p.name);
+    } else {
+      btn.onclick = () => handleSelectPlayer(p.id, false);
     }
 
     const avatarHtml = p.avatar_url
       ? `<img src="${p.avatar_url}" class="w-10 h-10 rounded-xl object-cover border border-white/20"/>`
       : `<div class="w-10 h-10 rounded-xl border border-white/20 flex items-center justify-center text-white font-bold text-sm" style="background-color: ${pal.hex};">${escapeHtml(p.name.slice(0, 1))}</div>`;
+
+    let statusHtml = '';
+    if (isClaimedByMe) {
+      statusHtml = `<span class="px-2.5 py-1 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs shadow-md">เข้าเล่นต่อ →</span>`;
+    } else if (isClaimedByOther) {
+      statusHtml = `<span class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-[11px] hover:bg-amber-500/30">กู้คืนตัวละคร ↻</span>`;
+    } else {
+      statusHtml = `<span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs">เลือกเล่น →</span>`;
+    }
 
     btn.innerHTML = `
       <div class="flex items-center gap-3">
@@ -2143,36 +2175,45 @@ function renderUserSelectionList() {
         <div>
           <div class="flex items-center gap-1.5">
             <p class="font-bold text-base text-white leading-tight">${escapeHtml(p.name)}</p>
-            ${isClaimedByMe ? `<span class="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 font-bold">เครื่องคุณ</span>` : ''}
+            ${isClaimedByMe ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold">★ ตัวละครของคุณ</span>` : ''}
+            ${!isClaimedByMe && isClaimedByOther ? `<span class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-medium border border-amber-500/30">กำลังเล่น</span>` : ''}
           </div>
           <p class="text-[11px] text-slate-400">บัญชี: 089-${p.id}</p>
         </div>
       </div>
       <div class="text-right">
-        ${isClaimedByOther 
-          ? `<span class="px-2 py-1 rounded-lg bg-red-950/60 border border-red-800 text-[10px] text-red-300 font-semibold">มีผู้เล่นใช้งาน</span>`
-          : `<span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs">เลือกเล่น →</span>`
-        }
+        ${statusHtml}
       </div>
     `;
     list.appendChild(btn);
   });
 }
 
-async function handleSelectPlayer(playerId) {
+function confirmReclaimPlayer(playerId, playerName) {
+  const ok = confirm(`ตัวละคร "${playerName}" มีประวัติผู้เล่นอยู่ในระบบ\n\nหากคุณคือผู้เล่นเดิมที่หลุดออกมา หรือต้องการเข้าเล่นต่อจากเครื่องนี้ ให้กด "ตกลง" เพื่อกู้คืนและเข้าเล่นต่อ`);
+  if (ok) {
+    handleSelectPlayer(playerId, true);
+  }
+}
+
+async function handleSelectPlayer(playerId, force = false) {
   try {
+    showToast('กำลังเข้าสู่ตัวละคร...', 'info');
     await apiRequest(`/api/game/${appState.currentRoomCode}/claim`, {
       method: 'POST',
       body: JSON.stringify({
         playerId,
         sessionId: appState.sessionId,
-        action: 'claim'
+        action: 'claim',
+        force: !!force
       })
     });
 
     appState.myPlayerId = playerId;
     appState.isSpectator = false;
 
+    // Remember this device's player ID for this room
+    localStorage.setItem(`monobank_room_${appState.currentRoomCode}_player`, String(playerId));
     localStorage.setItem('monobank_session', JSON.stringify({
       code: appState.currentRoomCode,
       pid: playerId,
@@ -2182,6 +2223,10 @@ async function handleSelectPlayer(playerId) {
     openMainApp();
 
   } catch(e) {
+    if (e.canReclaim) {
+      confirmReclaimPlayer(playerId, e.playerName || 'ผู้เล่น');
+      return;
+    }
     showToast(e.message || 'ไม่สามารถเลือกผู้เล่นนี้ได้ (อาจมีผู้อื่นเข้าใช้งานแล้ว)', 'error');
     const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
     appState.gameState = data;
@@ -2601,6 +2646,12 @@ function prepareTransferReview() {
 
 function closeReviewModal() {
   document.getElementById('modal-transfer-review').classList.add('hidden');
+  const btn = document.getElementById('btn-review-confirm');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = 'ยืนยันการโอนเงิน';
+  }
+  appState.pendingTransfer = null;
 }
 
 async function confirmAndExecuteTransfer() {
@@ -2908,6 +2959,12 @@ function prepareBankReview() {
 
 function closeBankReviewModal() {
   document.getElementById('modal-bank-review').classList.add('hidden');
+  const btn = document.getElementById('btn-bank-review-confirm');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = 'ยืนยันทำรายการ';
+  }
+  appState.pendingBank = null;
 }
 
 async function confirmAndExecuteBankTransfer() {
@@ -3360,6 +3417,9 @@ async function confirmExitGame() {
   } catch(e) {}
 
   localStorage.removeItem('monobank_session');
+  if (appState.currentRoomCode) {
+    localStorage.removeItem(`monobank_room_${appState.currentRoomCode}_player`);
+  }
   stopPolling();
   appState.myPlayerId = null;
 
@@ -3407,7 +3467,11 @@ async function refreshGameState(showIndicator = false) {
   if (showIndicator && syncBtn) syncBtn.classList.add('animate-spin');
 
   try {
-    const data = await apiRequest(`/api/game/${appState.currentRoomCode}`);
+    let query = '';
+    if (appState.myPlayerId && appState.sessionId) {
+      query = `?playerId=${appState.myPlayerId}&sessionId=${encodeURIComponent(appState.sessionId)}`;
+    }
+    const data = await apiRequest(`/api/game/${appState.currentRoomCode}${query}`, { timeout: 6000 });
     appState.gameState = data;
     appState.currentRoomName = data.game.roomName || data.game.room_code;
 
@@ -3434,13 +3498,40 @@ async function refreshGameState(showIndicator = false) {
 }
 
 async function apiRequest(url, opts = {}) {
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
-    ...opts
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-  return data;
+  const timeoutMs = opts.timeout || 9000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      ...opts
+    });
+    clearTimeout(timeoutId);
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (_) {
+      throw new Error(`การตอบกลับจากเซิร์ฟเวอร์ขัดข้อง (HTTP ${res.status})`);
+    }
+
+    if (!res.ok) {
+      const err = new Error(data.error || `HTTP ${res.status}`);
+      err.status = res.status;
+      err.canReclaim = data.canReclaim;
+      err.playerName = data.playerName;
+      throw err;
+    }
+    return data;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error('การเชื่อมต่อเครือข่ายล่าช้า กรุณาลองใหม่อีกครั้ง (Network Timeout)');
+    }
+    throw err;
+  }
 }
 
 // ==========================================
